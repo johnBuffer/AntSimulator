@@ -1,4 +1,8 @@
 #include <SFML/Graphics.hpp>
+#include <vector>
+
+
+constexpr float PI = 3.14159265f;
 
 
 float getRandRange(float width)
@@ -24,8 +28,19 @@ struct Ant
 	void update(const float dt)
 	{
 		const float speed = 50.0f;
-		last_direction_update += dt;
 		position += (dt * speed) * sf::Vector2f(cos(direction), sin(direction));
+
+		last_direction_update += dt;
+		if (last_direction_update >= direction_update_period) {
+			findNewDirection();
+		}
+	}
+
+	void findNewDirection()
+	{
+		const float range = PI * 0.5f;
+		direction += getRandRange(range);
+		last_direction_update = 0.0f;
 	}
 
 	void render(sf::RenderTarget& target) const
@@ -49,12 +64,39 @@ struct Ant
 };
 
 
+struct Colony
+{
+	Colony(float x, float y, uint32_t n)
+	{
+		for (uint32_t i(n); i--;) {
+			ants.emplace_back(x, y, getRandRange(2.0f * PI));
+		}
+	}
+
+	void update(const float dt)
+	{
+		for (Ant& a : ants) {
+			a.update(dt);
+		}
+	}
+
+	void render(sf::RenderTarget& target) const
+	{
+		for (const Ant& a : ants) {
+			a.render(target);
+		}
+	}
+
+	std::vector<Ant> ants;
+};
+
+
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(1600, 900), "AntSim");
 	window.setFramerateLimit(60);
 
-	Ant ant(800, 450, 0.0f);
+	Colony colony(800, 450, 100);
 
 	while (window.isOpen())
 	{
@@ -65,11 +107,11 @@ int main()
 				window.close();
 		}
 
-		ant.update(0.016f);
+		colony.update(0.016f);
 
 		window.clear();
 		
-		ant.render(window);
+		colony.render(window);
 
 		window.display();
 	}
