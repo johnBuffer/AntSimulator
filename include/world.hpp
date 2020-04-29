@@ -17,12 +17,12 @@ struct Grid
 		cells.resize(width * height);
 	}
 
-	void addMarker(const sf::Vector2f& position, const Marker& marker)
+	void addMarker(const Marker& marker)
 	{
-		addMarker(getCellCoords(position), marker);
+		addMarker(getCellCoords(marker.position), marker);
 	}
 
-	const std::list<Marker>* getMarkersAt(const sf::Vector2f& position)
+	std::list<Marker>* getMarkersAt(const sf::Vector2f& position)
 	{
 		const sf::Vector2i cell_coords = getCellCoords(position);
 
@@ -67,7 +67,7 @@ struct Grid
 struct World
 {
 	World(uint32_t width, uint32_t height)
-		: grid(width, height, 20)
+		: grid(width, height, 150)
 	{}
 
 	void removeExpiredMarkers()
@@ -79,22 +79,21 @@ struct World
 
 	void update(const float dt)
 	{
+		removeExpiredMarkers();
 		for (std::list<Marker>& l : grid.cells) {
 			for (Marker& m : l) {
 				m.update(dt);
 			}
 		}
-
-		removeExpiredMarkers();
 	}
 
 	void render(sf::RenderTarget& target) const
 	{
-		/*for (const std::list<Marker>& l : grid.cells) {
+		for (const std::list<Marker>& l : grid.cells) {
 			for (const Marker& m : l) {
 				m.render(target);
 			}
-		}*/
+		}
 
 		food.render(target);
 	}

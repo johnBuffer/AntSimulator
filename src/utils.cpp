@@ -5,7 +5,7 @@ float getRandRange(float width)
 {
 	constexpr int32_t max_value = 10000;
 	constexpr int32_t half = max_value / 2;
-	constexpr float div = 1.0f / float(max_value);
+	constexpr float div = 1.0f / float(max_value-1);
 	const float val = (rand() % max_value - half) * div * width;
 	return val;
 }

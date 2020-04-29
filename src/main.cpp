@@ -6,17 +6,20 @@
 
 int main()
 {
-	const uint32_t win_width(1600);
-	const uint32_t win_height(900);
+	const uint32_t win_width(1000);
+	const uint32_t win_height(1000);
 	sf::RenderWindow window(sf::VideoMode(win_width, win_height), "AntSim");
-	//window.setFramerateLimit(144);
+	window.setFramerateLimit(500);
 
-	srand(10);
+	srand(144);
 
 	World world(win_width, win_height);
-	world.food = Food(200, 200, 100);
+	//world.grid.addMarker(Marker(sf::Vector2f(500.0f, 500.0f), Marker::ToFood, 0.0f, 100.0f));
+	world.food = Food(400, 400, 48);
+	world.grid.addMarker(Marker(world.food.position, Marker::ToFood, 0.0f, 200.0f, true));
 
-	Colony colony(1200, 750, 500);
+	Colony colony(500, 650, 100);
+	world.grid.addMarker(Marker(colony.position, Marker::ToHome, 0.0f, 200.0f, true));
 
 	while (window.isOpen())
 	{
@@ -28,13 +31,14 @@ int main()
 		}
 
 		const float dt = 0.016f;
-		world.update(dt);
+
 		colony.update(dt, world);
+		world.update(dt);
 
 		window.clear();
 		
-		colony.render(window);
 		world.render(window);
+		colony.render(window);
 
 		window.display();
 	}
