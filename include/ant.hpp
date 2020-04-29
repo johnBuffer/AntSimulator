@@ -94,7 +94,7 @@ struct Ant
 			return;
 		}
 
-		const float max_dist = 50.0f;
+		const float max_dist = 100.0f;
 
 		float total_intensity = 0.0f;
 		sf::Vector2f point(0.0f, 0.0f);
@@ -106,8 +106,8 @@ struct Ant
 				if (length < max_dist) {
 					if (dot(to_marker, sf::Vector2f(cos(direction), sin(direction))) > 0.0f) {
 						if (m.intensity > total_intensity) {
-							total_intensity = m.intensity;
-							point = m.position;
+							total_intensity += m.intensity;
+							point += m.intensity * m.position;
 						}
 					}
 				}
@@ -115,7 +115,7 @@ struct Ant
 		}
 
 		if (total_intensity) {
-			direction = getAngle(point - position);
+			direction = getAngle(point / total_intensity - position);
 		}
 	}
 

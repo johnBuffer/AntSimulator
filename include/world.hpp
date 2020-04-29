@@ -67,7 +67,7 @@ struct Grid
 struct World
 {
 	World(uint32_t width, uint32_t height)
-		: grid(width, height, 150)
+		: grid(width, height, 1000)
 	{}
 
 	void removeExpiredMarkers()

@@ -15,10 +15,10 @@ int main()
 
 	World world(win_width, win_height);
 	//world.grid.addMarker(Marker(sf::Vector2f(500.0f, 500.0f), Marker::ToFood, 0.0f, 100.0f));
-	world.food = Food(400, 400, 48);
+	world.food = Food(300, 300, 48);
 	world.grid.addMarker(Marker(world.food.position, Marker::ToFood, 0.0f, 200.0f, true));
 
-	Colony colony(500, 650, 100);
+	Colony colony(600, 650, 100);
 	world.grid.addMarker(Marker(colony.position, Marker::ToHome, 0.0f, 200.0f, true));
 
 	while (window.isOpen())

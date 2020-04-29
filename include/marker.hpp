@@ -30,7 +30,7 @@ struct Marker
 
 	void render(sf::RenderTarget& target) const
 	{
-		if (intensity > 0.0f) {
+		if (intensity < 0.0f) {
 			const float radius = intensity / 10.0f;
 			sf::CircleShape circle(radius);
 			circle.setOrigin(radius, radius);
