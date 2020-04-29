@@ -6,13 +6,17 @@
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(1600, 900), "AntSim");
+	const uint32_t win_width(1600);
+	const uint32_t win_height(900);
+	sf::RenderWindow window(sf::VideoMode(win_width, win_height), "AntSim");
 	//window.setFramerateLimit(144);
 
 	srand(10);
 
-	Colony colony(1200, 750, 100);
-	Food food(200, 200, 100);
+	World world(win_width, win_height);
+	world.food = Food(200, 200, 100);
+
+	Colony colony(1200, 750, 500);
 
 	while (window.isOpen())
 	{
@@ -23,12 +27,14 @@ int main()
 				window.close();
 		}
 
-		colony.update(0.016f, food);
+		const float dt = 0.016f;
+		world.update(dt);
+		colony.update(dt, world);
 
 		window.clear();
 		
 		colony.render(window);
-		food.render(window);
+		world.render(window);
 
 		window.display();
 	}

@@ -51,5 +51,5 @@ struct Marker
 	float angle;
 	Type type;
 	float time;
-	const float max_time = 40.0f;
+	const float max_time = 20.0f;
 };

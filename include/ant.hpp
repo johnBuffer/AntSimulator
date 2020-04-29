@@ -4,6 +4,7 @@
 #include "marker.hpp"
 #include "food.hpp"
 #include "utils.hpp"
+#include "world.hpp"
 
 
 struct Ant
@@ -19,12 +20,12 @@ struct Ant
 		, colony(x, y)
 	{}
 
-	void update(const float dt, std::list<Marker>& markers, const Food& food)
+	void update(const float dt, World& world)
 	{
 		updatePosition(dt);
 
 		if (phase == Marker::ToFood) {
-			checkFood(food);
+			checkFood(world.food);
 		}
 		else {
 			checkColony();
@@ -32,12 +33,12 @@ struct Ant
 
 		last_direction_update += dt;
 		if (last_direction_update >= direction_update_period) {
-			findNewDirection(markers);
+			findNewDirection(world.grid.getMarkersAt(position));
 		}
 
 		last_marker += dt;
 		if (last_marker >= marker_period) {
-			addMarker(markers);
+			addMarker(world);
 		}
 	}
 
@@ -70,13 +71,9 @@ struct Ant
 		}
 	}
 
-	void findNewDirection(const std::list<Marker>& markers)
+	void findNewDirection(const std::list<Marker>* markers)
 	{
 		float new_angle = 0.0f;
-
-		if (phase == Marker::ToHome) {
-			float b = 0.0f;
-		}
 
 		if (findMarker(markers, &new_angle)) {
 			direction = new_angle;
@@ -84,36 +81,41 @@ struct Ant
 		else {
 			const float range = PI * 0.05f;
 			direction += getRandRange(range);
-			if (direction < 0.0f) direction += 2.0f * PI;
-			if (direction > 2.0f * PI) direction -= 2.0f * PI;
 		}
 
 		last_direction_update = 0.0f;
 	}
 
-	bool findMarker(const std::list<Marker>& markers, float* new_angle)
+	bool findMarker(const std::list<Marker>* markers, float* new_angle)
 	{
-		const float max_dist = 20.0f;
+		if (!markers) {
+			return false;
+		}
+
+		const float max_dist = 10.0f;
 		const float max_angle = 0.25f * PI;
 
-		for (const Marker& m : markers) {
+		float markers_count = 0.0f;
+		float markers_sum = 0.0f;
+
+		for (const Marker& m : *markers) {
 			const sf::Vector2f to_marker = m.position - position;
 			if (m.type == phase) {
 				if (getLength(to_marker) < max_dist) {
 					if (dot(to_marker, sf::Vector2f(cos(direction), sin(direction))) > 0.0f) {
-						*new_angle = m.angle + getRandRange(0.025f * PI);
+						*new_angle = m.angle;
 						return true;
 					}
 				}
 			}
 		}
 
-		return false;
+		return markers_count;
 	}
 
-	void addMarker(std::list<Marker>& markers)
+	void addMarker(World& world)
 	{
-		markers.emplace_back(position, phase == Marker::ToFood ? Marker::ToHome : Marker::ToFood, direction + PI);
+		world.grid.addMarker(position, Marker(position, phase == Marker::ToFood ? Marker::ToHome : Marker::ToFood, direction + PI));
 		last_marker = 0.0f;
 	}
 

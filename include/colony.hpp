@@ -4,6 +4,7 @@
 #include <list>
 #include "ant.hpp"
 #include "utils.hpp"
+#include "world.hpp"
 
 
 struct Colony
@@ -16,27 +17,17 @@ struct Colony
 		}
 	}
 
-	void update(const float dt, const Food& food)
+	void update(const float dt, World& world)
 	{
 		for (Ant& a : ants) {
-			a.update(dt, markers, food);
+			a.update(dt, world);
 		}
-
-		for (Marker& m : markers) {
-			m.update(dt);
-		}
-
-		removeExpiredMarkers();
 	}
 
 	void render(sf::RenderTarget& target) const
 	{
 		for (const Ant& a : ants) {
 			a.render(target);
-		}
-
-		for (const Marker& m : markers) {
-			m.render(target);
 		}
 
 		sf::CircleShape circle(size);
@@ -46,13 +37,7 @@ struct Colony
 		target.draw(circle);
 	}
 
-	void removeExpiredMarkers()
-	{
-		markers.remove_if([&](const Marker& m) {return m.isDone(); });
-	}
-
 	const sf::Vector2f position;
 	std::vector<Ant> ants;
-	std::list<Marker> markers;
 	const float size = 50.0f;
 };

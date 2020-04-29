@@ -4,6 +4,8 @@
 
 struct Food
 {
+	Food() = default;
+
 	Food(float x, float y, float r)
 		: position(x, y)
 		, radius(r)
@@ -19,6 +21,6 @@ struct Food
 		target.draw(circle);
 	}
 
-	const sf::Vector2f position;
-	const float radius;
+	sf::Vector2f position;
+	float radius;
 };
