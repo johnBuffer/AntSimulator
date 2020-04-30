@@ -1,13 +1,13 @@
 #include "utils.hpp"
+#include <random>
 
+std::random_device rd();
+std::mt19937 gen(0);
 
 float getRandRange(float width)
 {
-	constexpr int32_t max_value = 10000;
-	constexpr int32_t half = max_value / 2;
-	constexpr float div = 1.0f / float(max_value-1);
-	const float val = (rand() % max_value - half) * div * width;
-	return val;
+	std::uniform_real_distribution<float> distr(-width, width);
+	return distr(gen);
 }
 
 

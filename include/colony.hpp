@@ -13,7 +13,7 @@ struct Colony
 		: position(x, y)
 	{
 		for (uint32_t i(n); i--;) {
-			ants.emplace_back(x, y, getRandRange(2.0f * PI));
+			ants.emplace_back(x, y, getRandRange(2.0f * PI), n - i - 1);
 		}
 	}
 
@@ -39,5 +39,5 @@ struct Colony
 
 	const sf::Vector2f position;
 	std::vector<Ant> ants;
-	const float size = 50.0f;
+	const float size = 20.0f;
 };

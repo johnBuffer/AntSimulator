@@ -15,7 +15,7 @@ struct Ant
 {
 	Ant() = default;
 
-	Ant(float x, float y, float angle)
+	Ant(float x, float y, float angle, uint32_t id_)
 		: position(x, y)
 		, direction(angle)
 		, last_direction_update(0.0f)
@@ -24,6 +24,7 @@ struct Ant
 		, colony(x, y)
 		, target_marker(nullptr)
 		, reserve(max_reserve)
+		, id(id_)
 	{}
 
 	void update(const float dt, World& world)
@@ -40,8 +41,8 @@ struct Ant
 
 		last_direction_update += dt;
 		if (last_direction_update > direction_update_period) {
-			findNewDirection(world.grid.getMarkersAt(position));
-			float range = PI * 0.025f;
+			findNewDirection(world);
+			float range = PI * 0.15f;
 			direction += getRandRange(range);
 			last_direction_update = 0.0f;
 		}
@@ -57,11 +58,11 @@ struct Ant
 		const float speed = 50.0f;
 		position += (dt * speed) * sf::Vector2f(cos(direction), sin(direction));
 
-		position.x = position.x < 0.0f ? 1000.0f : position.x;
-		position.y = position.y < 0.0f ? 1000.0f : position.y;
+		position.x = position.x < 0.0f ? 1920.0f : position.x;
+		position.y = position.y < 0.0f ? 1080.0f : position.y;
 
-		position.x = position.x > 1000.0f ? 0.0f : position.x;
-		position.y = position.y > 1000.0f ? 0.0f : position.y;
+		position.x = position.x > 1920.0f ? 0.0f : position.x;
+		position.y = position.y > 1080.0f ? 0.0f : position.y;
 	}
 
 	void checkFood(const Food& food)
@@ -75,7 +76,7 @@ struct Ant
 
 	void checkColony()
 	{
-		const float colony_size = 40.0f;
+		const float colony_size = 20.0f;
 		if (getLength(position - colony) < colony_size) {
 			phase = Marker::ToFood;
 			direction += PI;
@@ -83,32 +84,29 @@ struct Ant
 		}
 	}
 
-	void findNewDirection(std::list<Marker>* markers)
+	void findNewDirection(World& world)
 	{
-		findMarker(markers);
+		findMarker(world);
 	}
 
-	void findMarker(std::list<Marker>* markers)
+	void findMarker(World& world)
 	{
-		if (!markers) {
-			return;
-		}
-
-		const float max_dist = 100.0f;
+		const std::list<Marker*> markers = world.grid.getAllMarkersAt(position);
+		const float max_dist = 40.0f;
 
 		float total_intensity = 0.0f;
 		sf::Vector2f point(0.0f, 0.0f);
 
-		for (Marker& m : *markers) {
-			if (m.type == phase) {
-				const sf::Vector2f to_marker = m.position - position;
-				const float length = getLength(to_marker);
-				if (length < max_dist) {
+		for (Marker* mp : markers) {
+			Marker& m = *mp;
+			const sf::Vector2f to_marker = m.position - position;
+			const float length = getLength(to_marker);
+
+			if (length < max_dist) {
+				if (m.type == phase) {
 					if (dot(to_marker, sf::Vector2f(cos(direction), sin(direction))) > 0.0f) {
-						if (m.intensity > total_intensity) {
-							total_intensity += m.intensity;
-							point += m.intensity * m.position;
-						}
+						total_intensity += m.intensity;
+						point += m.intensity * m.position;
 					}
 				}
 			}
@@ -166,7 +164,8 @@ struct Ant
 	Marker::Type phase;
 	Marker* target_marker;
 	float reserve = 500.0f;
+	const uint32_t id;
 
 	const float direction_update_period = 0.25f;
-	const float marker_period = 0.5f;
+	const float marker_period = 0.25f;
 };
