@@ -1,33 +1,33 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-
-
-const sf::Color FOOD_COLOR(255, 205, 31);
+#include "config.hpp"
 
 
 struct Food
 {
 	Food() = default;
 
-	Food(float x, float y, float r, Marker* maker_ptr = nullptr)
+	Food(float x, float y, float r, float quantity_, Marker* maker_ptr = nullptr)
 		: position(x, y)
 		, radius(r)
-		, done(false)
+		, quantity(quantity_)
 		, marker(maker_ptr)
 	{}
 
-	void destroy()
+	void pick()
 	{
-		done = true;
-		if (marker) {
-			marker->intensity = 50.0f;
-			marker->permanent = false;
+		quantity -= 1.0f;
+		if (isDone()) {
+			if (marker) {
+				marker->intensity = 50.0f;
+				marker->permanent = false;
+			}
 		}
 	}
 
 	bool isDone() const
 	{
-		return done;
+		return quantity <= 0.0f;
 	}
 
 	void render(sf::RenderTarget& target) const
@@ -35,13 +35,13 @@ struct Food
 		sf::CircleShape circle(radius);
 		circle.setOrigin(radius, radius);
 		circle.setPosition(position);
-		circle.setFillColor(FOOD_COLOR);
+		circle.setFillColor(Conf<>::FOOD_COLOR);
 
 		target.draw(circle);
 	}
 
 	sf::Vector2f position;
 	float radius;
-	bool done;
+	float quantity;
 	Marker* marker;
 };

@@ -1,8 +1,5 @@
 #pragma once
-
-
-const sf::Color TO_HOME_COLOR(122, 105, 199);
-const sf::Color TO_FOOD_COLOR(255, 228, 117);
+#include "config.hpp"
 
 
 struct Marker
@@ -23,7 +20,7 @@ struct Marker
 	void update(const float dt)
 	{
 		if (!permanent) {
-			intensity -= 0.5f * dt;
+			intensity -= 1.0f * dt;
 		}
 	}
 
@@ -46,13 +43,32 @@ struct Marker
 			circle.setPosition(position);
 
 			if (type == ToHome) {
-				circle.setFillColor(TO_HOME_COLOR);
+				circle.setFillColor(Conf<>::TO_HOME_COLOR);
 			}
 			else {
-				circle.setFillColor(TO_FOOD_COLOR);
+				circle.setFillColor(Conf<>::TO_FOOD_COLOR);
 			}
 
 			target.draw(circle);
+		}
+	}
+
+	void render_in(sf::VertexArray& va, const uint32_t index) const
+	{
+		if (!permanent) {
+			const float radius = intensity / 10.0f;
+			
+			sf::Color color = (type == ToHome) ? Conf<>::TO_HOME_COLOR : Conf<>::TO_FOOD_COLOR;
+
+			va[index + 0].position = position + sf::Vector2f(radius, 0.0f);
+			va[index + 1].position = position + sf::Vector2f(0.0f, radius);
+			va[index + 2].position = position + sf::Vector2f(-radius, 0.0f);
+			va[index + 3].position = position + sf::Vector2f(0.0f, -radius);
+
+			va[index + 0].color = color;
+			va[index + 1].color = color;
+			va[index + 2].color = color;
+			va[index + 3].color = color;
 		}
 	}
 

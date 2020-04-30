@@ -16,11 +16,9 @@ int main()
 	srand(11);
 
 	World world(win_width, win_height);
-	//world.grid.addMarker(Marker(sf::Vector2f(500.0f, 500.0f), Marker::ToFood, 0.0f, 100.0f));
-	world.addFoodAt(300, 300);
 
-	Colony colony(600, 650, 1000);
-	world.grid_markers.add(Marker(colony.position, Marker::ToHome, 1000.0f, true));
+	Colony colony(600, 650, 500);
+	world.grid_markers_home.add(Marker(colony.position, Marker::ToHome, 100000.0f, true));
 
 	bool clicking = false;
 	sf::Vector2i last_clic;
@@ -46,7 +44,7 @@ int main()
 			const sf::Vector2i mouse_position = sf::Mouse::getPosition(window);
 			const float clic_min_dist = 2.0f;
 			if (getLength(mouse_position - last_clic) > clic_min_dist) {
-				world.addFoodAt(mouse_position.x, mouse_position.y);
+				world.addFoodAt(mouse_position.x, mouse_position.y, 10.0f);
 				last_clic = mouse_position;
 			}
 		}
