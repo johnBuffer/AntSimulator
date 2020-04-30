@@ -1,6 +1,10 @@
 #pragma once
 
 
+const sf::Color TO_HOME_COLOR(122, 105, 199);
+const sf::Color TO_FOOD_COLOR(255, 228, 117);
+
+
 struct Marker
 {
 	enum Type {
@@ -9,7 +13,7 @@ struct Marker
 	};
 
 	Marker() = default;
-	Marker(const sf::Vector2f& pos, Type type_, float angle_, float intensity_, bool permanent_ = false)
+	Marker(const sf::Vector2f& pos, Type type_, float intensity_, bool permanent_ = false)
 		: position(pos)
 		, intensity(intensity_)
 		, type(type_)
@@ -21,6 +25,11 @@ struct Marker
 		if (!permanent) {
 			intensity -= 0.5f * dt;
 		}
+	}
+
+	void destroy()
+	{
+		intensity = -1.0f;
 	}
 
 	bool isDone() const
@@ -37,10 +46,10 @@ struct Marker
 			circle.setPosition(position);
 
 			if (type == ToHome) {
-				circle.setFillColor(sf::Color::Red);
+				circle.setFillColor(TO_HOME_COLOR);
 			}
 			else {
-				circle.setFillColor(sf::Color::Yellow);
+				circle.setFillColor(TO_FOOD_COLOR);
 			}
 
 			target.draw(circle);

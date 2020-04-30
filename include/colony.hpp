@@ -7,6 +7,9 @@
 #include "world.hpp"
 
 
+const sf::Color COLONY_COLOR(67, 46, 163);
+
+
 struct Colony
 {
 	Colony(float x, float y, uint32_t n)
@@ -33,7 +36,7 @@ struct Colony
 		sf::CircleShape circle(size);
 		circle.setOrigin(size, size);
 		circle.setPosition(position);
-		circle.setFillColor(sf::Color::Blue);
+		circle.setFillColor(COLONY_COLOR);
 		target.draw(circle);
 	}
 

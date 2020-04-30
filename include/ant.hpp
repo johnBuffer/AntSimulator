@@ -11,6 +11,9 @@
 constexpr float max_reserve = 2000.0f;
 
 
+const sf::Color ANT_COLOR(255, 73, 68);
+
+
 struct Ant
 {
 	Ant() = default;
@@ -18,7 +21,7 @@ struct Ant
 	Ant(float x, float y, float angle, uint32_t id_)
 		: position(x, y)
 		, direction(angle)
-		, last_direction_update(0.0f)
+		, last_direction_update(getRandUnder(direction_update_period))
 		, last_marker(0.0f)
 		, phase(Marker::Type::ToFood)
 		, colony(x, y)
@@ -32,7 +35,7 @@ struct Ant
 		updatePosition(dt);
 
 		if (phase == Marker::ToFood) {
-			checkFood(world.food);
+			checkFood(world);
 		}
 		else {
 			checkColony();
@@ -65,12 +68,16 @@ struct Ant
 		position.y = position.y > 1080.0f ? 0.0f : position.y;
 	}
 
-	void checkFood(const Food& food)
+	void checkFood(World& world)
 	{
-		if (getLength(position - food.position) < food.radius) {
-			phase = Marker::ToHome;
-			direction += PI;
-			reserve = max_reserve;
+		const std::list<Food*> food_spots = world.grid_food.getAllAt(position);
+		for (Food* fp : food_spots) {
+			if (getLength(position - fp->position) < fp->radius) {
+				phase = Marker::ToHome;
+				direction += PI;
+				reserve = max_reserve;
+				fp->destroy();
+			}
 		}
 	}
 
@@ -91,7 +98,7 @@ struct Ant
 
 	void findMarker(World& world)
 	{
-		const std::list<Marker*> markers = world.grid.getAllMarkersAt(position);
+		const std::list<Marker*> markers = world.grid_markers.getAllAt(position);
 		const float max_dist = 40.0f;
 
 		float total_intensity = 0.0f;
@@ -119,7 +126,7 @@ struct Ant
 
 	void addMarker(World& world)
 	{
-		world.grid.addMarker(Marker(position, phase == Marker::ToFood ? Marker::ToHome : Marker::ToFood, direction + PI, reserve * 0.02f));
+		world.grid_markers.add(Marker(position, phase == Marker::ToFood ? Marker::ToHome : Marker::ToFood, reserve * 0.02f));
 		reserve *= 0.98f;
 
 		last_marker = 0.0f;
@@ -142,7 +149,7 @@ struct Ant
 		body.setOrigin(width * 0.5f, length * 0.5f);
 		body.setPosition(position);
 		body.setRotation(direction * 57.2958f + 90.0f);
-		body.setFillColor(sf::Color::Green);
+		body.setFillColor(ANT_COLOR);
 
 		if (phase == Marker::ToHome) {
 			const float radius = 2.0f;
@@ -155,6 +162,7 @@ struct Ant
 
 		target.draw(body);
 	}
+
 
 	const sf::Vector2f colony;
 	sf::Vector2f position;

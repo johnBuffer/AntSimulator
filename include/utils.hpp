@@ -8,7 +8,14 @@ constexpr float PI = 3.14159265f;
 float getRandRange(float width);
 
 
-float getLength(const sf::Vector2f& v);
+float getRandUnder(float width);
+
+
+template<typename T>
+float getLength(const sf::Vector2<T>& v)
+{
+	return sqrt(v.x * v.x + v.y * v.y);
+}
 
 
 float getAngle(const sf::Vector2f& v);

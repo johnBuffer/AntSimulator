@@ -10,10 +10,10 @@ float getRandRange(float width)
 	return distr(gen);
 }
 
-
-float getLength(const sf::Vector2f& v)
+float getRandUnder(float width)
 {
-	return sqrt(v.x * v.x + v.y * v.y);
+	std::uniform_real_distribution<float> distr(0.0f, width);
+	return distr(gen);
 }
 
 

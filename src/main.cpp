@@ -17,19 +17,38 @@ int main()
 
 	World world(win_width, win_height);
 	//world.grid.addMarker(Marker(sf::Vector2f(500.0f, 500.0f), Marker::ToFood, 0.0f, 100.0f));
-	world.food = Food(300, 300, 10);
-	world.grid.addMarker(Marker(world.food.position, Marker::ToFood, 0.0f, 1000.0f, true));
+	world.addFoodAt(300, 300);
 
-	Colony colony(600, 650, 40);
-	world.grid.addMarker(Marker(colony.position, Marker::ToHome, 0.0f, 1000.0f, true));
+	Colony colony(600, 650, 1000);
+	world.grid_markers.add(Marker(colony.position, Marker::ToHome, 1000.0f, true));
+
+	bool clicking = false;
+	sf::Vector2i last_clic;
 
 	while (window.isOpen())
 	{
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
-			if (event.type == sf::Event::Closed)
+			if (event.type == sf::Event::Closed) {
 				window.close();
+			}
+			else if (event.type == sf::Event::MouseButtonPressed) {
+				clicking = true;
+				last_clic = sf::Mouse::getPosition(window);
+			}
+			else if (event.type == sf::Event::MouseButtonReleased) {
+				clicking = false;
+			}
+		}
+
+		if (clicking) {
+			const sf::Vector2i mouse_position = sf::Mouse::getPosition(window);
+			const float clic_min_dist = 2.0f;
+			if (getLength(mouse_position - last_clic) > clic_min_dist) {
+				world.addFoodAt(mouse_position.x, mouse_position.y);
+				last_clic = mouse_position;
+			}
 		}
 
 		const float dt = 0.016f;
