@@ -2,22 +2,21 @@
 #include <vector>
 #include <list>
 #include "colony.hpp"
+#include "config.hpp"
 
 
 int main()
 {
-	const uint32_t win_width(1920);
-	const uint32_t win_height(1080);
 	sf::ContextSettings settings;
-	settings.antialiasingLevel = 4;
-	sf::RenderWindow window(sf::VideoMode(win_width, win_height), "AntSim", sf::Style::Fullscreen, settings);
+	settings.antialiasingLevel = 8;
+	sf::RenderWindow window(sf::VideoMode(Conf<>::WIN_WIDTH, Conf<>::WIN_HEIGHT), "AntSim", sf::Style::Fullscreen, settings);
 	window.setFramerateLimit(144);
 
 	srand(11);
 
-	World world(win_width, win_height);
+	World world(Conf<>::WIN_WIDTH, Conf<>::WIN_HEIGHT);
 
-	Colony colony(600, 650, 500);
+	Colony colony(800, 800, 512);
 	world.grid_markers_home.add(Marker(colony.position, Marker::ToHome, 100000.0f, true));
 
 	bool clicking = false;
@@ -44,7 +43,7 @@ int main()
 			const sf::Vector2i mouse_position = sf::Mouse::getPosition(window);
 			const float clic_min_dist = 2.0f;
 			if (getLength(mouse_position - last_clic) > clic_min_dist) {
-				world.addFoodAt(mouse_position.x, mouse_position.y, 10.0f);
+				world.addFoodAt(mouse_position.x, mouse_position.y, 5.0f);
 				last_clic = mouse_position;
 			}
 		}

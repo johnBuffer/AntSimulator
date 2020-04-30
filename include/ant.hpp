@@ -38,8 +38,7 @@ struct Ant
 
 		last_direction_update += dt;
 		if (last_direction_update > direction_update_period) {
-			findNewDirection(world);
-			float range = PI * 0.15f;
+			float range = PI * 0.08f;
 			direction += getRandRange(range);
 			last_direction_update = 0.0f;
 		}
@@ -55,11 +54,11 @@ struct Ant
 		const float speed = 50.0f;
 		position += (dt * speed) * sf::Vector2f(cos(direction), sin(direction));
 
-		position.x = position.x < 0.0f ? 1920.0f : position.x;
-		position.y = position.y < 0.0f ? 1080.0f : position.y;
+		position.x = position.x < 0.0f ? Conf<>::WIN_WIDTH : position.x;
+		position.y = position.y < 0.0f ? Conf<>::WIN_HEIGHT : position.y;
 
-		position.x = position.x > 1920.0f ? 0.0f : position.x;
-		position.y = position.y > 1080.0f ? 0.0f : position.y;
+		position.x = position.x > Conf<>::WIN_WIDTH ? 0.0f : position.x;
+		position.y = position.y > Conf<>::WIN_HEIGHT ? 0.0f : position.y;
 	}
 
 	void checkFood(World& world)
@@ -129,8 +128,10 @@ struct Ant
 
 	void addMarker(World& world)
 	{
-		world.addMarker(Marker(position, phase == Marker::ToFood ? Marker::ToHome : Marker::ToFood, reserve * 0.02f));
-		reserve *= 0.98f;
+		if (reserve > 1.0f) {
+			world.addMarker(Marker(position, phase == Marker::ToFood ? Marker::ToHome : Marker::ToFood, reserve * 0.02f));
+			reserve *= 0.98f;
+		}
 
 		last_marker = 0.0f;
 	}
@@ -166,6 +167,6 @@ struct Ant
 	float reserve = 500.0f;
 	const uint32_t id;
 
-	const float direction_update_period = 0.25f;
+	const float direction_update_period = 0.125f;
 	const float marker_period = 0.25f;
 };

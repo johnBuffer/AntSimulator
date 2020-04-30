@@ -2,6 +2,7 @@
 #include <list>
 #include <vector>
 #include <SFML/System.hpp>
+#include <swarm.hpp>
 
 #include "marker.hpp"
 #include "food.hpp"
@@ -94,6 +95,8 @@ struct World
 		: grid_markers_home(width, height, 45)
 		, grid_markers_food(width, height, 45)
 		, grid_food(width, height, 5)
+		, va(sf::Quads)
+		, swarm(Conf<>::THREAD_COUNT)
 	{}
 
 	void removeExpiredMarkers()
@@ -146,7 +149,7 @@ struct World
 
 	void render(sf::RenderTarget& target) const
 	{
-		sf::VertexArray va(sf::Quads, 4 * markers_count);
+		va.resize(4 * markers_count);
 		generateMarkersVertexArray(va);
 		target.draw(va);
 
@@ -183,9 +186,11 @@ struct World
 		}
 	}
 
+	mutable sf::VertexArray va;
 	Grid<Marker> grid_markers_home;
 	Grid<Marker> grid_markers_food;
 	Grid<Food> grid_food;
+	swrm::Swarm swarm;
 
 	uint64_t markers_count;
 };
