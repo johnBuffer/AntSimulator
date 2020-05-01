@@ -21,7 +21,7 @@ struct Ant
 		, position(x, y)
 		, direction(angle)
 		, last_direction_update(getRandUnder(direction_update_period))
-		, last_marker(0.0f)
+		, last_marker(getRandUnder(marker_period))
 		, phase(Marker::Type::ToFood)
 		, reserve(max_reserve)
 		, id(id_)

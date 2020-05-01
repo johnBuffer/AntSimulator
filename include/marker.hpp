@@ -56,7 +56,7 @@ struct Marker
 	void render_in(sf::VertexArray& va, const uint32_t index) const
 	{
 		if (!permanent) {
-			const float radius = intensity / 10.0f;
+			const float radius = intensity / 20.0f;
 			
 			sf::Color color = (type == ToHome) ? Conf<>::TO_HOME_COLOR : Conf<>::TO_FOOD_COLOR;
 
