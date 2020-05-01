@@ -95,6 +95,7 @@ struct World
 		: grid_markers_home(width, height, 45)
 		, grid_markers_food(width, height, 45)
 		, grid_food(width, height, 5)
+		, size(width, height)
 		, va(sf::Quads)
 		, swarm(Conf<>::THREAD_COUNT)
 	{}
@@ -147,15 +148,15 @@ struct World
 		return grid_markers_home.add(marker);
 	}
 
-	void render(sf::RenderTarget& target) const
+	void render(sf::RenderTarget& target, const sf::RenderStates& states) const
 	{
 		va.resize(4 * markers_count);
 		generateMarkersVertexArray(va);
-		target.draw(va);
+		target.draw(va, states);
 
 		for (const std::list<Food>& l : grid_food.cells) {
 			for (const Food& f : l) {
-				f.render(target);
+				f.render(target, states);
 			}
 		}
 	}
@@ -186,6 +187,7 @@ struct World
 		}
 	}
 
+	sf::Vector2f size;
 	mutable sf::VertexArray va;
 	Grid<Marker> grid_markers_home;
 	Grid<Marker> grid_markers_food;

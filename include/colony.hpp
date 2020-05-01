@@ -40,17 +40,17 @@ struct Colony
 		}
 	}
 
-	void render(sf::RenderTarget& target) const
+	void render(sf::RenderTarget& target, const sf::RenderStates& states) const
 	{
 		for (const Ant& a : ants) {
-			a.render(target);
+			a.render(target, states);
 		}
 
 		sf::CircleShape circle(size);
 		circle.setOrigin(size, size);
 		circle.setPosition(position);
 		circle.setFillColor(Conf<>::COLONY_COLOR);
-		target.draw(circle);
+		target.draw(circle, states);
 	}
 
 	const sf::Vector2f position;

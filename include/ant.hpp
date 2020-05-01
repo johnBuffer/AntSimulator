@@ -70,6 +70,7 @@ struct Ant
 				direction += PI;
 				reserve = max_reserve;
 				fp->pick();
+				return;
 			}
 		}
 	}
@@ -136,7 +137,7 @@ struct Ant
 		last_marker = 0.0f;
 	}
 
-	void render(sf::RenderTarget& target) const
+	void render(sf::RenderTarget& target, const sf::RenderStates& states) const
 	{
 		const float width = 2.0f;
 		const float length = 7.0f;
@@ -152,10 +153,10 @@ struct Ant
 			circle.setOrigin(radius, radius);
 			circle.setPosition(position + length * 0.5f * sf::Vector2f(cos(direction), sin(direction)));
 			circle.setFillColor(Conf<>::FOOD_COLOR);
-			target.draw(circle);
+			target.draw(circle, states);
 		}
 
-		target.draw(body);
+		target.draw(body, states);
 	}
 
 	sf::Vector2f colony;

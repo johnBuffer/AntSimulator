@@ -30,14 +30,14 @@ struct Food
 		return quantity <= 0.0f;
 	}
 
-	void render(sf::RenderTarget& target) const
+	void render(sf::RenderTarget& target, const sf::RenderStates& states) const
 	{
 		sf::CircleShape circle(radius);
 		circle.setOrigin(radius, radius);
 		circle.setPosition(position);
 		circle.setFillColor(Conf<>::FOOD_COLOR);
 
-		target.draw(circle);
+		target.draw(circle, states);
 	}
 
 	sf::Vector2f position;
