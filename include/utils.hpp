@@ -22,3 +22,6 @@ float getAngle(const sf::Vector2f& v);
 
 
 float dot(const sf::Vector2f& v1, const sf::Vector2f& v2);
+
+
+float sign(const float f);

@@ -7,6 +7,7 @@
 #include "world.hpp"
 #include "config.hpp"
 #include <iostream>
+#include "sound_player.hpp"
 
 
 constexpr float max_reserve = 2000.0f;
@@ -20,12 +21,14 @@ struct Ant
 		: colony(x, y)
 		, position(x, y)
 		, direction(angle)
-		, last_direction_update(getRandUnder(direction_update_period))
-		, last_marker(getRandUnder(marker_period))
+		, target_direction(angle)
+		, last_direction_update(getRandUnder(100.0f) * 0.01f * direction_update_period)
+		, last_marker(getRandUnder(100.0f) * 0.01f * marker_period)
 		, phase(Marker::Type::ToFood)
 		, reserve(max_reserve)
 		, id(id_)
-	{}
+	{
+	}
 
 	void update(const float dt, World& world)
 	{
@@ -38,8 +41,9 @@ struct Ant
 
 		last_direction_update += dt;
 		if (last_direction_update > direction_update_period) {
-			float range = PI * 0.08f;
-			direction += getRandRange(range);
+			findMarker(world);
+			float range = PI * 0.2f;
+			target_direction += getRandRange(range);
 			last_direction_update = 0.0f;
 		}
 
@@ -47,6 +51,19 @@ struct Ant
 		if (last_marker >= marker_period) {
 			addMarker(world);
 		}
+
+		updateDirection(dt);
+	}
+
+	void updateDirection(const float dt)
+	{
+		const sf::Vector2f dir_vec(cos(direction), sin(direction));
+		const sf::Vector2f dir_nrm(-dir_vec.y, dir_vec.x);
+		const sf::Vector2f target_dir_vec(cos(target_direction), sin(target_direction));
+
+		const float dir_delta = dot(target_dir_vec, dir_nrm);
+		const float rotation_speed = 10.0f;
+		direction += rotation_speed * dir_delta * dt;
 	}
 
 	void updatePosition(const float dt)
@@ -67,6 +84,7 @@ struct Ant
 		for (Food* fp : food_spots) {
 			if (getLength(position - fp->position) < fp->radius) {
 				phase = Marker::ToHome;
+				target_direction += PI;
 				direction += PI;
 				reserve = max_reserve;
 				fp->pick();
@@ -81,6 +99,7 @@ struct Ant
 		if (getLength(position - colony) < colony_size) {
 			if (phase == Marker::ToHome) {
 				phase = Marker::ToFood;
+				target_direction += PI;
 				direction += PI;
 			}
 			reserve = max_reserve;
@@ -123,7 +142,7 @@ struct Ant
 		}
 
 		if (total_intensity) {
-			direction = getAngle(point / total_intensity - position);
+			target_direction = getAngle(point / total_intensity - position);
 		}
 	}
 
@@ -139,13 +158,14 @@ struct Ant
 
 	void render(sf::RenderTarget& target, const sf::RenderStates& states) const
 	{
-		const float width = 2.0f;
+		const float width = 4.0f;
 		const float length = 7.0f;
 		sf::RectangleShape body(sf::Vector2f(width, length));
 		body.setOrigin(width * 0.5f, length * 0.5f);
 		body.setPosition(position);
 		body.setRotation(direction * 57.2958f + 90.0f);
 		body.setFillColor(Conf<>::ANT_COLOR);
+		body.setTexture(Conf<>::ANT_TEXTURE);
 
 		if (phase == Marker::ToHome) {
 			const float radius = 2.0f;
@@ -161,13 +181,16 @@ struct Ant
 
 	sf::Vector2f colony;
 	sf::Vector2f position;
+	
 	float direction;
+	float target_direction;
+
 	float last_direction_update;
 	float last_marker;
 	Marker::Type phase;
 	float reserve = 500.0f;
 	const uint32_t id;
 
-	const float direction_update_period = 0.125f;
+	const float direction_update_period = 0.25f;
 	const float marker_period = 0.25f;
 };

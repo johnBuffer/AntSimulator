@@ -16,9 +16,13 @@ DisplayManager::DisplayManager(sf::RenderTarget& target, sf::RenderWindow& windo
 	, m_colony(colony)
 	, clic(false)
 	, m_mouse_button_pressed(false)
+	, emit(true)
 {
 	m_windowOffsetX = m_window.getSize().x * 0.5f;
     m_windowOffsetY = m_window.getSize().y * 0.5f;
+
+	m_offsetX = m_windowOffsetX;
+	m_offsetY = m_windowOffsetY;
 
     m_texture.loadFromFile("res/circle.png");
 }

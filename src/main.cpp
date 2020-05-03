@@ -10,13 +10,17 @@ int main()
 {
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 8;
-	sf::RenderWindow window(sf::VideoMode(Conf<>::WIN_WIDTH, Conf<>::WIN_HEIGHT), "AntSim", sf::Style::Fullscreen, settings);
-	window.setFramerateLimit(60);
+	sf::RenderWindow window(sf::VideoMode(Conf<>::WIN_WIDTH, Conf<>::WIN_HEIGHT), "AntSim", sf::Style::Default, settings);
+	window.setFramerateLimit(144);
+
+	Conf<>::ANT_TEXTURE = new sf::Texture();
+	Conf<>::ANT_TEXTURE->loadFromFile("res/ant_2.png");
+	Conf<>::ANT_TEXTURE->setSmooth(true);
 
 	srand(11);
 
 	World world(Conf<>::WIN_WIDTH, Conf<>::WIN_HEIGHT);
-	Colony colony(800, 800, 512);
+	Colony colony(800, 450, 512);
 
 	world.grid_markers_home.add(Marker(colony.position, Marker::ToHome, 100000.0f, true));
 	
@@ -40,10 +44,12 @@ int main()
 
 		const float dt = 0.016f;
 
-		colony.update(dt, world);
-		world.update(dt);
+		if (display_manager.emit) {
+			colony.update(dt, world);
+			world.update(dt);
+		}
 
-		window.clear(sf::Color::Black);
+		window.clear(sf::Color(94, 87, 87));
 		
 		display_manager.draw();
 
