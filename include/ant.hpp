@@ -160,12 +160,12 @@ struct Ant
 	{
 		const float width = 4.0f;
 		const float length = 7.0f;
-		sf::RectangleShape body(sf::Vector2f(width, length));
+		/*sf::RectangleShape body(sf::Vector2f(width, length));
 		body.setOrigin(width * 0.5f, length * 0.5f);
 		body.setPosition(position);
 		body.setRotation(direction * 57.2958f + 90.0f);
 		body.setFillColor(Conf<>::ANT_COLOR);
-		body.setTexture(Conf<>::ANT_TEXTURE);
+		body.setTexture(Conf<>::ANT_TEXTURE);*/
 
 		if (phase == Marker::ToHome) {
 			const float radius = 2.0f;
@@ -175,8 +175,20 @@ struct Ant
 			circle.setFillColor(Conf<>::FOOD_COLOR);
 			target.draw(circle, states);
 		}
+	}
 
-		target.draw(body, states);
+	void render_in(sf::VertexArray& va, const uint32_t index) const
+	{
+		const float width = 2.0f;
+		const float length = 3.5f;
+
+		const sf::Vector2f dir_vec(cos(direction), sin(direction));
+		const sf::Vector2f nrm_vec(-dir_vec.y, dir_vec.x);
+
+		va[index + 0].position = position - width * nrm_vec + length * dir_vec;
+		va[index + 1].position = position + width * nrm_vec + length * dir_vec;
+		va[index + 2].position = position + width * nrm_vec - length * dir_vec;
+		va[index + 3].position = position - width * nrm_vec - length * dir_vec;
 	}
 
 	sf::Vector2f colony;
