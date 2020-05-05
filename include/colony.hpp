@@ -37,12 +37,16 @@ struct Colony
 		for (Ant& ant : ants) {
 			ant.update(dt, world);
 		}
+
+		for (Ant& ant : ants) {
+			ant.checkColony(position);
+		}
 	}
 
 	void render(sf::RenderTarget& target, const sf::RenderStates& states) const
 	{
 		for (const Ant& a : ants) {
-			a.render(target, states);
+			a.render_food(target, states);
 		}
 
 		uint64_t index = 0;
@@ -51,7 +55,7 @@ struct Colony
 		}
 
 		sf::RenderStates rs = states;
-		rs.texture = Conf<>::ANT_TEXTURE;
+		rs.texture = &(*Conf<>::ANT_TEXTURE);
 		target.draw(ants_va, rs);
 
 		sf::CircleShape circle(size);

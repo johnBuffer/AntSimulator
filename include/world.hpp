@@ -142,10 +142,7 @@ struct World
 
 	Marker* addMarker(const Marker& marker)
 	{
-		if (marker.type == Marker::ToFood) {
-			return grid_markers_food.add(marker);
-		}
-		return grid_markers_home.add(marker);
+		return getGrid(marker.type).add(marker);
 	}
 
 	void render(sf::RenderTarget& target, const sf::RenderStates& states) const
@@ -153,7 +150,7 @@ struct World
 		va.resize(4 * markers_count);
 		generateMarkersVertexArray(va);
 		sf::RenderStates rs = states;
-		rs.texture = Conf<>::MARKER_TEXTURE;
+		rs.texture = &(*Conf<>::MARKER_TEXTURE);
 		target.draw(va, rs);
 
 		for (const std::list<Food>& l : grid_food.cells) {
@@ -187,6 +184,14 @@ struct World
 		if (marker) {
 			grid_food.add(Food(x, y, 4.0f, quantity, marker));
 		}
+	}
+
+	Grid<Marker>& getGrid(Marker::Type type)
+	{
+		if (type == Marker::ToFood) {
+			return grid_markers_food;
+		}
+		return grid_markers_home;
 	}
 
 	sf::Vector2f size;

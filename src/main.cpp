@@ -13,19 +13,10 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(Conf<>::WIN_WIDTH, Conf<>::WIN_HEIGHT), "AntSim", sf::Style::Fullscreen, settings);
 	window.setFramerateLimit(60);
 
-	Conf<>::ANT_TEXTURE = new sf::Texture();
-	Conf<>::ANT_TEXTURE->loadFromFile("res/ant_2.png");
-	Conf<>::ANT_TEXTURE->setSmooth(true);
-
-	Conf<>::MARKER_TEXTURE = new sf::Texture();
-	Conf<>::MARKER_TEXTURE->loadFromFile("res/circle.png");
-	Conf<>::MARKER_TEXTURE->setSmooth(true);
-
-	srand(11);
+	Conf<>::loadTextures();
 
 	World world(Conf<>::WIN_WIDTH, Conf<>::WIN_HEIGHT);
 	Colony colony(800, 450, 512);
-
 	world.grid_markers_home.add(Marker(colony.position, Marker::ToHome, 100000.0f, true));
 	
 	DisplayManager display_manager(window, window, world, colony);
@@ -36,6 +27,7 @@ int main()
 	{
 		display_manager.processEvents();
 
+		// Add food on clic
 		if (display_manager.clic) {
 			const sf::Vector2i mouse_position = sf::Mouse::getPosition(window);
 			const sf::Vector2f world_position = display_manager.displayCoordToWorldCoord(sf::Vector2f(mouse_position.x, mouse_position.y));
@@ -59,6 +51,9 @@ int main()
 
 		window.display();
 	}
+
+	// Free textures
+	Conf<>::freeTextures();
 
 	return 0;
 }

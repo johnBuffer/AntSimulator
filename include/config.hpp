@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <SFML/Graphics.hpp>
 #include "sound_player.hpp"
 
@@ -17,7 +18,25 @@ struct Conf
 	inline const static uint32_t WIN_WIDTH = 1600;
 	inline const static uint32_t WIN_HEIGHT = 900;
 
-	inline static sf::Texture* ANT_TEXTURE;
-	inline static sf::Texture* MARKER_TEXTURE;
+	inline static std::shared_ptr<sf::Texture> ANT_TEXTURE;
+	inline static std::shared_ptr<sf::Texture> MARKER_TEXTURE;
+
+	static void loadTextures()
+	{
+		Conf<>::ANT_TEXTURE = std::make_shared<sf::Texture>();
+		Conf<>::ANT_TEXTURE->loadFromFile("res/ant_2.png");
+		Conf<>::ANT_TEXTURE->setSmooth(true);
+
+		Conf<>::MARKER_TEXTURE = std::make_shared<sf::Texture>();
+		Conf<>::MARKER_TEXTURE->loadFromFile("res/circle.png");
+		Conf<>::MARKER_TEXTURE->setSmooth(true);
+	}
+
+	static void freeTextures()
+	{
+		Conf<>::ANT_TEXTURE = nullptr;
+		Conf<>::MARKER_TEXTURE = nullptr;
+	}
 };
+
 
