@@ -87,9 +87,10 @@ struct Ant
 		, last_direction_update(getRandUnder(100.0f) * 0.01f * direction_update_period)
 		, last_marker(getRandUnder(100.0f) * 0.01f * marker_period)
 		, phase(Marker::Type::ToFood)
-		, reserve(max_reserve)
+		, reserve(0.0f)
 		, id(id_)
 	{
+		reserve = max_reserve;
 	}
 
 	void update(const float dt, World& world)

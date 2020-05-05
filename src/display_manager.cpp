@@ -1,5 +1,4 @@
 #include "display_manager.hpp"
-#include <iostream>
 
 
 DisplayManager::DisplayManager(sf::RenderTarget& target, sf::RenderWindow& window, World& world, Colony& colony)
@@ -16,7 +15,8 @@ DisplayManager::DisplayManager(sf::RenderTarget& target, sf::RenderWindow& windo
 	, m_colony(colony)
 	, clic(false)
 	, m_mouse_button_pressed(false)
-	, emit(true)
+	, pause(false)
+	, draw_markers(true)
 {
 	m_windowOffsetX = m_window.getSize().x * 0.5f;
     m_windowOffsetY = m_window.getSize().y * 0.5f;
@@ -68,7 +68,7 @@ void DisplayManager::draw()
 	rs.transform.scale(m_zoom, m_zoom);
 	rs.transform.translate(-m_offsetX, -m_offsetY);
 
-	m_world.render(m_target, rs);
+	m_world.render(m_target, rs, draw_markers);
 	m_colony.render(m_target, rs);
 
 	render_time = clock.getElapsedTime().asMicroseconds() * 0.001f;
@@ -89,7 +89,8 @@ void DisplayManager::processEvents()
 			else if ((event.key.code == sf::Keyboard::Subtract)) zoom(0.8f);
 			else if ((event.key.code == sf::Keyboard::Add)) zoom(1.2f);
 			else if ((event.key.code == sf::Keyboard::Space)) update = !update;
-			else if ((event.key.code == sf::Keyboard::E)) emit = !emit;
+			else if ((event.key.code == sf::Keyboard::E)) pause = !pause;
+			else if ((event.key.code == sf::Keyboard::A)) draw_markers = !draw_markers;
 			else if ((event.key.code == sf::Keyboard::D)) debug_mode = !debug_mode;
 			else if ((event.key.code == sf::Keyboard::R))
 			{
@@ -97,10 +98,13 @@ void DisplayManager::processEvents()
 				m_offsetY = 0.0f;
 				m_zoom = 1.0f;
 			}
-			else if ((event.key.code == sf::Keyboard::E))
+			else if ((event.key.code == sf::Keyboard::S))
 			{
 				speed_mode = !speed_mode;
-				m_window.setVerticalSyncEnabled(!speed_mode);
+				if (speed_mode)
+					m_window.setFramerateLimit(0);
+				else
+					m_window.setFramerateLimit(60);
 			}
 			break;
 		case sf::Event::MouseWheelMoved:

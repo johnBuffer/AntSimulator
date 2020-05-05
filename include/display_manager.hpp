@@ -35,7 +35,8 @@ public:
 	sf::Vector2f displayCoordToWorldCoord(const sf::Vector2f&);
 
 	bool clic;
-	bool emit;
+	bool pause;
+	bool draw_markers;
 	bool update;
 	float render_time;
 	bool speed_mode;

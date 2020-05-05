@@ -128,14 +128,14 @@ struct World
 		markers_count = 0u;
 		for (std::list<Marker>& l : grid_markers_home.cells) {
 			for (Marker& m : l) {
-				markers_count += !m.permanent;
+				markers_count += m.permanent ? 0 : 1;
 				m.update(dt);
 			}
 		}
 
 		for (std::list<Marker>& l : grid_markers_food.cells) {
 			for (Marker& m : l) {
-				markers_count += !m.permanent;
+				markers_count += m.permanent ? 0 : 1;
 				m.update(dt);
 			}
 		}
@@ -146,13 +146,15 @@ struct World
 		return getGrid(marker.type).add(marker);
 	}
 
-	void render(sf::RenderTarget& target, const sf::RenderStates& states) const
+	void render(sf::RenderTarget& target, const sf::RenderStates& states, bool draw_markers = true) const
 	{
-		va.resize(4 * markers_count);
-		generateMarkersVertexArray(va);
-		sf::RenderStates rs = states;
-		rs.texture = &(*Conf<>::MARKER_TEXTURE);
-		target.draw(va, rs);
+		if (draw_markers) {
+			va.resize(4 * markers_count);
+			generateMarkersVertexArray(va);
+			sf::RenderStates rs = states;
+			rs.texture = &(*Conf<>::MARKER_TEXTURE);
+			target.draw(va, rs);
+		}
 
 		for (const std::list<Food>& l : grid_food.cells) {
 			for (const Food& f : l) {

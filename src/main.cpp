@@ -17,7 +17,7 @@ int main()
 
 	World world(Conf<>::WIN_WIDTH, Conf<>::WIN_HEIGHT);
 	Colony colony(800, 450, 512);
-	world.addMarker(Marker(colony.position, Marker::ToHome, 100000.0f, true));
+	world.addMarker(Marker(colony.position, Marker::ToHome, 10.0f, true));
 	
 	DisplayManager display_manager(window, window, world, colony);
 
@@ -40,7 +40,7 @@ int main()
 
 		const float dt = 0.016f;
 
-		if (display_manager.emit) {
+		if (!display_manager.pause) {
 			colony.update(dt, world);
 			world.update(dt);
 		}
