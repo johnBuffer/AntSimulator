@@ -5,12 +5,13 @@
 
 #include "marker.hpp"
 #include "food.hpp"
+#include "utils.hpp"
 
 
 template<typename T>
 struct Grid
 {
-	Grid(uint32_t width_, uint32_t height_, uint32_t cell_size_)
+	Grid(int32_t width_, int32_t height_, uint32_t cell_size_)
 		: cell_size(cell_size_)
 		, width(width_ / cell_size_)
 		, height(height_ / cell_size_)
@@ -78,15 +79,15 @@ struct Grid
 
 	sf::Vector2i getCellCoords(const sf::Vector2f& position)
 	{
-		const int32_t x_cell = position.x / cell_size;
-		const int32_t y_cell = position.y / cell_size;
+		const int32_t x_cell = to<int32_t>(position.x / cell_size);
+		const int32_t y_cell = to<int32_t>(position.y / cell_size);
 
 		return sf::Vector2i(x_cell, y_cell);
 	}
 
 	std::vector<std::list<T>> cells;
 
-	const uint32_t width, height, cell_size;
+	const int32_t width, height, cell_size;
 };
 
 
@@ -96,7 +97,7 @@ struct World
 		: grid_markers_home(width, height, 45)
 		, grid_markers_food(width, height, 45)
 		, grid_food(width, height, 5)
-		, size(width, height)
+		, size(to<float>(width), to<float>(height))
 		, va(sf::Quads)
 	{}
 

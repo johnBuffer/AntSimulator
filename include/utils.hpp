@@ -18,6 +18,13 @@ float getLength(const sf::Vector2<T>& v)
 }
 
 
+template<typename T, typename U>
+T to(const U& u)
+{
+	return static_cast<T>(u);
+}
+
+
 float getAngle(const sf::Vector2f& v);
 
 

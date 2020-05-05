@@ -49,7 +49,7 @@ struct Colony
 			a.render_food(target, states);
 		}
 
-		uint64_t index = 0;
+		uint32_t index = 0;
 		for (const Ant& a : ants) {
 			a.render_in(ants_va, 4 * (index++));
 		}

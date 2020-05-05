@@ -20,7 +20,7 @@ public:
     // set the absolute zoom
     void setZoom(float zoom) {m_zoom = zoom;};
 
-    // zoom on the current view (depending on the current zoom)
+    // zoom
     void zoom(float zoomFactor) {m_zoom *= zoomFactor;};
 
     // draw the current world
@@ -41,9 +41,9 @@ public:
 	bool speed_mode;
 	bool debug_mode;
 
-	const sf::Vector2f& getClicPosition() const
+	sf::Vector2f getClicPosition() const
 	{
-		return sf::Vector2f(m_clic_position.x, m_clic_position.y);
+		return sf::Vector2f(to<float>(m_clic_position.x), to<float>(m_clic_position.y));
 	}
 
 private:

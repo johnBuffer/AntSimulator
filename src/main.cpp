@@ -30,7 +30,7 @@ int main()
 		// Add food on clic
 		if (display_manager.clic) {
 			const sf::Vector2i mouse_position = sf::Mouse::getPosition(window);
-			const sf::Vector2f world_position = display_manager.displayCoordToWorldCoord(sf::Vector2f(mouse_position.x, mouse_position.y));
+			const sf::Vector2f world_position = display_manager.displayCoordToWorldCoord(sf::Vector2f(to<float>(mouse_position.x), to<float>(mouse_position.y)));
 			const float clic_min_dist = 2.0f;
 			if (getLength(world_position - last_clic) > clic_min_dist) {
 				world.addFoodAt(world_position.x, world_position.y, 5.0f);
