@@ -17,7 +17,7 @@ int main()
 
 	World world(Conf<>::WIN_WIDTH, Conf<>::WIN_HEIGHT);
 	Colony colony(800, 450, 512);
-	world.grid_markers_home.add(Marker(colony.position, Marker::ToHome, 100000.0f, true));
+	world.addMarker(Marker(colony.position, Marker::ToHome, 100000.0f, true));
 	
 	DisplayManager display_manager(window, window, world, colony);
 

@@ -128,14 +128,14 @@ struct World
 		markers_count = 0u;
 		for (std::list<Marker>& l : grid_markers_home.cells) {
 			for (Marker& m : l) {
-				++markers_count;
+				markers_count += !m.permanent;
 				m.update(dt);
 			}
 		}
 
 		for (std::list<Marker>& l : grid_markers_food.cells) {
 			for (Marker& m : l) {
-				++markers_count;
+				markers_count += !m.permanent;
 				m.update(dt);
 			}
 		}
@@ -166,15 +166,17 @@ struct World
 		uint32_t current_index = 0;
 		for (const std::list<Marker>& l : grid_markers_home.cells) {
 			for (const Marker& m : l) {
-				m.render_in(va, 4 * current_index);
-				++current_index;
+				if (!m.permanent) {
+					m.render_in(va, 4 * (current_index++));
+				}
 			}
 		}
 
 		for (const std::list<Marker>& l : grid_markers_food.cells) {
 			for (const Marker& m : l) {
-				m.render_in(va, 4 * current_index);
-				++current_index;
+				if (!m.permanent) {
+					m.render_in(va, 4 * (current_index++));
+				}
 			}
 		}
 	}

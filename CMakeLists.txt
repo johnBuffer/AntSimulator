@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 
 set(PROJECT_NAME AntSimulator)
 project(${PROJECT_NAME} VERSION 1.0.0 LANGUAGES CXX)
@@ -17,7 +17,11 @@ set(SFML_LIBS "${SFML_LIB_DIR}/sfml-graphics-s.lib"
     "winmm.lib"
 )
 
-set(SOURCES "src/main.cpp")
+file(GLOB source_files
+	"src/*.cpp"
+)
+
+set(SOURCES ${source_files})
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 add_definitions(-DSFML_STATIC)

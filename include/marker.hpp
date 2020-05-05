@@ -1,5 +1,6 @@
 #pragma once
 #include "config.hpp"
+#include <iostream>
 
 
 struct Marker
@@ -37,7 +38,7 @@ struct Marker
 	void render_in(sf::VertexArray& va, const uint32_t index) const
 	{
 		if (!permanent) {
-			const float radius = intensity * 0.03f;
+			const float radius = intensity * 0.15f;
 			
 			sf::Color color = (type == ToHome) ? Conf<>::TO_HOME_COLOR : Conf<>::TO_FOOD_COLOR;
 
@@ -51,7 +52,7 @@ struct Marker
 			va[index + 2].color = color;
 			va[index + 3].color = color;
 
-			constexpr float tex_size = 512.0f;
+			constexpr float tex_size = 100.0f;
 			va[index + 0].texCoords = sf::Vector2f(0.0f, 0.0f);
 			va[index + 1].texCoords = sf::Vector2f(tex_size, 0.0f);
 			va[index + 2].texCoords = sf::Vector2f(tex_size, tex_size);

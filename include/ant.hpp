@@ -7,7 +7,6 @@
 #include "world.hpp"
 #include "config.hpp"
 #include <iostream>
-#include "sound_player.hpp"
 
 
 struct Direction
