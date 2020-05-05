@@ -42,7 +42,7 @@ struct Ant
 		last_direction_update += dt;
 		if (last_direction_update > direction_update_period) {
 			findMarker(world);
-			float range = PI * 0.2f;
+			float range = PI * 0.1f;
 			target_direction += getRandRange(range);
 			last_direction_update = 0.0f;
 		}
@@ -158,14 +158,7 @@ struct Ant
 
 	void render(sf::RenderTarget& target, const sf::RenderStates& states) const
 	{
-		const float width = 4.0f;
 		const float length = 7.0f;
-		/*sf::RectangleShape body(sf::Vector2f(width, length));
-		body.setOrigin(width * 0.5f, length * 0.5f);
-		body.setPosition(position);
-		body.setRotation(direction * 57.2958f + 90.0f);
-		body.setFillColor(Conf<>::ANT_COLOR);
-		body.setTexture(Conf<>::ANT_TEXTURE);*/
 
 		if (phase == Marker::ToHome) {
 			const float radius = 2.0f;
@@ -203,6 +196,6 @@ struct Ant
 	float reserve = 500.0f;
 	const uint32_t id;
 
-	const float direction_update_period = 0.25f;
+	const float direction_update_period = 0.125f;
 	const float marker_period = 0.25f;
 };

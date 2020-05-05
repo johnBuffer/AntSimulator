@@ -19,7 +19,7 @@ struct Food
 		quantity -= 1.0f;
 		if (isDone()) {
 			if (marker) {
-				marker->intensity = 50.0f;
+				marker->intensity = 10.0f;
 				marker->permanent = false;
 			}
 		}

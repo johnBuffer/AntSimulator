@@ -2,7 +2,6 @@
 #include <list>
 #include <vector>
 #include <SFML/System.hpp>
-#include <swarm.hpp>
 
 #include "marker.hpp"
 #include "food.hpp"
@@ -59,8 +58,10 @@ struct Grid
 	{
 		if (checkCell(cell_coords)) {
 			std::list<T>& l = cells[getIndexFromCoords(cell_coords)];
-			l.emplace_back(obj);
-			return &l.back();
+			if (Conf<>::MAX_MARKERS_PER_CELL > l.size()) {
+				l.emplace_back(obj);
+				return &l.back();
+			}
 		}
 		return nullptr;
 	}
@@ -97,7 +98,6 @@ struct World
 		, grid_food(width, height, 5)
 		, size(width, height)
 		, va(sf::Quads)
-		, swarm(Conf<>::THREAD_COUNT)
 	{}
 
 	void removeExpiredMarkers()
@@ -152,7 +152,9 @@ struct World
 	{
 		va.resize(4 * markers_count);
 		generateMarkersVertexArray(va);
-		target.draw(va, states);
+		sf::RenderStates rs = states;
+		rs.texture = Conf<>::MARKER_TEXTURE;
+		target.draw(va, rs);
 
 		for (const std::list<Food>& l : grid_food.cells) {
 			for (const Food& f : l) {
@@ -192,7 +194,6 @@ struct World
 	Grid<Marker> grid_markers_home;
 	Grid<Marker> grid_markers_food;
 	Grid<Food> grid_food;
-	swrm::Swarm swarm;
 
 	uint64_t markers_count;
 };

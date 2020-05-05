@@ -10,12 +10,16 @@ int main()
 {
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 8;
-	sf::RenderWindow window(sf::VideoMode(Conf<>::WIN_WIDTH, Conf<>::WIN_HEIGHT), "AntSim", sf::Style::Default, settings);
-	window.setFramerateLimit(144);
+	sf::RenderWindow window(sf::VideoMode(Conf<>::WIN_WIDTH, Conf<>::WIN_HEIGHT), "AntSim", sf::Style::Fullscreen, settings);
+	window.setFramerateLimit(60);
 
 	Conf<>::ANT_TEXTURE = new sf::Texture();
 	Conf<>::ANT_TEXTURE->loadFromFile("res/ant_2.png");
 	Conf<>::ANT_TEXTURE->setSmooth(true);
+
+	Conf<>::MARKER_TEXTURE = new sf::Texture();
+	Conf<>::MARKER_TEXTURE->loadFromFile("res/circle.png");
+	Conf<>::MARKER_TEXTURE->setSmooth(true);
 
 	srand(11);
 

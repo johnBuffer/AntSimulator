@@ -34,29 +34,10 @@ struct Marker
 		return intensity < 0.0f;
 	}
 
-	void render(sf::RenderTarget& target) const
-	{
-		if (intensity > 0.0f && !permanent) {
-			const float radius = intensity / 10.0f;
-			sf::CircleShape circle(radius);
-			circle.setOrigin(radius, radius);
-			circle.setPosition(position);
-
-			if (type == ToHome) {
-				circle.setFillColor(Conf<>::TO_HOME_COLOR);
-			}
-			else {
-				circle.setFillColor(Conf<>::TO_FOOD_COLOR);
-			}
-
-			target.draw(circle);
-		}
-	}
-
 	void render_in(sf::VertexArray& va, const uint32_t index) const
 	{
 		if (!permanent) {
-			const float radius = intensity / 20.0f;
+			const float radius = intensity * 0.03f;
 			
 			sf::Color color = (type == ToHome) ? Conf<>::TO_HOME_COLOR : Conf<>::TO_FOOD_COLOR;
 
@@ -69,6 +50,12 @@ struct Marker
 			va[index + 1].color = color;
 			va[index + 2].color = color;
 			va[index + 3].color = color;
+
+			constexpr float tex_size = 512.0f;
+			va[index + 0].texCoords = sf::Vector2f(0.0f, 0.0f);
+			va[index + 1].texCoords = sf::Vector2f(tex_size, 0.0f);
+			va[index + 2].texCoords = sf::Vector2f(tex_size, tex_size);
+			va[index + 3].texCoords = sf::Vector2f(0.0f, tex_size);
 		}
 	}
 
