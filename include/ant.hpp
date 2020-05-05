@@ -152,11 +152,6 @@ struct Ant
 		}
 	}
 
-	void findNewDirection(World& world)
-	{
-		findMarker(world);
-	}
-
 	void findMarker(World& world)
 	{
 		std::list<Marker*> markers = world.getGrid(phase).getAllAt(position);
