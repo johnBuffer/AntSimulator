@@ -41,6 +41,7 @@ public:
 	float render_time;
 	bool speed_mode;
 	bool debug_mode;
+	bool wall_mode;
 
 	sf::Vector2f getClicPosition() const
 	{

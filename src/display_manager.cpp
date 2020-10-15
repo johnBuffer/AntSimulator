@@ -17,6 +17,7 @@ DisplayManager::DisplayManager(sf::RenderTarget& target, sf::RenderWindow& windo
 	, m_mouse_button_pressed(false)
 	, pause(false)
 	, draw_markers(true)
+	, wall_mode(false)
 {
 	m_windowOffsetX = m_window.getSize().x * 0.5f;
     m_windowOffsetY = m_window.getSize().y * 0.5f;
@@ -92,6 +93,7 @@ void DisplayManager::processEvents()
 			else if ((event.key.code == sf::Keyboard::E)) pause = !pause;
 			else if ((event.key.code == sf::Keyboard::A)) draw_markers = !draw_markers;
 			else if ((event.key.code == sf::Keyboard::D)) debug_mode = !debug_mode;
+			else if ((event.key.code == sf::Keyboard::W)) wall_mode = !wall_mode;
 			else if ((event.key.code == sf::Keyboard::R))
 			{
 				m_offsetX = 0.0f;

@@ -95,7 +95,7 @@ struct Ant
 
 	void update(const float dt, World& world)
 	{
-		updatePosition(dt);
+		updatePosition(world, dt);
 		if (phase == Marker::ToFood) {
 			checkFood(world);
 		}
@@ -115,9 +115,22 @@ struct Ant
 		direction.update(dt);
 	}
 
-	void updatePosition(const float dt)
+	void updatePosition(World& world, const float dt)
 	{
-		position += (dt * move_speed) * direction.getVec();
+		const sf::Vector2f v = direction.getVec();
+		const sf::Vector2f next_position = position + (dt * move_speed) * direction.getVec();
+		if (!world.grid_walls.isEmpty(next_position)) {
+			const sf::Vector2i cell_position = world.grid_walls.getCellCoords(next_position);
+			const sf::Vector2f center = sf::Vector2f(cell_position.x + 0.5f, cell_position.y + 0.5f) * float(world.grid_walls.cell_size);
+			const sf::Vector2f to_center = center - position;
+			const float length = sqrt(to_center.x * to_center.x + to_center.y * to_center.y);
+			const sf::Vector2f normal = -(to_center / length);
+			const float dot = normal.x * v.x + normal.y * v.y;
+			direction.addNow(PI * dot);
+			return;
+		}
+		
+		position += (dt * move_speed) * v;
 
 		position.x = position.x < 0.0f ? Conf<>::WIN_WIDTH : position.x;
 		position.y = position.y < 0.0f ? Conf<>::WIN_HEIGHT : position.y;
