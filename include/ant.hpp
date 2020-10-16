@@ -32,6 +32,19 @@ public:
 		m_angle += rotation_speed * dir_delta * dt;
 	}
 
+	void setDirection(const sf::Vector2f& d, bool add_pi)
+	{
+		m_target_angle = atan(d.y / d.x) + add_pi * PI;
+		updateTargetVec();
+	}
+
+	void setDirectionNow(const sf::Vector2f& d, bool add_pi)
+	{
+		setDirection(d, add_pi);
+		updateVec();
+		m_angle = m_target_angle;
+	}
+
 	sf::Vector2f getVec() const
 	{
 		return m_vec;
@@ -117,17 +130,13 @@ struct Ant
 
 	void updatePosition(World& world, const float dt)
 	{
-		const sf::Vector2f v = direction.getVec();
+		sf::Vector2f v = direction.getVec();
 		const sf::Vector2f next_position = position + (dt * move_speed) * direction.getVec();
 		if (!world.grid_walls.isEmpty(next_position)) {
-			const sf::Vector2i cell_position = world.grid_walls.getCellCoords(next_position);
-			const sf::Vector2f center = sf::Vector2f(cell_position.x + 0.5f, cell_position.y + 0.5f) * float(world.grid_walls.cell_size);
-			const sf::Vector2f to_center = center - position;
-			const float length = sqrt(to_center.x * to_center.x + to_center.y * to_center.y);
-			const sf::Vector2f normal = -(to_center / length);
+			const sf::Vector2f normal = getWallNormal(world, v);
 			const float dot = normal.x * v.x + normal.y * v.y;
-			direction.addNow(PI * dot);
-			return;
+			v = v - 2 * dot * normal;
+			direction.setDirectionNow(v, normal.x == -1.0f);
 		}
 		
 		position += (dt * move_speed) * v;
@@ -214,6 +223,26 @@ struct Ant
 		}
 	}
 
+	sf::Vector2f getWallNormal(World& world, const sf::Vector2f& v) const
+	{
+		const float cell_size_f = to<float>(world.grid_walls.cell_size);
+		const float inv_direction[]{ 1.0f / v.x, 1.0f / v.y };
+		const float t_d[]{ std::abs(cell_size_f * inv_direction[0]), std::abs(cell_size_f * inv_direction[1]) };
+		const int32_t step[]{v.x >= 0.0f ? 1 : -1, v.y >= 0.0f ? 1 : -1 };
+		const sf::Vector2i cell_coords = world.grid_walls.getCellCoords(position);
+
+		float t_max[]{
+			((cell_coords.x + (step[0] > 0)) * cell_size_f - position.x) * inv_direction[0],
+			((cell_coords.y + (step[1] > 0)) * cell_size_f - position.y) * inv_direction[1]
+		};
+
+		if (t_max[0] < t_max[1]) {
+			return sf::Vector2f(-step[0], 0.0f);
+		}
+
+		return sf::Vector2f(0.0f, -step[1]);
+	}
+
 	void render_in(sf::VertexArray& va, const uint32_t index) const
 	{
 		const sf::Vector2f dir_vec(direction.getVec());
@@ -242,6 +271,6 @@ struct Ant
 	const float marker_detection_max_dist = 40.0f;
 	const float direction_update_period = 0.125f;
 	const float marker_period = 0.25f;
-	const float max_reserve = 2000.0f;
+	const float max_reserve = 6000.0f;
 	const float direction_noise_range = PI * 0.1f;
 };
