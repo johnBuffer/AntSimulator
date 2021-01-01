@@ -84,8 +84,10 @@ void DisplayManager::processEvents()
 	{
 		switch (event.type)
 		{
+		case sf::Event::Closed:
+			m_window.close();
+			break;
 		case sf::Event::KeyPressed:
-			if (event.type == sf::Event::Closed) m_window.close();
 			if (event.key.code == sf::Keyboard::Escape) m_window.close();
 			else if ((event.key.code == sf::Keyboard::Subtract)) zoom(0.8f);
 			else if ((event.key.code == sf::Keyboard::Add)) zoom(1.2f);
