@@ -3,78 +3,10 @@
 #include <list>
 #include "marker.hpp"
 #include "food.hpp"
-#include "utils.hpp"
 #include "world.hpp"
 #include "config.hpp"
 #include <iostream>
-
-
-struct Direction
-{
-public:
-	Direction(float angle, float rotation_speed = 10.0f)
-		: m_angle(angle)
-		, m_target_angle(angle)
-		, m_rotation_speed(rotation_speed)
-	{
-		updateVec();
-		m_target_vec = m_vec;
-	}
-
-	void update(float dt)
-	{
-		updateVec();
-
-		const sf::Vector2f dir_nrm(-m_vec.y, m_vec.x);
-
-		const float dir_delta = dot(m_target_vec, dir_nrm);
-		const float rotation_speed = 10.0f;
-		m_angle += rotation_speed * dir_delta * dt;
-	}
-
-	sf::Vector2f getVec() const
-	{
-		return m_vec;
-	}
-
-	void operator+=(float a)
-	{
-		m_target_angle += a;
-		updateTargetVec();
-	}
-
-	void operator=(float a)
-	{
-		m_target_angle = a;
-		updateTargetVec();
-	}
-
-	void addNow(float a)
-	{
-		this->operator+=(a);
-		m_angle = m_target_angle;
-		updateVec();
-	}
-
-private:
-	sf::Vector2f m_vec;
-	sf::Vector2f m_target_vec;
-	float m_angle;
-	float m_target_angle;
-	float m_rotation_speed;
-
-	void updateVec()
-	{
-		m_vec.x = cos(m_angle);
-		m_vec.y = sin(m_angle);
-	}
-
-	void updateTargetVec()
-	{
-		m_target_vec.x = cos(m_target_angle);
-		m_target_vec.y = sin(m_target_angle);
-	}
-};
+#include "direction.hpp"
 
 
 struct Ant
@@ -142,7 +74,6 @@ struct Ant
 
 	void checkColony(const sf::Vector2f colony_position)
 	{
-		const float colony_size = 20.0f;
 		if (getLength(position - colony_position) < colony_size) {
 			if (phase == Marker::ToHome) {
 				phase = Marker::ToFood;
@@ -182,8 +113,8 @@ struct Ant
 	void addMarker(World& world)
 	{
 		if (reserve > 1.0f) {
-			world.addMarker(Marker(position, phase == Marker::ToFood ? Marker::ToHome : Marker::ToFood, reserve * 0.02f));
-			reserve *= 0.98f;
+			world.addMarker(Marker(position, phase == Marker::ToFood ? Marker::ToHome : Marker::ToFood, reserve * marker_reserve_consumption));
+			reserve *= 1.0f - marker_reserve_consumption;
 		}
 
 		last_marker = 0.0f;
@@ -231,4 +162,6 @@ struct Ant
 	const float marker_period = 0.25f;
 	const float max_reserve = 2000.0f;
 	const float direction_noise_range = PI * 0.1f;
+	const float marker_reserve_consumption = 0.02f;
+	const float colony_size = 20.0f;
 };
