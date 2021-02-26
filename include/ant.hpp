@@ -51,11 +51,11 @@ struct Ant
 	{
 		position += (dt * move_speed) * direction.getVec();
 
-		position.x = position.x < 0.0f ? Conf<>::WIN_WIDTH : position.x;
-		position.y = position.y < 0.0f ? Conf<>::WIN_HEIGHT : position.y;
+		position.x = position.x < 0.0f ? Conf::WIN_WIDTH : position.x;
+		position.y = position.y < 0.0f ? Conf::WIN_HEIGHT : position.y;
 
-		position.x = position.x > Conf<>::WIN_WIDTH ? 0.0f : position.x;
-		position.y = position.y > Conf<>::WIN_HEIGHT ? 0.0f : position.y;
+		position.x = position.x > Conf::WIN_WIDTH ? 0.0f : position.x;
+		position.y = position.y > Conf::WIN_HEIGHT ? 0.0f : position.y;
 	}
 
 	void checkFood(World& world)
@@ -127,7 +127,7 @@ struct Ant
 			sf::CircleShape circle(radius);
 			circle.setOrigin(radius, radius);
 			circle.setPosition(position + length * 0.5f * direction.getVec());
-			circle.setFillColor(Conf<>::FOOD_COLOR);
+			circle.setFillColor(Conf::FOOD_COLOR);
 			target.draw(circle, states);
 		}
 	}

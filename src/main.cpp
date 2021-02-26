@@ -10,13 +10,13 @@ int main()
 {
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 8;
-	sf::RenderWindow window(sf::VideoMode(Conf<>::WIN_WIDTH, Conf<>::WIN_HEIGHT), "AntSim", sf::Style::Default, settings);
+	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", sf::Style::Default, settings);
 	window.setFramerateLimit(60);
 
-	Conf<>::loadTextures();
+	Conf::loadTextures();
 
-	World world(Conf<>::WIN_WIDTH, Conf<>::WIN_HEIGHT);
-	Colony colony(Conf<>::WIN_WIDTH/2, Conf<>::WIN_HEIGHT/2, 512);
+	World world(Conf::WIN_WIDTH, Conf::WIN_HEIGHT);
+	Colony colony(Conf::WIN_WIDTH/2, Conf::WIN_HEIGHT/2, 512);
 	world.addMarker(Marker(colony.position, Marker::ToHome, 10.0f, true));
 	
 	DisplayManager display_manager(window, window, world, colony);
@@ -53,7 +53,7 @@ int main()
 	}
 
 	// Free textures
-	Conf<>::freeTextures();
+	Conf::freeTextures();
 
 	return 0;
 }

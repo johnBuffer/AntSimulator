@@ -59,7 +59,7 @@ struct Grid
 	{
 		if (checkCell(cell_coords)) {
 			std::list<T>& l = cells[getIndexFromCoords(cell_coords)];
-			if (Conf<>::MAX_MARKERS_PER_CELL > l.size()) {
+			if (Conf::MAX_MARKERS_PER_CELL > l.size()) {
 				l.emplace_back(obj);
 				return &l.back();
 			}
@@ -152,7 +152,7 @@ struct World
 			va.resize(4 * markers_count);
 			generateMarkersVertexArray(va);
 			sf::RenderStates rs = states;
-			rs.texture = &(*Conf<>::MARKER_TEXTURE);
+			rs.texture = &(*Conf::MARKER_TEXTURE);
 			target.draw(va, rs);
 		}
 

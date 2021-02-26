@@ -40,7 +40,7 @@ struct Marker
 		if (!permanent) {
 			const float radius = intensity * 0.15f;
 			
-			sf::Color color = (type == ToHome) ? Conf<>::TO_HOME_COLOR : Conf<>::TO_FOOD_COLOR;
+			sf::Color color = (type == ToHome) ? Conf::TO_HOME_COLOR : Conf::TO_FOOD_COLOR;
 
 			va[index + 0].position = position + sf::Vector2f(radius, 0.0f);
 			va[index + 1].position = position + sf::Vector2f(0.0f, radius);

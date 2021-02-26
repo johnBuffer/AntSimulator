@@ -20,10 +20,10 @@ struct Colony
 
 		for (uint64_t i(0); i < n; ++i) {
 			const uint64_t index = 4 * i;
-			ants_va[index + 0].color = Conf<>::ANT_COLOR;
-			ants_va[index + 1].color = Conf<>::ANT_COLOR;
-			ants_va[index + 2].color = Conf<>::ANT_COLOR;
-			ants_va[index + 3].color = Conf<>::ANT_COLOR;
+			ants_va[index + 0].color = Conf::ANT_COLOR;
+			ants_va[index + 1].color = Conf::ANT_COLOR;
+			ants_va[index + 2].color = Conf::ANT_COLOR;
+			ants_va[index + 3].color = Conf::ANT_COLOR;
 
 			ants_va[index + 0].texCoords = sf::Vector2f(0.0f, 0.0f);
 			ants_va[index + 1].texCoords = sf::Vector2f(73.0f, 0.0f);
@@ -55,13 +55,13 @@ struct Colony
 		}
 
 		sf::RenderStates rs = states;
-		rs.texture = &(*Conf<>::ANT_TEXTURE);
+		rs.texture = &(*Conf::ANT_TEXTURE);
 		target.draw(ants_va, rs);
 
 		sf::CircleShape circle(size);
 		circle.setOrigin(size, size);
 		circle.setPosition(position);
-		circle.setFillColor(Conf<>::COLONY_COLOR);
+		circle.setFillColor(Conf::COLONY_COLOR);
 		target.draw(circle, states);
 	}
 

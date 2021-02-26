@@ -35,7 +35,7 @@ struct Food
 		sf::CircleShape circle(radius);
 		circle.setOrigin(radius, radius);
 		circle.setPosition(position);
-		circle.setFillColor(Conf<>::FOOD_COLOR);
+		circle.setFillColor(Conf::FOOD_COLOR);
 
 		target.draw(circle, states);
 	}
