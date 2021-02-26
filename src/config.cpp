@@ -1,5 +1,6 @@
 #include "config.hpp"
 
+
 const sf::Color Conf::ANT_COLOR = sf::Color(255, 73, 68);
 const sf::Color Conf::FOOD_COLOR = sf::Color(29, 129, 18);
 const sf::Color Conf::TO_FOOD_COLOR = sf::Color(119, 211, 109);
