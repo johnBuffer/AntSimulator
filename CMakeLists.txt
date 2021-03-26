@@ -19,3 +19,6 @@ target_link_libraries(${PROJECT_NAME} sfml-system sfml-window sfml-graphics)
 if (UNIX)
    target_link_libraries(${PROJECT_NAME} pthread)
 endif (UNIX)
+
+# copy res dir to the binary directory
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
