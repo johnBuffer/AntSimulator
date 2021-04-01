@@ -104,10 +104,7 @@ void DisplayManager::processEvents()
 			else if ((event.key.code == sf::Keyboard::S))
 			{
 				speed_mode = !speed_mode;
-				if (speed_mode)
-					m_window.setFramerateLimit(0);
-				else
-					m_window.setFramerateLimit(60);
+				m_window.setFramerateLimit(speed_mode ? 0 : 60);
 			}
 			break;
 		case sf::Event::MouseWheelMoved:
