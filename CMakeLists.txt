@@ -19,10 +19,18 @@ endif(WIN32)
 
 add_executable(${PROJECT_NAME} ${WIN32_GUI} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE "include" "lib")
-target_link_libraries(${PROJECT_NAME} sfml-system sfml-window sfml-graphics)
+set(SFML_LIBS sfml-system sfml-window sfml-graphics)
+target_link_libraries(${PROJECT_NAME} ${SFML_LIBS})
 if (UNIX)
    target_link_libraries(${PROJECT_NAME} pthread)
 endif (UNIX)
 
 # copy res dir to the binary directory
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+if(MSVC)
+   foreach(lib ${SFML_LIBS})
+      get_target_property(lib_path ${lib} LOCATION)
+      file(COPY ${lib_path} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+   endforeach()
+endif(MSVC)
