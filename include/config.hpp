@@ -12,8 +12,9 @@ struct Conf
 	const static sf::Color TO_HOME_COLOR;
 	const static sf::Color COLONY_COLOR;
 	const static uint32_t MAX_MARKERS_PER_CELL;
-	const static uint32_t WIN_WIDTH;
-	const static uint32_t WIN_HEIGHT;
+	static uint32_t WIN_WIDTH;
+	static uint32_t WIN_HEIGHT;
+	static uint32_t ANTS_COUNT;
 	static std::shared_ptr<sf::Texture> ANT_TEXTURE;
 	static std::shared_ptr<sf::Texture> MARKER_TEXTURE;
 

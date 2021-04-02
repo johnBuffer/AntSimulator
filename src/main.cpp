@@ -7,33 +7,33 @@
 #include "display_manager.hpp"
 
 
-uint32_t loadUserConf()
+
+void loadUserConf()
 {
-	uint32_t ants_count = 512;
 	std::ifstream conf_file("conf.txt");
 	if (conf_file) {
-		conf_file >> ants_count;
+		conf_file >> Conf::WIN_WIDTH;
+		conf_file >> Conf::WIN_HEIGHT;
+		conf_file >> Conf::ANTS_COUNT;
 	}
 	else {
 		std::cout << "Couldn't find 'conf.txt', loading default" << std::endl;
 	}
-
-	return ants_count;
 }
 
 
 int main()
 {
+	Conf::loadTextures();
+	loadUserConf();
+
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 8;
 	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", sf::Style::Default, settings);
 	window.setFramerateLimit(60);
 
-	Conf::loadTextures();
-	const uint32_t ants_count = loadUserConf();
-
 	World world(Conf::WIN_WIDTH, Conf::WIN_HEIGHT);
-	Colony colony(Conf::WIN_WIDTH/2, Conf::WIN_HEIGHT/2, ants_count);
+	Colony colony(Conf::WIN_WIDTH * 0.5f, Conf::WIN_HEIGHT * 0.5f, Conf::ANTS_COUNT);
 	world.addMarker(Marker(colony.position, Marker::ToHome, 10.0f, true));
 	
 	DisplayManager display_manager(window, window, world, colony);
