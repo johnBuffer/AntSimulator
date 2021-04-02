@@ -74,3 +74,11 @@ int main()
 
 	return 0;
 }
+
+#if defined(_WIN32)
+#include <windows.h>
+int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline,
+                     int cmdshow) {
+  return main();
+}
+#endif
