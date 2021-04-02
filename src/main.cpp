@@ -1,9 +1,25 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <list>
+#include <fstream>
 #include "colony.hpp"
 #include "config.hpp"
 #include "display_manager.hpp"
+
+
+uint32_t loadUserConf()
+{
+	uint32_t ants_count = 512;
+	std::ifstream conf_file("conf.txt");
+	if (conf_file) {
+		conf_file >> ants_count;
+	}
+	else {
+		std::cout << "Couldn't find 'conf.txt', loading default" << std::endl;
+	}
+
+	return ants_count;
+}
 
 
 int main()
@@ -14,9 +30,10 @@ int main()
 	window.setFramerateLimit(60);
 
 	Conf::loadTextures();
+	const uint32_t ants_count = loadUserConf();
 
 	World world(Conf::WIN_WIDTH, Conf::WIN_HEIGHT);
-	Colony colony(Conf::WIN_WIDTH/2, Conf::WIN_HEIGHT/2, 512);
+	Colony colony(Conf::WIN_WIDTH/2, Conf::WIN_HEIGHT/2, ants_count);
 	world.addMarker(Marker(colony.position, Marker::ToHome, 10.0f, true));
 	
 	DisplayManager display_manager(window, window, world, colony);
