@@ -15,6 +15,6 @@ When the project is compiled, the `res` folder has to be placed in the same fold
 |**E**|Pause/Unpause the simulation|
 |**A**|Toggle markers drawing|
 |**S**|Toggle max speed mode|
-|**Right clic**|Add food|
-|**Left clic**|Move view|
+|**Right click**|Add food|
+|**Left click**|Move view|
 |**Wheel**|Zoom|
