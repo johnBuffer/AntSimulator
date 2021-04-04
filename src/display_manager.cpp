@@ -97,8 +97,8 @@ void DisplayManager::processEvents()
 			else if ((event.key.code == sf::Keyboard::D)) debug_mode = !debug_mode;
 			else if ((event.key.code == sf::Keyboard::R))
 			{
-				m_offsetX = 0.0f;
-				m_offsetY = 0.0f;
+				m_offsetX = m_windowOffsetX;
+				m_offsetY = m_windowOffsetY;
 				m_zoom = 1.0f;
 			}
 			else if ((event.key.code == sf::Keyboard::S))
