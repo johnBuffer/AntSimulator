@@ -25,6 +25,12 @@ struct Grid
 		return add(getCellCoords(obj.position), obj);
 	}
 
+	void clearAt(sf::Vector2f position)
+	{
+		auto cell_coords = getCellCoords(position);
+		cells[getIndexFromCoords(cell_coords)].clear();
+	}
+
 	bool isEmpty(const sf::Vector2f& position) const
 	{
 		const sf::Vector2i cell_coords = getCellCoords(position);
@@ -71,7 +77,7 @@ struct Grid
 	{
 		if (checkCell(cell_coords)) {
 			std::list<T>& l = cells[getIndexFromCoords(cell_coords)];
-			if (Conf<>::MAX_MARKERS_PER_CELL > l.size()) {
+			if (Conf::MAX_MARKERS_PER_CELL > l.size()) {
 				l.emplace_back(obj);
 				return &l.back();
 			}
@@ -148,8 +154,7 @@ struct World
 					va_markers[4 * i + 1].position = position + sf::Vector2f(cell_size, 0.0f);
 					va_markers[4 * i + 2].position = position + sf::Vector2f(cell_size, cell_size);
 					va_markers[4 * i + 3].position = position + sf::Vector2f(0.0f, cell_size);
-
-					const float offset = 30.0f;
+					const float offset = 32.0f;
 					va_markers[4 * i + 0].texCoords = sf::Vector2f(offset, offset);
 					va_markers[4 * i + 1].texCoords = sf::Vector2f(100.0f - offset, offset);
 					va_markers[4 * i + 2].texCoords = sf::Vector2f(100.0f - offset, 100.0f - offset);
@@ -189,14 +194,22 @@ struct World
 		grid_walls.add(Wall{ position });
 	}
 
-	void render(sf::RenderTarget& target, const sf::RenderStates& states) const
+	void removeWall(const sf::Vector2f& position)
+	{
+		grid_walls.clearAt(position);
+	}
+
+	void renderFood(sf::RenderTarget& target, const sf::RenderStates& states) const
 	{
 		for (const std::list<Food>& l : grid_food.cells) {
 			for (const Food& f : l) {
 				f.render(target, states);
 			}
 		}
+	}
 
+	void renderWalls(sf::RenderTarget& target, const sf::RenderStates& states) const
+	{
 		uint64_t i = 0;
 		const float cell_size = grid_walls.cell_size;
 		for (int32_t x(0); x < grid_walls.width; x++) {
@@ -220,17 +233,25 @@ struct World
 
 	void renderMarkers(sf::RenderTarget& target, sf::RenderStates states) const
 	{
-		states.texture = &(*Conf<>::MARKER_TEXTURE);
+		const sf::Vector3f to_home_color(Conf::TO_HOME_COLOR.r / 255.0f, Conf::TO_HOME_COLOR.g / 255.0f, Conf::TO_HOME_COLOR.b / 255.0f);
+		const sf::Vector3f to_food_color(Conf::TO_FOOD_COLOR.r / 255.0f, Conf::TO_FOOD_COLOR.g / 255.0f, Conf::TO_FOOD_COLOR.b / 255.0f);
+
+		states.texture = &(*Conf::MARKER_TEXTURE);
 		uint64_t i = 0;
 		const float cell_size = markers.cell_size;
 		for (int32_t x(0); x < markers.size_width; x++) {
 			for (int32_t y(0); y < markers.size_height; y++) {
 				const uint32_t index = y * markers.size_width + x;
 				const auto& cell = markers.cells[index];
-				const float intensity_factor = 3.0f;
-				const float intensity_1 = std::min(255.0f, cell.intensity[0] * intensity_factor);
-				const float intensity_2 = std::min(255.0f, cell.intensity[1] * intensity_factor);
-				sf::Color color(sf::Color(intensity_1, intensity_2, 0));
+				const float intensity_factor = 4.0f;
+				const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * cell.intensity[0];
+				const sf::Vector3f intensity_2_color = intensity_factor * to_food_color * cell.intensity[1];
+				const sf::Vector3f mixed_color(
+					std::min(255.0f, intensity_1_color.x + intensity_2_color.x),
+					std::min(255.0f, intensity_1_color.y + intensity_2_color.y),
+					std::min(255.0f, intensity_1_color.z + intensity_2_color.z)
+				);
+				sf::Color color(sf::Color(mixed_color.x, mixed_color.y, mixed_color.z));
 				const sf::Vector2f position(x * cell_size, y * cell_size);
 				va_markers[4 * i + 0].color = color;
 				va_markers[4 * i + 1].color = color;

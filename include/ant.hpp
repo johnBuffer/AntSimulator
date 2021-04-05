@@ -98,8 +98,8 @@ struct Ant
 	Ant(float x, float y, float angle, uint32_t id_)
 		: position(x, y)
 		, direction(angle)
-		, last_direction_update(getRandUnder(100.0f) * 0.01f * direction_update_period)
-		, last_marker(getRandUnder(100.0f) * 0.01f * marker_period)
+		, last_direction_update(RNGf::getUnder(1.0f) * direction_update_period)
+		, last_marker(RNGf::getUnder(1.0f) * marker_period)
 		, phase(Marker::Type::ToFood)
 		, reserve(0.0f)
 		, id(id_)
@@ -143,11 +143,11 @@ struct Ant
 		
 		position += (dt * move_speed) * v;
 
-		position.x = position.x < 0.0f ? Conf<>::WIN_WIDTH : position.x;
-		position.y = position.y < 0.0f ? Conf<>::WIN_HEIGHT : position.y;
+		position.x = position.x < 0.0f ? Conf::WIN_WIDTH : position.x;
+		position.y = position.y < 0.0f ? Conf::WIN_HEIGHT : position.y;
 
-		position.x = position.x > Conf<>::WIN_WIDTH ? 0.0f : position.x;
-		position.y = position.y > Conf<>::WIN_HEIGHT ? 0.0f : position.y;
+		position.x = position.x > Conf::WIN_WIDTH ? 0.0f : position.x;
+		position.y = position.y > Conf::WIN_HEIGHT ? 0.0f : position.y;
 	}
 
 	void checkFood(World& world)
@@ -231,7 +231,7 @@ struct Ant
 	void addMarker(World& world)
 	{
 		if (reserve > 1.0f) {
-			world.addMarker(Marker(position, phase == Marker::ToFood ? Marker::ToHome : Marker::ToFood, reserve * 0.04f));
+			world.addMarker(Marker(position, phase == Marker::ToFood ? Marker::ToHome : Marker::ToFood, reserve * 0.02f));
 			reserve *= 0.98f;
 		}
 
@@ -244,8 +244,8 @@ struct Ant
 			const float radius = 2.0f;
 			sf::CircleShape circle(radius);
 			circle.setOrigin(radius, radius);
-			circle.setPosition(position + length * 0.5f * direction.getVec());
-			circle.setFillColor(Conf<>::FOOD_COLOR);
+			circle.setPosition(position + length * 0.65f * direction.getVec());
+			circle.setFillColor(Conf::FOOD_COLOR);
 			target.draw(circle, states);
 		}
 	}
@@ -293,12 +293,12 @@ struct Ant
 	float liberty_coef;
 
 	// Parameters
-	const float width = 2.0f;
-	const float length = 3.5f;
+	const float width = 3.0f;
+	const float length = 4.7f;
 	const float move_speed = 50.0f;
 	const float marker_detection_max_dist = 40.0f;
 	const float direction_update_period = 0.125f;
 	const float marker_period = 0.25f;
-	const float max_reserve = 3000.0f;
+	const float max_reserve = 6000.0f;
 	const float direction_noise_range = PI * 0.1f;
 };
