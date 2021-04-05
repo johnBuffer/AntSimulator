@@ -8,7 +8,7 @@ Very simple ants simulator.
 
 In order to compile this project you will need to:
  - have [SFML](https://www.sfml-dev.org/index.php) installed on your system. If you don't know how to do it see [this link](https://www.sfml-dev.org/tutorials/2.5/#getting-started).
- - [CMake](https://cmake.org/)
+ - have [CMake](https://cmake.org/) installed
 
 ## Compilation
 
@@ -16,7 +16,6 @@ In order to compile this project you will need to:
  - Go in the repo folder
 
 `cd the/repo/location`
-
 - Create a `build` directory
 
 `mkdir build`
