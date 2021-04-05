@@ -34,7 +34,10 @@ int main()
 
 	World world(Conf::WIN_WIDTH, Conf::WIN_HEIGHT);
 	Colony colony(Conf::WIN_WIDTH * 0.5f, Conf::WIN_HEIGHT * 0.5f, Conf::ANTS_COUNT);
-	world.addMarker(Marker(colony.position, Marker::ToHome, 10.0f, true));
+	for (uint32_t i(0); i < 64; ++i) {
+		float angle = float(i) / 64.0f * (2.0f * PI);
+		world.addMarker(Marker(colony.position + 16.0f * sf::Vector2f(cos(angle), sin(angle)), Marker::ToHome, 10.0f, true));
+	}
 	
 	DisplayManager display_manager(window, window, world, colony);
 

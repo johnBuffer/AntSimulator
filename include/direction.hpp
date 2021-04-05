@@ -31,6 +31,11 @@ public:
 		return m_vec;
 	}
 
+	float getCurrentAngle() const
+	{
+		return getAngle(m_target_vec);
+	}
+
 	void operator+=(float a)
 	{
 		m_target_angle += a;

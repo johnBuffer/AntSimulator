@@ -7,6 +7,7 @@
 #include "config.hpp"
 #include <iostream>
 #include "direction.hpp"
+#include "number_generator.hpp"
 
 
 struct Ant
@@ -16,13 +17,13 @@ struct Ant
 	Ant(float x, float y, float angle, uint32_t id_)
 		: position(x, y)
 		, direction(angle)
-		, last_direction_update(getRandUnder(100.0f) * 0.01f * direction_update_period)
-		, last_marker(getRandUnder(100.0f) * 0.01f * marker_period)
+		, last_direction_update(RNGf::getUnder(1.0f) * direction_update_period)
+		, last_marker(RNGf::getUnder(1.0f) * marker_period)
 		, phase(Marker::Type::ToFood)
-		, reserve(0.0f)
+		, reserve(max_reserve)
 		, id(id_)
+		, liberty_coef(RNGf::getRange(0.001f, 0.001f))
 	{
-		reserve = max_reserve;
 	}
 
 	void update(const float dt, World& world)
@@ -87,26 +88,39 @@ struct Ant
 	{
 		std::list<Marker*> markers = world.getGrid(phase).getAllAt(position);
 
-		float total_intensity = 0.0f;
-		sf::Vector2f point(0.0f, 0.0f);
-
 		const sf::Vector2f dir_vec = direction.getVec();
 
+		float max_intensity = 0.0f;
+		sf::Vector2f max_direction;
 		for (Marker* mp : markers) {
 			const Marker& m = *mp;
 			const sf::Vector2f to_marker = m.position - position;
 			const float length = getLength(to_marker);
+			const sf::Vector2f to_marker_v = to_marker / length;
 
 			if (length < marker_detection_max_dist) {
-				if (dot(to_marker, dir_vec) > 0.0f) {
-					total_intensity += m.intensity;
-					point += m.intensity * m.position;
+				if (dot(to_marker_v, dir_vec) > 0.3f) {
+					// Check for food or colony
+					if (m.permanent) {
+						max_direction = to_marker_v;
+						break;
+					}
+					// Check for the most intense marker
+					if (m.intensity > max_intensity) {
+						max_intensity = m.intensity;
+						max_direction = to_marker_v;
+					}
+					// Randomly choose own path
+					if (RNGf::proba(liberty_coef)) {
+						break;
+					}
 				}
 			}
 		}
 
-		if (total_intensity) {
-			direction = getAngle(point / total_intensity - position);
+		// Update direction
+		if (max_intensity) {
+			direction = getAngle(max_direction);
 		}
 	}
 
@@ -152,6 +166,7 @@ struct Ant
 	Marker::Type phase;
 	float reserve;
 	const uint32_t id;
+	float liberty_coef;
 
 	// Parameters
 	const float width = 2.0f;
@@ -159,7 +174,7 @@ struct Ant
 	const float move_speed = 50.0f;
 	const float marker_detection_max_dist = 40.0f;
 	const float direction_update_period = 0.125f;
-	const float marker_period = 0.25f;
+	const float marker_period = 0.35f;
 	const float max_reserve = 2000.0f;
 	const float direction_noise_range = PI * 0.1f;
 	const float marker_reserve_consumption = 0.02f;
