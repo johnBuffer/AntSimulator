@@ -174,13 +174,19 @@ struct World
 
 	void render(sf::RenderTarget& target, const sf::RenderStates& states, bool draw_markers = true) const
 	{
+		for (const std::list<Food>& l : grid_food.cells) {
+			for (const Food& f : l) {
+				f.render(target, states);
+			}
+		}
+
 		uint64_t i = 0;
 		sf::VertexArray va(sf::Quads, 4 * grid_walls.cells.size());
 		const float cell_size = grid_walls.cell_size;
 		for (int32_t x(0); x < grid_walls.width; x++) {
 			for (int32_t y(0); y < grid_walls.height; y++) {
 				const uint32_t index = y * grid_walls.width + x;
-				sf::Color color(sf::Color::Black);
+				sf::Color color(sf::Color(0, 0, 0, 0));
 				if (!grid_walls.cells[index].empty()) {
 					color = sf::Color(94, 87, 87);
 				}
@@ -200,20 +206,6 @@ struct World
 		}
 
 		target.draw(va, states);
-
-		if (draw_markers) {
-			va.resize(4 * markers_count);
-			generateMarkersVertexArray(va);
-			sf::RenderStates rs = states;
-			rs.texture = &(*Conf<>::MARKER_TEXTURE);
-			target.draw(va, rs);
-		}
-
-		for (const std::list<Food>& l : grid_food.cells) {
-			for (const Food& f : l) {
-				f.render(target, states);
-			}
-		}
 	}
 
 	void generateMarkersVertexArray(sf::VertexArray& va) const

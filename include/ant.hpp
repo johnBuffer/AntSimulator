@@ -7,6 +7,7 @@
 #include "world.hpp"
 #include "config.hpp"
 #include <iostream>
+#include "number_generator.hpp"
 
 
 struct Direction
@@ -102,6 +103,7 @@ struct Ant
 		, phase(Marker::Type::ToFood)
 		, reserve(0.0f)
 		, id(id_)
+		, liberty_coef(RNGf::getRange(0.0001f, 0.001f))
 	{
 		reserve = max_reserve;
 	}
@@ -178,26 +180,38 @@ struct Ant
 	{
 		std::list<Marker*> markers = world.getGrid(phase).getAllAt(position);
 
-		float total_intensity = 0.0f;
-		sf::Vector2f point(0.0f, 0.0f);
-
 		const sf::Vector2f dir_vec = direction.getVec();
+		float max_intensity = 0.0f;
+		sf::Vector2f max_direction(0.0f, 0.0f);
 
 		for (Marker* mp : markers) {
 			const Marker& m = *mp;
 			const sf::Vector2f to_marker = m.position - position;
 			const float length = getLength(to_marker);
+			const sf::Vector2f to_marker_v = to_marker / length;
 
 			if (length < marker_detection_max_dist) {
-				if (dot(to_marker, dir_vec) > 0.0f) {
-					total_intensity += m.intensity;
-					point += m.intensity * m.position;
+				if (dot(to_marker_v, dir_vec) > 0.3f) {
+					// Check for food or colony
+					if (m.permanent) {
+						max_direction = to_marker_v;
+						break;
+					}
+					// Check for the most intense marker
+					if (m.intensity > max_intensity) {
+						max_intensity = m.intensity;
+						max_direction = to_marker_v;
+					}
+					// Randomly choose own path
+					if (RNGf::proba(liberty_coef)) {
+						break;
+					}
 				}
 			}
 		}
 
-		if (total_intensity) {
-			direction = getAngle(point / total_intensity - position);
+		if (max_intensity) {
+			direction = getAngle(max_direction);
 		}
 	}
 
@@ -263,6 +277,7 @@ struct Ant
 	Marker::Type phase;
 	float reserve;
 	const uint32_t id;
+	float liberty_coef;
 
 	// Parameters
 	const float width = 2.0f;

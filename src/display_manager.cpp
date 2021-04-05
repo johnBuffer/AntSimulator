@@ -64,13 +64,28 @@ void DisplayManager::draw()
     m_target.draw(ground, rs_ground);
 
 	sf::RenderStates rs;
-	//rs.texture = &m_texture;
 	rs.transform.translate(m_windowOffsetX, m_windowOffsetY);
 	rs.transform.scale(m_zoom, m_zoom);
 	rs.transform.translate(-m_offsetX, -m_offsetY);
 
-	m_world.render(m_target, rs, draw_markers);
+	// Render markers
+	sf::VertexArray va(sf::Quads, 4 * m_world.markers_count);
+	if (draw_markers) {
+		m_world.generateMarkersVertexArray(va);
+		rs.texture = &(*Conf<>::MARKER_TEXTURE);
+		m_target.draw(va, rs);
+	}
+	// Render ants
 	m_colony.render(m_target, rs);
+	m_world.render(m_target, rs, draw_markers);
+
+
+	const float size = m_colony.size;
+	sf::CircleShape circle(size);
+	circle.setOrigin(size, size);
+	circle.setPosition(m_colony.position);
+	circle.setFillColor(Conf<>::COLONY_COLOR);
+	m_target.draw(circle, rs_ground);
 
 	render_time = clock.getElapsedTime().asMicroseconds() * 0.001f;
 }
