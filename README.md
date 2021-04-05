@@ -31,7 +31,7 @@ Detailed explanation [here](https://preshing.com/20170511/how-to-build-a-cmake-b
 
 `make`
 
-### On windows with CMake GUI and Visual Studio
+### On Windows with CMake GUI and Visual Studio
  - Install the right SFML version or compile it (see [this](https://www.sfml-dev.org/tutorials/2.5/start-vc.php))
  - Run CMake
  - Select the repo location
