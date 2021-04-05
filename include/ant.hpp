@@ -218,7 +218,7 @@ struct Ant
 	void addMarker(World& world)
 	{
 		if (reserve > 1.0f) {
-			world.addMarker(Marker(position, phase == Marker::ToFood ? Marker::ToHome : Marker::ToFood, reserve * 0.02f));
+			world.addMarker(Marker(position, phase == Marker::ToFood ? Marker::ToHome : Marker::ToFood, reserve * 0.04f));
 			reserve *= 0.98f;
 		}
 

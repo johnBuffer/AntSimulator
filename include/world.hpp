@@ -111,7 +111,6 @@ struct World
 		, grid_walls(width, height, 20)
 		, grid_food(width, height, 5)
 		, size(to<float>(width), to<float>(height))
-		, va(sf::Quads)
 	{
 		for (int32_t x(0); x < grid_walls.width; x++) {
 			for (int32_t y(0); y < grid_walls.height; y++) {
@@ -172,7 +171,7 @@ struct World
 		grid_walls.add(Wall{ position });
 	}
 
-	void render(sf::RenderTarget& target, const sf::RenderStates& states, bool draw_markers = true) const
+	void render(sf::RenderTarget& target, const sf::RenderStates& states) const
 	{
 		for (const std::list<Food>& l : grid_food.cells) {
 			for (const Food& f : l) {
@@ -186,7 +185,7 @@ struct World
 		for (int32_t x(0); x < grid_walls.width; x++) {
 			for (int32_t y(0); y < grid_walls.height; y++) {
 				const uint32_t index = y * grid_walls.width + x;
-				sf::Color color(sf::Color(0, 0, 0, 0));
+				sf::Color color(sf::Color(255, 0, 0, 0));
 				if (!grid_walls.cells[index].empty()) {
 					color = sf::Color(94, 87, 87);
 				}
@@ -245,7 +244,6 @@ struct World
 	}
 
 	sf::Vector2f size;
-	mutable sf::VertexArray va;
 	Grid<Marker> grid_markers_home;
 	Grid<Marker> grid_markers_food;
 	Grid<Wall> grid_walls;

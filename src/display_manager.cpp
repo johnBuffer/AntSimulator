@@ -77,8 +77,7 @@ void DisplayManager::draw()
 	}
 	// Render ants
 	m_colony.render(m_target, rs);
-	m_world.render(m_target, rs, draw_markers);
-
+	m_world.render(m_target, rs_ground);
 
 	const float size = m_colony.size;
 	sf::CircleShape circle(size);
