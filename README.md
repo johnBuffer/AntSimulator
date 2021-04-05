@@ -12,6 +12,8 @@ In order to compile this project you will need to:
 
 ## Compilation
 
+Detailed explanation here [here](https://preshing.com/20170511/how-to-build-a-cmake-based-project/)
+
 ### On Linux with `make`
  - Go in the repo folder
 
@@ -30,7 +32,7 @@ In order to compile this project you will need to:
 `make`
 
 ### On windows with CMake GUI and Visual Studio
- - Install the right SFML version or compile it see [this](https://www.sfml-dev.org/tutorials/2.5/start-vc.php)
+ - Install the right SFML version or compile it (see [this](https://www.sfml-dev.org/tutorials/2.5/start-vc.php))
  - Run CMake
  - Select the repo location
  
@@ -43,8 +45,6 @@ In order to compile this project you will need to:
 
 ![Cmake 3](https://github.com/johnBuffer/AntSimulator/blob/master/img/cmake_3.PNG)
  - You can now open the generated project and build it.
-
-More information here [here](https://preshing.com/20170511/how-to-build-a-cmake-based-project/)
 
 # Commands
 
