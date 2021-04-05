@@ -12,7 +12,7 @@ In order to compile this project you will need to:
 
 ## Compilation
 
-Detailed explanation here [here](https://preshing.com/20170511/how-to-build-a-cmake-based-project/)
+Detailed explanation [here](https://preshing.com/20170511/how-to-build-a-cmake-based-project/)
 
 ### On Linux with `make`
  - Go in the repo folder
