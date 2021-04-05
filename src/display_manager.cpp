@@ -63,17 +63,11 @@ void DisplayManager::draw()
 	rs_ground.transform.translate(-m_offsetX, -m_offsetY);
     m_target.draw(ground, rs_ground);
 
-	sf::RenderStates rs;
-	rs.transform.translate(m_windowOffsetX, m_windowOffsetY);
-	rs.transform.scale(m_zoom, m_zoom);
-	rs.transform.translate(-m_offsetX, -m_offsetY);
+	sf::RenderStates rs = rs_ground;
 
 	// Render markers
-	sf::VertexArray va(sf::Quads, 4 * m_world.markers_count);
 	if (draw_markers) {
-		m_world.generateMarkersVertexArray(va);
-		rs.texture = &(*Conf<>::MARKER_TEXTURE);
-		m_target.draw(va, rs);
+		m_world.renderMarkers(m_target, rs_ground);
 	}
 	// Render ants
 	m_colony.render(m_target, rs);

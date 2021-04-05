@@ -6,8 +6,8 @@
 struct Marker
 {
 	enum Type {
-		ToHome,
-		ToFood
+		ToHome = 0,
+		ToFood = 1
 	};
 
 	Marker() = default;

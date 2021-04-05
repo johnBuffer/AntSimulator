@@ -10,13 +10,13 @@ int main()
 {
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 8;
-	sf::RenderWindow window(sf::VideoMode(Conf<>::WIN_WIDTH, Conf<>::WIN_HEIGHT), "AntSim", sf::Style::Default, settings);
+	sf::RenderWindow window(sf::VideoMode(Conf<>::WIN_WIDTH, Conf<>::WIN_HEIGHT), "AntSim", sf::Style::Fullscreen, settings);
 	window.setFramerateLimit(60);
 
 	Conf<>::loadTextures();
 
 	World world(Conf<>::WIN_WIDTH, Conf<>::WIN_HEIGHT);
-	Colony colony(800, 450, 512);
+	Colony colony(800, 450, 768);
 	for (uint32_t i(0); i < 64; ++i) {
 		float angle = float(i) / 64.0f * (2.0f * PI);
 		world.addMarker(Marker(colony.position + 16.0f * sf::Vector2f(cos(angle), sin(angle)), Marker::ToHome, 10.0f, true));

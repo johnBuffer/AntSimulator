@@ -3,7 +3,7 @@
 #include <vector>
 #include <SFML/System.hpp>
 
-#include "marker.hpp"
+#include "markers_grid.hpp"
 #include "food.hpp"
 #include "utils.hpp"
 #include "wall.hpp"
@@ -106,11 +106,12 @@ struct Grid
 struct World
 {
 	World(uint32_t width, uint32_t height)
-		: grid_markers_home(width, height, 45)
-		, grid_markers_food(width, height, 45)
-		, grid_walls(width, height, 20)
+		: markers(width, height, 4)
+		, grid_walls(width, height, 10)
 		, grid_food(width, height, 5)
 		, size(to<float>(width), to<float>(height))
+		, va_walls(sf::Quads)
+		, va_markers(sf::Quads)
 	{
 		for (int32_t x(0); x < grid_walls.width; x++) {
 			for (int32_t y(0); y < grid_walls.height; y++) {
@@ -119,51 +120,68 @@ struct World
 				}
 			}
 		}
-	}
 
-	void removeExpiredMarkers()
-	{
-		// Home
-		for (std::list<Marker>& l : grid_markers_home.cells) {
-			l.remove_if([&](const Marker& m) {return m.isDone(); });
+		va_walls.resize(4 * grid_walls.cells.size());
+		{
+			uint64_t i = 0;
+			const float cell_size = grid_walls.cell_size;
+			for (int32_t x(0); x < grid_walls.width; x++) {
+				for (int32_t y(0); y < grid_walls.height; y++) {
+					sf::Vector2f position(x * cell_size, y * cell_size);
+					va_walls[4 * i + 0].position = position;
+					va_walls[4 * i + 1].position = position + sf::Vector2f(cell_size, 0.0f);
+					va_walls[4 * i + 2].position = position + sf::Vector2f(cell_size, cell_size);
+					va_walls[4 * i + 3].position = position + sf::Vector2f(0.0f, cell_size);
+					++i;
+				}
+			}
 		}
-		// Food
-		for (std::list<Marker>& l : grid_markers_food.cells) {
-			l.remove_if([&](const Marker& m) {return m.isDone(); });
+
+		va_markers.resize(4 * markers.cells.size());
+		{
+			uint64_t i = 0;
+			const float cell_size = markers.cell_size;
+			for (int32_t x(0); x < markers.size_width; x++) {
+				for (int32_t y(0); y < markers.size_height; y++) {
+					const sf::Vector2f position(x * cell_size, y * cell_size);
+					va_markers[4 * i + 0].position = position;
+					va_markers[4 * i + 1].position = position + sf::Vector2f(cell_size, 0.0f);
+					va_markers[4 * i + 2].position = position + sf::Vector2f(cell_size, cell_size);
+					va_markers[4 * i + 3].position = position + sf::Vector2f(0.0f, cell_size);
+
+					const float offset = 30.0f;
+					va_markers[4 * i + 0].texCoords = sf::Vector2f(offset, offset);
+					va_markers[4 * i + 1].texCoords = sf::Vector2f(100.0f - offset, offset);
+					va_markers[4 * i + 2].texCoords = sf::Vector2f(100.0f - offset, 100.0f - offset);
+					va_markers[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
+					++i;
+				}
+			}
 		}
 	}
 
 	void removeExpiredFood()
 	{
 		for (std::list<Food>& l : grid_food.cells) {
-			l.remove_if([&](const Food& m) {return m.isDone(); });
+			l.remove_if([&](const Food& m) {
+				if (m.isDone()) {
+					markers.remove(m.position.x, m.position.y, Marker::Type::ToFood);
+					return true;
+				}
+				return false;
+			});
 		}
 	}
 
-	void update(const float dt)
+	void update(float dt)
 	{
-		removeExpiredMarkers();
 		removeExpiredFood();
-
-		markers_count = 0u;
-		for (std::list<Marker>& l : grid_markers_home.cells) {
-			for (Marker& m : l) {
-				markers_count += m.permanent ? 0 : 1;
-				m.update(dt);
-			}
-		}
-
-		for (std::list<Marker>& l : grid_markers_food.cells) {
-			for (Marker& m : l) {
-				markers_count += m.permanent ? 0 : 1;
-				m.update(dt);
-			}
-		}
+		markers.update(dt);
 	}
 
-	Marker* addMarker(const Marker& marker)
+	void addMarker(const Marker& marker)
 	{
-		return getGrid(marker.type).add(marker);
+		markers.addMarker(marker.position.x, marker.position.y, marker.type, marker.intensity, marker.permanent);
 	}
 
 	void addWall(const sf::Vector2f& position)
@@ -180,74 +198,64 @@ struct World
 		}
 
 		uint64_t i = 0;
-		sf::VertexArray va(sf::Quads, 4 * grid_walls.cells.size());
 		const float cell_size = grid_walls.cell_size;
 		for (int32_t x(0); x < grid_walls.width; x++) {
 			for (int32_t y(0); y < grid_walls.height; y++) {
 				const uint32_t index = y * grid_walls.width + x;
 				sf::Color color(sf::Color(255, 0, 0, 0));
-				if (!grid_walls.cells[index].empty()) {
+				if (grid_walls.cells[index].size()) {
 					color = sf::Color(94, 87, 87);
 				}
-				sf::Vector2f position(x * cell_size, y * cell_size);
 
-				va[4 * i].position = position;
-				va[4 * i + 1].position = position + sf::Vector2f(cell_size, 0.0f);
-				va[4 * i + 2].position = position + sf::Vector2f(cell_size, cell_size);
-				va[4 * i + 3].position = position + sf::Vector2f(0.0f, cell_size);
-
-				va[4 * i].color = color;
-				va[4 * i + 1].color = color;
-				va[4 * i + 2].color = color;
-				va[4 * i + 3].color = color;
+				va_walls[4 * i + 0].color = color;
+				va_walls[4 * i + 1].color = color;
+				va_walls[4 * i + 2].color = color;
+				va_walls[4 * i + 3].color = color;
 				++i;
 			}
 		}
 
-		target.draw(va, states);
+		target.draw(va_walls, states);
 	}
 
-	void generateMarkersVertexArray(sf::VertexArray& va) const
+	void renderMarkers(sf::RenderTarget& target, sf::RenderStates states) const
 	{
-		uint32_t current_index = 0;
-		for (const std::list<Marker>& l : grid_markers_home.cells) {
-			for (const Marker& m : l) {
-				if (!m.permanent) {
-					m.render_in(va, 4 * (current_index++));
-				}
+		states.texture = &(*Conf<>::MARKER_TEXTURE);
+		uint64_t i = 0;
+		const float cell_size = markers.cell_size;
+		for (int32_t x(0); x < markers.size_width; x++) {
+			for (int32_t y(0); y < markers.size_height; y++) {
+				const uint32_t index = y * markers.size_width + x;
+				const auto& cell = markers.cells[index];
+				const float intensity_factor = 3.0f;
+				const float intensity_1 = std::min(255.0f, cell.intensity[0] * intensity_factor);
+				const float intensity_2 = std::min(255.0f, cell.intensity[1] * intensity_factor);
+				sf::Color color(sf::Color(intensity_1, intensity_2, 0));
+				const sf::Vector2f position(x * cell_size, y * cell_size);
+				va_markers[4 * i + 0].color = color;
+				va_markers[4 * i + 1].color = color;
+				va_markers[4 * i + 2].color = color;
+				va_markers[4 * i + 3].color = color;
+				++i;
 			}
 		}
 
-		for (const std::list<Marker>& l : grid_markers_food.cells) {
-			for (const Marker& m : l) {
-				if (!m.permanent) {
-					m.render_in(va, 4 * (current_index++));
-				}
-			}
-		}
+		target.draw(va_markers, states);
 	}
 
 	void addFoodAt(float x, float y, float quantity)
 	{
-		Marker* marker = addMarker(Marker(sf::Vector2f(x, y), Marker::ToFood, 100000000.0f, true));
-		if (marker) {
-			grid_food.add(Food(x, y, 4.0f, quantity, marker));
-		}
-	}
-
-	Grid<Marker>& getGrid(Marker::Type type)
-	{
-		if (type == Marker::ToFood) {
-			return grid_markers_food;
-		}
-		return grid_markers_home;
+		addMarker(Marker(sf::Vector2f(x, y), Marker::ToFood, 100000000.0f, true));
+		grid_food.add(Food(x, y, 4.0f, quantity));
 	}
 
 	sf::Vector2f size;
-	Grid<Marker> grid_markers_home;
-	Grid<Marker> grid_markers_food;
+	MarkersGrid markers;
 	Grid<Wall> grid_walls;
 	Grid<Food> grid_food;
+
+	mutable sf::VertexArray va_walls;
+	mutable sf::VertexArray va_markers;
 
 	uint64_t markers_count;
 };

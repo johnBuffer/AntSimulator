@@ -178,28 +178,41 @@ struct Ant
 
 	void findMarker(World& world)
 	{
-		std::list<Marker*> markers = world.getGrid(phase).getAllAt(position);
-
+		// Init
 		const sf::Vector2f dir_vec = direction.getVec();
+		const uint32_t grid_cell_size = world.markers.cell_size;
+		const float radius = 40.0f;
+		const int32_t radius_cell = radius / grid_cell_size;
+		const int32_t cell_x = position.x / grid_cell_size;
+		const int32_t cell_y = position.y / grid_cell_size;
+		const int32_t min_range_x = std::max(1, cell_x - radius_cell);
+		const int32_t min_range_y = std::max(1, cell_y - radius_cell);
+		const int32_t max_range_x = std::min(int32_t(world.markers.size_width) - 2, cell_x + radius_cell);
+		const int32_t max_range_y = std::min(int32_t(world.markers.size_height) - 2, cell_y + radius_cell);
+		
 		float max_intensity = 0.0f;
-		sf::Vector2f max_direction(0.0f, 0.0f);
-
-		for (Marker* mp : markers) {
-			const Marker& m = *mp;
-			const sf::Vector2f to_marker = m.position - position;
+		sf::Vector2f max_direction;
+		// Sample the markers
+		const uint32_t sample_count = 100;
+		for (uint32_t i(0); i < sample_count; ++i) {
+			const uint32_t sample_x = RNGf::getRange(min_range_x, max_range_x + 1.0f);
+			const uint32_t sample_y = RNGf::getRange(min_range_y, max_range_y + 1.0f);
+			const sf::Vector2f marker_pos = float(grid_cell_size) * sf::Vector2f(sample_x, sample_y) + sf::Vector2f(RNGf::getUnder(grid_cell_size), RNGf::getUnder(grid_cell_size));
+			const sf::Vector2f to_marker = marker_pos - position;
 			const float length = getLength(to_marker);
 			const sf::Vector2f to_marker_v = to_marker / length;
 
+			const auto& cell = world.markers.getCell(sample_x, sample_y);
 			if (length < marker_detection_max_dist) {
 				if (dot(to_marker_v, dir_vec) > 0.3f) {
 					// Check for food or colony
-					if (m.permanent) {
+					if (cell.permanent[phase]) {
 						max_direction = to_marker_v;
 						break;
 					}
 					// Check for the most intense marker
-					if (m.intensity > max_intensity) {
-						max_intensity = m.intensity;
+					if (cell.intensity[phase] > max_intensity) {
+						max_intensity = cell.intensity[phase];
 						max_direction = to_marker_v;
 					}
 					// Randomly choose own path
@@ -286,6 +299,6 @@ struct Ant
 	const float marker_detection_max_dist = 40.0f;
 	const float direction_update_period = 0.125f;
 	const float marker_period = 0.25f;
-	const float max_reserve = 6000.0f;
+	const float max_reserve = 3000.0f;
 	const float direction_noise_range = PI * 0.1f;
 };

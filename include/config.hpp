@@ -5,7 +5,7 @@
 
 
 template<typename T = int>
-struct Conf
+struct DefaultConf
 {
 	const static sf::Color ANT_COLOR;
 	const static sf::Color FOOD_COLOR;
@@ -38,13 +38,14 @@ struct Conf
 	}
 };
 
+using Conf = DefaultConf<>;
 
-template<>
-const sf::Color Conf<>::ANT_COLOR = sf::Color(255, 73, 68);
-const sf::Color Conf<>::FOOD_COLOR = sf::Color(29, 129, 18);
-const sf::Color Conf<>::TO_FOOD_COLOR = sf::Color(119, 211, 109);
-const sf::Color Conf<>::TO_HOME_COLOR = sf::Color(122, 105, 199);
-const sf::Color Conf<>::COLONY_COLOR = sf::Color(67, 46, 163);
+const sf::Color Conf::ANT_COLOR = sf::Color(255, 73, 68);
+const sf::Color Conf::FOOD_COLOR = sf::Color(29, 129, 18);
+const sf::Color Conf::TO_FOOD_COLOR = sf::Color(119, 211, 109);
+const sf::Color Conf::TO_HOME_COLOR = sf::Color(122, 105, 199);
+const sf::Color Conf::COLONY_COLOR = sf::Color(67, 46, 163);
 
-std::shared_ptr<sf::Texture> Conf<>::ANT_TEXTURE;
-std::shared_ptr<sf::Texture> Conf<>::MARKER_TEXTURE;
+std::shared_ptr<sf::Texture> Conf::ANT_TEXTURE;
+std::shared_ptr<sf::Texture> Conf::MARKER_TEXTURE;
+
