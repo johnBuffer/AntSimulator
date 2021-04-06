@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 
 
-template<typename T = void>
+template<typename T>
 struct DefaultConf
 {
 	const static sf::Color ANT_COLOR;
@@ -37,21 +37,31 @@ struct DefaultConf
 	}
 };
 
-
-using Conf = DefaultConf<>;
-
-const sf::Color Conf::ANT_COLOR = sf::Color(255, 73, 68);
-const sf::Color Conf::FOOD_COLOR = sf::Color(66, 153, 66);
-const sf::Color Conf::TO_FOOD_COLOR = sf::Color(0, 255, 0);
-const sf::Color Conf::TO_HOME_COLOR = sf::Color(255, 0, 0);
-const sf::Color Conf::COLONY_COLOR = Conf::ANT_COLOR;
-uint32_t Conf::WIN_WIDTH = 1920;
-uint32_t Conf::WIN_HEIGHT = 1080;
-uint32_t Conf::ANTS_COUNT = 1024;
-float Conf::COLONY_SIZE = 20.0f;
-sf::Vector2f Conf::COLONY_POSITION = sf::Vector2f(Conf::WIN_WIDTH * 0.5f, Conf::WIN_HEIGHT * 0.5f);
+template<typename T>
+const sf::Color DefaultConf<T>::ANT_COLOR = sf::Color(255, 73, 68);
+template<typename T>
+const sf::Color DefaultConf<T>::FOOD_COLOR = sf::Color(66, 153, 66);
+template<typename T>
+const sf::Color DefaultConf<T>::TO_FOOD_COLOR = sf::Color(0, 255, 0);
+template<typename T>
+const sf::Color DefaultConf<T>::TO_HOME_COLOR = sf::Color(255, 0, 0);
+template<typename T>
+const sf::Color DefaultConf<T>::COLONY_COLOR = Conf::ANT_COLOR;
+template<typename T>
+uint32_t DefaultConf<T>::WIN_WIDTH = 1920;
+template<typename T>
+uint32_t DefaultConf<T>::WIN_HEIGHT = 1080;
+template<typename T>
+uint32_t DefaultConf<T>::ANTS_COUNT = 1024;
+template<typename T>
+float DefaultConf<T>::COLONY_SIZE = 20.0f;
+template<typename T>
+sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(DefaultConf<T>::WIN_WIDTH * 0.5f, DefaultConf<T>::WIN_HEIGHT * 0.5f);
 //sf::Vector2f Conf::COLONY_POSITION = sf::Vector2f(100.0f, 100.0f);
 
-std::shared_ptr<sf::Texture> Conf::ANT_TEXTURE;
-std::shared_ptr<sf::Texture> Conf::MARKER_TEXTURE;
+template<typename T>
+std::shared_ptr<sf::Texture> DefaultConf<T>::ANT_TEXTURE;
+template<typename T>
+std::shared_ptr<sf::Texture> DefaultConf<T>::MARKER_TEXTURE;
 
+using Conf = DefaultConf<int>;
