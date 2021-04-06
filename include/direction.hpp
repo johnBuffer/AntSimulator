@@ -55,6 +55,15 @@ public:
 		updateVec();
 	}
 
+	void setDirectionNow(sf::Vector2f d)
+	{
+		m_target_vec = d;
+		m_vec = d;
+		m_angle = getAngle(d);
+		m_target_angle = m_angle;
+	}
+
+
 private:
 	sf::Vector2f m_vec;
 	sf::Vector2f m_target_vec;

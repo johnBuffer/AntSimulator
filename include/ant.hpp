@@ -23,6 +23,7 @@ struct Ant
 		, reserve(max_reserve)
 		, id(id_)
 		, liberty_coef(RNGf::getRange(0.0001f, 0.001f))
+		, hits(0)
 	{
 	}
 
@@ -36,7 +37,7 @@ struct Ant
 		last_direction_update += dt;
 		if (last_direction_update > direction_update_period) {
 			findMarker(world);
-			direction += getRandRange(direction_noise_range);
+			direction += RNGf::getFullRange(direction_noise_range);
 			last_direction_update = 0.0f;
 		}
 
@@ -48,24 +49,33 @@ struct Ant
 		direction.update(dt);
 	}
 
-	void updatePosition(World& world, const float dt)
+	void updatePosition(World& world, float dt)
 	{
 		sf::Vector2f v = direction.getVec();
-		const sf::Vector2f next_position = position + (dt * move_speed) * direction.getVec();
+		const sf::Vector2f next_position = position + (dt * move_speed) * v;
 		if (!world.grid_walls.isEmpty(next_position)) {
+			++hits;
 			const sf::Vector2f normal = getWallNormal(world, v);
-			const float dot = normal.x * v.x + normal.y * v.y;
-			v = v - 2 * dot * normal;
-			direction.addNow(v, normal.x == -1.0f);
+			positions.push_back(position);
+			velocities.push_back(v);
+			normals.push_back(normal);
+			v.x *= (normal.x ? -1.0f : 1.0f);
+			v.y *= (normal.y ? -1.0f : 1.0f);
+			direction.setDirectionNow(v);
+		}
+		else {
+			hits = 0;
+		}
+
+		if (hits > 1) {
+			// Bad but nothing better for now
+			position = Conf::COLONY_POSITION;
 		}
 		
 		position += (dt * move_speed) * v;
 
-		position.x = position.x < 0.0f ? Conf::WIN_WIDTH : position.x;
-		position.y = position.y < 0.0f ? Conf::WIN_HEIGHT : position.y;
-
-		position.x = position.x > Conf::WIN_WIDTH ? 0.0f : position.x;
-		position.y = position.y > Conf::WIN_HEIGHT ? 0.0f : position.y;
+		position.x = (position.x < 0.0f || position.x > Conf::WIN_WIDTH) ? Conf::COLONY_POSITION.x : position.x;
+		position.y = (position.y < 0.0f || position.y > Conf::WIN_HEIGHT) ? Conf::COLONY_POSITION.y : position.y;
 	}
 
 	void checkFood(World& world)
@@ -98,7 +108,7 @@ struct Ant
 		// Init
 		const sf::Vector2f dir_vec = direction.getVec();
 		const uint32_t grid_cell_size = world.markers.cell_size;
-		const float radius = 40.0f;
+		const float radius = 20.0f;
 		const int32_t radius_cell = radius / grid_cell_size;
 		const int32_t cell_x = position.x / grid_cell_size;
 		const int32_t cell_y = position.y / grid_cell_size;
@@ -110,7 +120,7 @@ struct Ant
 		float max_intensity = 0.0f;
 		sf::Vector2f max_direction;
 		// Sample the markers
-		const uint32_t sample_count = 100;
+		const uint32_t sample_count = 32;
 		for (uint32_t i(0); i < sample_count; ++i) {
 			const uint32_t sample_x = RNGf::getRange(min_range_x, max_range_x + 1.0f);
 			const uint32_t sample_y = RNGf::getRange(min_range_y, max_range_y + 1.0f);
@@ -199,6 +209,23 @@ struct Ant
 		va[index + 3].position = position - width * nrm_vec - length * dir_vec;
 	}
 
+	// Parameters
+	const float width = 3.0f;
+	const float length = 4.7f;
+	const float move_speed = 50.0f;
+	const float marker_detection_max_dist = 40.0f;
+	const float direction_update_period = 0.125f;
+	const float marker_period = 0.25f;
+	const float max_reserve = 200000.0f;
+	const float direction_noise_range = PI * 0.1f;
+	const float marker_reserve_consumption = 0.02f;
+	const float colony_size = 20.0f;
+
+	uint32_t hits;
+	std::vector<sf::Vector2f> normals;
+	std::vector<sf::Vector2f> positions;
+	std::vector<sf::Vector2f> velocities;
+
 	sf::Vector2f position;
 	
 	Direction direction;
@@ -209,16 +236,4 @@ struct Ant
 	float reserve;
 	const uint32_t id;
 	float liberty_coef;
-
-	// Parameters
-	const float width = 3.0f;
-	const float length = 4.7f;
-	const float move_speed = 50.0f;
-	const float marker_detection_max_dist = 40.0f;
-	const float direction_update_period = 0.125f;
-	const float marker_period = 0.25f;
-	const float max_reserve = 6000.0f;
-	const float direction_noise_range = PI * 0.1f;
-	const float marker_reserve_consumption = 0.02f;
-	const float colony_size = 20.0f;
 };

@@ -72,11 +72,11 @@ void DisplayManager::draw()
 		m_world.renderMarkers(m_target, rs_ground);
 	}
 	m_world.renderFood(m_target, rs_ground);
+	m_world.renderWalls(m_target, rs_ground);
 	// Render ants
 	if (render_ants) {
 		m_colony.render(m_target, rs);
 	}
-	m_world.renderWalls(m_target, rs_ground);
 
 	const float size = m_colony.size;
 	sf::CircleShape circle(size);

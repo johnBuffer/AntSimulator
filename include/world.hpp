@@ -25,6 +25,12 @@ struct Grid
 		return add(getCellCoords(obj.position), obj);
 	}
 
+	sf::Vector2f getCellCenter(sf::Vector2f position)
+	{
+		const sf::Vector2i cell_coords = getCellCoords(position);
+		return float(cell_size) * sf::Vector2f(cell_coords.x + 0.5f, cell_coords.y + 0.5f);
+	}
+
 	void clearAt(sf::Vector2f position)
 	{
 		auto cell_coords = getCellCoords(position);
@@ -77,10 +83,8 @@ struct Grid
 	{
 		if (checkCell(cell_coords)) {
 			std::list<T>& l = cells[getIndexFromCoords(cell_coords)];
-			if (Conf::MAX_MARKERS_PER_CELL > l.size()) {
-				l.emplace_back(obj);
-				return &l.back();
-			}
+			l.emplace_back(obj);
+			return &l.back();
 		}
 		return nullptr;
 	}
