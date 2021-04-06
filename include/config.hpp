@@ -4,7 +4,8 @@
 #include <SFML/Graphics.hpp>
 
 
-struct Conf
+template<typename T = int>
+struct DefaultConf
 {
 	const static sf::Color ANT_COLOR;
 	const static sf::Color FOOD_COLOR;
@@ -35,3 +36,15 @@ struct Conf
 		Conf::MARKER_TEXTURE = nullptr;
 	}
 };
+
+using Conf = DefaultConf<>;
+
+const sf::Color Conf::ANT_COLOR = sf::Color(255, 73, 68);
+const sf::Color Conf::FOOD_COLOR = sf::Color(66, 153, 66);
+const sf::Color Conf::TO_FOOD_COLOR = sf::Color(0, 255, 0);
+const sf::Color Conf::TO_HOME_COLOR = sf::Color(255, 0, 0);
+const sf::Color Conf::COLONY_COLOR = Conf::ANT_COLOR;
+
+std::shared_ptr<sf::Texture> Conf::ANT_TEXTURE;
+std::shared_ptr<sf::Texture> Conf::MARKER_TEXTURE;
+

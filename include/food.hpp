@@ -7,22 +7,15 @@ struct Food
 {
 	Food() = default;
 
-	Food(float x, float y, float r, float quantity_, Marker* maker_ptr = nullptr)
+	Food(float x, float y, float r, float quantity_)
 		: position(x, y)
 		, radius(r)
 		, quantity(quantity_)
-		, marker(maker_ptr)
 	{}
 
 	void pick()
 	{
 		quantity -= 1.0f;
-		if (isDone()) {
-			if (marker) {
-				marker->intensity = 10.0f;
-				marker->permanent = false;
-			}
-		}
 	}
 
 	bool isDone() const
@@ -43,5 +36,4 @@ struct Food
 	sf::Vector2f position;
 	float radius;
 	float quantity;
-	Marker* marker;
 };

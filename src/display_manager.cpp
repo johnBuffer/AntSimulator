@@ -15,8 +15,11 @@ DisplayManager::DisplayManager(sf::RenderTarget& target, sf::RenderWindow& windo
 	, m_colony(colony)
 	, clic(false)
 	, m_mouse_button_pressed(false)
-	, pause(false)
+	, pause(true)
 	, draw_markers(true)
+	, wall_mode(false)
+	, render_ants(true)
+	, remove_wall(false)
 {
 	m_windowOffsetX = m_window.getSize().x * 0.5f;
     m_windowOffsetY = m_window.getSize().y * 0.5f;
@@ -62,14 +65,25 @@ void DisplayManager::draw()
 	rs_ground.transform.translate(-m_offsetX, -m_offsetY);
     m_target.draw(ground, rs_ground);
 
-	sf::RenderStates rs;
-	//rs.texture = &m_texture;
-	rs.transform.translate(m_windowOffsetX, m_windowOffsetY);
-	rs.transform.scale(m_zoom, m_zoom);
-	rs.transform.translate(-m_offsetX, -m_offsetY);
+	sf::RenderStates rs = rs_ground;
 
-	m_world.render(m_target, rs, draw_markers);
-	m_colony.render(m_target, rs);
+	// Render markers
+	if (draw_markers) {
+		m_world.renderMarkers(m_target, rs_ground);
+	}
+	m_world.renderFood(m_target, rs_ground);
+	// Render ants
+	if (render_ants) {
+		m_colony.render(m_target, rs);
+	}
+	m_world.renderWalls(m_target, rs_ground);
+
+	const float size = m_colony.size;
+	sf::CircleShape circle(size);
+	circle.setOrigin(size, size);
+	circle.setPosition(m_colony.position);
+	circle.setFillColor(Conf::COLONY_COLOR);
+	m_target.draw(circle, rs_ground);
 
 	render_time = clock.getElapsedTime().asMicroseconds() * 0.001f;
 }
@@ -92,9 +106,21 @@ void DisplayManager::processEvents()
 			else if ((event.key.code == sf::Keyboard::Subtract)) zoom(0.8f);
 			else if ((event.key.code == sf::Keyboard::Add)) zoom(1.2f);
 			else if ((event.key.code == sf::Keyboard::Space)) update = !update;
-			else if ((event.key.code == sf::Keyboard::E)) pause = !pause;
-			else if ((event.key.code == sf::Keyboard::A)) draw_markers = !draw_markers;
-			else if ((event.key.code == sf::Keyboard::D)) debug_mode = !debug_mode;
+			else if ((event.key.code == sf::Keyboard::P)) pause = !pause;
+			else if ((event.key.code == sf::Keyboard::E)) {
+				remove_wall = !remove_wall;
+				if (remove_wall) {
+					wall_mode = false;
+				}
+			}
+			else if ((event.key.code == sf::Keyboard::A)) render_ants = !render_ants;
+			else if ((event.key.code == sf::Keyboard::M)) draw_markers = !draw_markers;
+			else if ((event.key.code == sf::Keyboard::W)) {
+				wall_mode = !wall_mode;
+				if (wall_mode) {
+					remove_wall = false;
+				}
+			}
 			else if ((event.key.code == sf::Keyboard::R))
 			{
 				m_offsetX = m_windowOffsetX;

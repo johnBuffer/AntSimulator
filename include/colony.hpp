@@ -57,12 +57,6 @@ struct Colony
 		sf::RenderStates rs = states;
 		rs.texture = &(*Conf::ANT_TEXTURE);
 		target.draw(ants_va, rs);
-
-		sf::CircleShape circle(size);
-		circle.setOrigin(size, size);
-		circle.setPosition(position);
-		circle.setFillColor(Conf::COLONY_COLOR);
-		target.draw(circle, states);
 	}
 
 	const sf::Vector2f position;

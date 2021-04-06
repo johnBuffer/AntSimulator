@@ -22,13 +22,13 @@ struct Ant
 		, phase(Marker::Type::ToFood)
 		, reserve(max_reserve)
 		, id(id_)
-		, liberty_coef(RNGf::getRange(0.001f, 0.001f))
+		, liberty_coef(RNGf::getRange(0.0001f, 0.001f))
 	{
 	}
 
 	void update(const float dt, World& world)
 	{
-		updatePosition(dt);
+		updatePosition(world, dt);
 		if (phase == Marker::ToFood) {
 			checkFood(world);
 		}
@@ -48,9 +48,18 @@ struct Ant
 		direction.update(dt);
 	}
 
-	void updatePosition(const float dt)
+	void updatePosition(World& world, const float dt)
 	{
-		position += (dt * move_speed) * direction.getVec();
+		sf::Vector2f v = direction.getVec();
+		const sf::Vector2f next_position = position + (dt * move_speed) * direction.getVec();
+		if (!world.grid_walls.isEmpty(next_position)) {
+			const sf::Vector2f normal = getWallNormal(world, v);
+			const float dot = normal.x * v.x + normal.y * v.y;
+			v = v - 2 * dot * normal;
+			direction.addNow(v, normal.x == -1.0f);
+		}
+		
+		position += (dt * move_speed) * v;
 
 		position.x = position.x < 0.0f ? Conf::WIN_WIDTH : position.x;
 		position.y = position.y < 0.0f ? Conf::WIN_HEIGHT : position.y;
@@ -86,28 +95,41 @@ struct Ant
 
 	void findMarker(World& world)
 	{
-		std::list<Marker*> markers = world.getGrid(phase).getAllAt(position);
-
+		// Init
 		const sf::Vector2f dir_vec = direction.getVec();
-
+		const uint32_t grid_cell_size = world.markers.cell_size;
+		const float radius = 40.0f;
+		const int32_t radius_cell = radius / grid_cell_size;
+		const int32_t cell_x = position.x / grid_cell_size;
+		const int32_t cell_y = position.y / grid_cell_size;
+		const int32_t min_range_x = std::max(1, cell_x - radius_cell);
+		const int32_t min_range_y = std::max(1, cell_y - radius_cell);
+		const int32_t max_range_x = std::min(int32_t(world.markers.size_width) - 2, cell_x + radius_cell);
+		const int32_t max_range_y = std::min(int32_t(world.markers.size_height) - 2, cell_y + radius_cell);
+		
 		float max_intensity = 0.0f;
 		sf::Vector2f max_direction;
-		for (Marker* mp : markers) {
-			const Marker& m = *mp;
-			const sf::Vector2f to_marker = m.position - position;
+		// Sample the markers
+		const uint32_t sample_count = 100;
+		for (uint32_t i(0); i < sample_count; ++i) {
+			const uint32_t sample_x = RNGf::getRange(min_range_x, max_range_x + 1.0f);
+			const uint32_t sample_y = RNGf::getRange(min_range_y, max_range_y + 1.0f);
+			const sf::Vector2f marker_pos = float(grid_cell_size) * sf::Vector2f(sample_x, sample_y) + sf::Vector2f(RNGf::getUnder(grid_cell_size), RNGf::getUnder(grid_cell_size));
+			const sf::Vector2f to_marker = marker_pos - position;
 			const float length = getLength(to_marker);
 			const sf::Vector2f to_marker_v = to_marker / length;
 
+			const auto& cell = world.markers.getCell(sample_x, sample_y);
 			if (length < marker_detection_max_dist) {
 				if (dot(to_marker_v, dir_vec) > 0.3f) {
 					// Check for food or colony
-					if (m.permanent) {
+					if (cell.permanent[phase]) {
 						max_direction = to_marker_v;
 						break;
 					}
 					// Check for the most intense marker
-					if (m.intensity > max_intensity) {
-						max_intensity = m.intensity;
+					if (cell.intensity[phase] > max_intensity) {
+						max_intensity = cell.intensity[phase];
 						max_direction = to_marker_v;
 					}
 					// Randomly choose own path
@@ -140,10 +162,30 @@ struct Ant
 			const float radius = 2.0f;
 			sf::CircleShape circle(radius);
 			circle.setOrigin(radius, radius);
-			circle.setPosition(position + length * 0.5f * direction.getVec());
+			circle.setPosition(position + length * 0.65f * direction.getVec());
 			circle.setFillColor(Conf::FOOD_COLOR);
 			target.draw(circle, states);
 		}
+	}
+
+	sf::Vector2f getWallNormal(World& world, const sf::Vector2f& v) const
+	{
+		const float cell_size_f = to<float>(world.grid_walls.cell_size);
+		const float inv_direction[]{ 1.0f / v.x, 1.0f / v.y };
+		const float t_d[]{ std::abs(cell_size_f * inv_direction[0]), std::abs(cell_size_f * inv_direction[1]) };
+		const int32_t step[]{v.x >= 0.0f ? 1 : -1, v.y >= 0.0f ? 1 : -1 };
+		const sf::Vector2i cell_coords = world.grid_walls.getCellCoords(position);
+
+		float t_max[]{
+			((cell_coords.x + (step[0] > 0)) * cell_size_f - position.x) * inv_direction[0],
+			((cell_coords.y + (step[1] > 0)) * cell_size_f - position.y) * inv_direction[1]
+		};
+
+		if (t_max[0] < t_max[1]) {
+			return sf::Vector2f(-step[0], 0.0f);
+		}
+
+		return sf::Vector2f(0.0f, -step[1]);
 	}
 
 	void render_in(sf::VertexArray& va, const uint32_t index) const
@@ -169,13 +211,13 @@ struct Ant
 	float liberty_coef;
 
 	// Parameters
-	const float width = 2.0f;
-	const float length = 3.5f;
+	const float width = 3.0f;
+	const float length = 4.7f;
 	const float move_speed = 50.0f;
 	const float marker_detection_max_dist = 40.0f;
 	const float direction_update_period = 0.125f;
-	const float marker_period = 0.35f;
-	const float max_reserve = 2000.0f;
+	const float marker_period = 0.25f;
+	const float max_reserve = 6000.0f;
 	const float direction_noise_range = PI * 0.1f;
 	const float marker_reserve_consumption = 0.02f;
 	const float colony_size = 20.0f;
