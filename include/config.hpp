@@ -4,7 +4,7 @@
 #include <SFML/Graphics.hpp>
 
 
-template<typename T = int>
+template<typename T = void>
 struct DefaultConf
 {
 	const static sf::Color ANT_COLOR;
@@ -22,21 +22,21 @@ struct DefaultConf
 
 	static void loadTextures()
 	{
-		Conf::ANT_TEXTURE = std::make_shared<sf::Texture>();
-		Conf::ANT_TEXTURE->loadFromFile("res/ant_2.png");
-		Conf::ANT_TEXTURE->setSmooth(true);
-
-		Conf::MARKER_TEXTURE = std::make_shared<sf::Texture>();
-		Conf::MARKER_TEXTURE->loadFromFile("res/marker.png");
-		Conf::MARKER_TEXTURE->setSmooth(true);
+		DefaultConf::ANT_TEXTURE = std::make_shared<sf::Texture>();
+		DefaultConf::ANT_TEXTURE->loadFromFile("res/ant_2.png");
+		DefaultConf::ANT_TEXTURE->setSmooth(true);
+		DefaultConf::MARKER_TEXTURE = std::make_shared<sf::Texture>();
+		DefaultConf::MARKER_TEXTURE->loadFromFile("res/marker.png");
+		DefaultConf::MARKER_TEXTURE->setSmooth(true);
 	}
 
 	static void freeTextures()
 	{
-		Conf::ANT_TEXTURE = nullptr;
-		Conf::MARKER_TEXTURE = nullptr;
+		DefaultConf::ANT_TEXTURE = nullptr;
+		DefaultConf::MARKER_TEXTURE = nullptr;
 	}
 };
+
 
 using Conf = DefaultConf<>;
 

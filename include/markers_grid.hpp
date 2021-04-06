@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "marker.hpp"
+#include "utils.hpp"
 
 
 struct MarkersGrid
@@ -47,7 +48,7 @@ struct MarkersGrid
 	void addMarker(float x, float y, Marker::Type type, float intensity, bool permanent = false)
 	{
 		Cell& cell = getCellAt(x, y);
-		cell.permanent[type] != permanent;
+		cell.permanent[type] |= permanent;
 		cell.intensity[type] = std::max(cell.intensity[type], intensity);
 	}
 
@@ -65,8 +66,8 @@ struct MarkersGrid
 
 	Cell& getCellAt(float x, float y)
 	{
-		const uint32_t cell_x = x / cell_size;
-		const uint32_t cell_y = y / cell_size;
+		const uint32_t cell_x = to<uint32_t>(x / cell_size);
+		const uint32_t cell_y = to<uint32_t>(y / cell_size);
 		return getCell(cell_x, cell_y);
 	}
 

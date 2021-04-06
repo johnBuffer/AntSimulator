@@ -48,7 +48,7 @@ int main()
 	if (wall_map.loadFromFile("map.bmp")) {
 		for (uint32_t x(0); x < wall_map.getSize().x; ++x) {
 			for (uint32_t y(0); y < wall_map.getSize().y; ++y) {
-				const sf::Vector2f position = float(world.grid_walls.cell_size) * sf::Vector2f(x, y);
+				const sf::Vector2f position = float(world.grid_walls.cell_size) * sf::Vector2f(to<float>(x), to<float>(y));
 				if (wall_map.getPixel(x, y).r > 50) {
 					world.addWall(position);
 				}

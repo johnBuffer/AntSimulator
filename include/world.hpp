@@ -134,7 +134,7 @@ struct World
 		va_walls.resize(4 * grid_walls.cells.size());
 		{
 			uint64_t i = 0;
-			const float cell_size = grid_walls.cell_size;
+			const float cell_size = to<float>(grid_walls.cell_size);
 			for (int32_t x(0); x < grid_walls.width; x++) {
 				for (int32_t y(0); y < grid_walls.height; y++) {
 					sf::Vector2f position(x * cell_size, y * cell_size);
@@ -150,9 +150,9 @@ struct World
 		va_markers.resize(4 * markers.cells.size());
 		{
 			uint64_t i = 0;
-			const float cell_size = markers.cell_size;
-			for (int32_t x(0); x < markers.size_width; x++) {
-				for (int32_t y(0); y < markers.size_height; y++) {
+			const float cell_size = to<float>(markers.cell_size);
+			for (uint32_t x(0); x < markers.size_width; x++) {
+				for (uint32_t y(0); y < markers.size_height; y++) {
 					const sf::Vector2f position(x * cell_size, y * cell_size);
 					va_markers[4 * i + 0].position = position;
 					va_markers[4 * i + 1].position = position + sf::Vector2f(cell_size, 0.0f);
@@ -215,7 +215,7 @@ struct World
 	void renderWalls(sf::RenderTarget& target, const sf::RenderStates& states) const
 	{
 		uint64_t i = 0;
-		const float cell_size = grid_walls.cell_size;
+		const float cell_size = to<float>(grid_walls.cell_size);
 		for (int32_t x(0); x < grid_walls.width; x++) {
 			for (int32_t y(0); y < grid_walls.height; y++) {
 				const uint32_t index = y * grid_walls.width + x;
@@ -242,9 +242,9 @@ struct World
 
 		states.texture = &(*Conf::MARKER_TEXTURE);
 		uint64_t i = 0;
-		const float cell_size = markers.cell_size;
-		for (int32_t x(0); x < markers.size_width; x++) {
-			for (int32_t y(0); y < markers.size_height; y++) {
+		const float cell_size = to<float>(markers.cell_size);
+		for (uint32_t x(0); x < markers.size_width; x++) {
+			for (uint32_t y(0); y < markers.size_height; y++) {
 				const uint32_t index = y * markers.size_width + x;
 				const auto& cell = markers.cells[index];
 				const float intensity_factor = 4.0f;
@@ -255,7 +255,7 @@ struct World
 					std::min(255.0f, intensity_1_color.y + intensity_2_color.y),
 					std::min(255.0f, intensity_1_color.z + intensity_2_color.z)
 				);
-				sf::Color color(sf::Color(mixed_color.x, mixed_color.y, mixed_color.z));
+				sf::Color color(sf::Color(to<uint8_t>(mixed_color.x), to<uint8_t>(mixed_color.y), to<uint8_t>(mixed_color.z)));
 				const sf::Vector2f position(x * cell_size, y * cell_size);
 				va_markers[4 * i + 0].color = color;
 				va_markers[4 * i + 1].color = color;

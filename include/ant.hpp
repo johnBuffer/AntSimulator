@@ -109,22 +109,28 @@ struct Ant
 		const sf::Vector2f dir_vec = direction.getVec();
 		const uint32_t grid_cell_size = world.markers.cell_size;
 		const float radius = 20.0f;
-		const int32_t radius_cell = radius / grid_cell_size;
-		const int32_t cell_x = position.x / grid_cell_size;
-		const int32_t cell_y = position.y / grid_cell_size;
+		const int32_t radius_cell = to<int32_t>(radius / grid_cell_size);
+		const int32_t cell_x = to<int32_t>(position.x / grid_cell_size);
+		const int32_t cell_y = to<int32_t>(position.y / grid_cell_size);
 		const int32_t min_range_x = std::max(1, cell_x - radius_cell);
 		const int32_t min_range_y = std::max(1, cell_y - radius_cell);
 		const int32_t max_range_x = std::min(int32_t(world.markers.size_width) - 2, cell_x + radius_cell);
 		const int32_t max_range_y = std::min(int32_t(world.markers.size_height) - 2, cell_y + radius_cell);
 		
+		const float cell_size_f = to<float>(grid_cell_size);
+		const float min_range_x_f = to<float>(min_range_x);
+		const float min_range_y_f = to<float>(min_range_y);
+		const float max_range_x_f = to<float>(max_range_x);
+		const float max_range_y_f = to<float>(max_range_y);
+
+		// Sample the markers
 		float max_intensity = 0.0f;
 		sf::Vector2f max_direction;
-		// Sample the markers
 		const uint32_t sample_count = 32;
 		for (uint32_t i(0); i < sample_count; ++i) {
-			const uint32_t sample_x = RNGf::getRange(min_range_x, max_range_x + 1.0f);
-			const uint32_t sample_y = RNGf::getRange(min_range_y, max_range_y + 1.0f);
-			const sf::Vector2f marker_pos = float(grid_cell_size) * sf::Vector2f(sample_x, sample_y) + sf::Vector2f(RNGf::getUnder(grid_cell_size), RNGf::getUnder(grid_cell_size));
+			const uint32_t sample_x = to<uint32_t>(RNGf::getRange(min_range_x_f, max_range_x_f + 1.0f));
+			const uint32_t sample_y = to<uint32_t>(RNGf::getRange(min_range_y_f, max_range_y_f + 1.0f));
+			const sf::Vector2f marker_pos = cell_size_f * sf::Vector2f(to<float>(sample_x), to<float>(sample_y)) + sf::Vector2f(RNGf::getUnder(cell_size_f), RNGf::getUnder(cell_size_f));
 			const sf::Vector2f to_marker = marker_pos - position;
 			const float length = getLength(to_marker);
 			const sf::Vector2f to_marker_v = to_marker / length;
@@ -192,10 +198,10 @@ struct Ant
 		};
 
 		if (t_max[0] < t_max[1]) {
-			return sf::Vector2f(-step[0], 0.0f);
+			return sf::Vector2f(to<float>(-step[0]), 0.0f);
 		}
 
-		return sf::Vector2f(0.0f, -step[1]);
+		return sf::Vector2f(0.0f, to<float>(-step[1]));
 	}
 
 	void render_in(sf::VertexArray& va, const uint32_t index) const
