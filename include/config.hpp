@@ -46,7 +46,7 @@ const sf::Color DefaultConf<T>::TO_FOOD_COLOR = sf::Color(0, 255, 0);
 template<typename T>
 const sf::Color DefaultConf<T>::TO_HOME_COLOR = sf::Color(255, 0, 0);
 template<typename T>
-const sf::Color DefaultConf<T>::COLONY_COLOR = Conf::ANT_COLOR;
+const sf::Color DefaultConf<T>::COLONY_COLOR = DefaultConf<T>::ANT_COLOR;
 template<typename T>
 uint32_t DefaultConf<T>::WIN_WIDTH = 1920;
 template<typename T>
