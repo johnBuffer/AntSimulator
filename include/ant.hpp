@@ -216,7 +216,7 @@ struct Ant
 	const float marker_detection_max_dist = 40.0f;
 	const float direction_update_period = 0.125f;
 	const float marker_period = 0.25f;
-	const float max_reserve = 200000.0f;
+	const float max_reserve = 8000.0f;
 	const float direction_noise_range = PI * 0.1f;
 	const float marker_reserve_consumption = 0.02f;
 	const float colony_size = 20.0f;
