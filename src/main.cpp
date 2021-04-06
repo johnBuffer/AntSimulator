@@ -32,10 +32,8 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", sf::Style::Fullscreen, settings);
 	window.setFramerateLimit(60);
 
-	Conf::loadTextures();
-
 	World world(Conf::WIN_WIDTH, Conf::WIN_HEIGHT);
-	Colony colony(Conf::COLONY_POSITION.x, Conf::COLONY_POSITION.y, 1024);
+	Colony colony(Conf::COLONY_POSITION.x, Conf::COLONY_POSITION.y, Conf::ANTS_COUNT);
 	//Colony colony(250, 250, 512);
 	for (uint32_t i(0); i < 64; ++i) {
 		float angle = float(i) / 64.0f * (2.0f * PI);
@@ -47,14 +45,16 @@ int main()
 	sf::Vector2f last_clic;
 
 	sf::Image wall_map;
-	wall_map.loadFromFile("map.bmp");
-	for (uint32_t x(0); x < wall_map.getSize().x; ++x) {
-		for (uint32_t y(0); y < wall_map.getSize().y; ++y) {
-			const sf::Vector2f position = float(world.grid_walls.cell_size) * sf::Vector2f(x, y);
-			if (wall_map.getPixel(x, y).r > 50) {
-				world.addWall(position);
-			} else if (wall_map.getPixel(x, y).g > 100) {
-				world.addFoodAt(position.x, position.y, 5.0f);
+	if (wall_map.loadFromFile("map.bmp")) {
+		for (uint32_t x(0); x < wall_map.getSize().x; ++x) {
+			for (uint32_t y(0); y < wall_map.getSize().y; ++y) {
+				const sf::Vector2f position = float(world.grid_walls.cell_size) * sf::Vector2f(x, y);
+				if (wall_map.getPixel(x, y).r > 50) {
+					world.addWall(position);
+				}
+				else if (wall_map.getPixel(x, y).g > 100) {
+					world.addFoodAt(position.x, position.y, 5.0f);
+				}
 			}
 		}
 	}

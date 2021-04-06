@@ -49,8 +49,8 @@ uint32_t Conf::WIN_WIDTH = 1920;
 uint32_t Conf::WIN_HEIGHT = 1080;
 uint32_t Conf::ANTS_COUNT = 1024;
 float Conf::COLONY_SIZE = 20.0f;
-//sf::Vector2f Conf::COLONY_POSITION = sf::Vector2f(Conf::WIN_WIDTH * 0.5f, Conf::WIN_HEIGHT * 0.5f);
-sf::Vector2f Conf::COLONY_POSITION = sf::Vector2f(100.0f, 100.0f);
+sf::Vector2f Conf::COLONY_POSITION = sf::Vector2f(Conf::WIN_WIDTH * 0.5f, Conf::WIN_HEIGHT * 0.5f);
+//sf::Vector2f Conf::COLONY_POSITION = sf::Vector2f(100.0f, 100.0f);
 
 std::shared_ptr<sf::Texture> Conf::ANT_TEXTURE;
 std::shared_ptr<sf::Texture> Conf::MARKER_TEXTURE;

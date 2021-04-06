@@ -15,7 +15,7 @@ DisplayManager::DisplayManager(sf::RenderTarget& target, sf::RenderWindow& windo
 	, m_colony(colony)
 	, clic(false)
 	, m_mouse_button_pressed(false)
-	, pause(true)
+	, pause(false)
 	, draw_markers(true)
 	, wall_mode(false)
 	, render_ants(true)
