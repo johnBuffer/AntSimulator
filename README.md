@@ -50,9 +50,12 @@ Detailed explanation [here](https://preshing.com/20170511/how-to-build-a-cmake-b
 
 |Command|Action|
 |---|---|
-|**E**|Pause/Unpause the simulation|
-|**A**|Toggle markers drawing|
+|**P**|Pause/Unpause the simulation|
+|**M**|Toggle markers drawing|
+|**A**|Toggle ants drawing|
 |**S**|Toggle max speed mode|
+|**W**|Toggle Wall mode|
+|**E**|Toggle Wall erase mode|
 |**Right click**|Add food|
 |**Left click**|Move view|
 |**Wheel**|Zoom|
