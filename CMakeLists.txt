@@ -17,6 +17,11 @@ if(WIN32)
    set(WIN32_GUI WIN32)
 endif(WIN32)
 
+# Set build type
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif(NOT CMAKE_BUILD_TYPE)
+
 add_executable(${PROJECT_NAME} ${WIN32_GUI} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE "include" "lib")
 set(SFML_LIBS sfml-system sfml-window sfml-graphics)
