@@ -108,7 +108,7 @@ struct Ant
 		// Init
 		const sf::Vector2f dir_vec = direction.getVec();
 		const uint32_t grid_cell_size = world.markers.cell_size;
-		const float radius = 20.0f;
+		const float radius = 24.0f;
 		const int32_t radius_cell = to<int32_t>(radius / grid_cell_size);
 		const int32_t cell_x = to<int32_t>(position.x / grid_cell_size);
 		const int32_t cell_y = to<int32_t>(position.y / grid_cell_size);
@@ -126,27 +126,27 @@ struct Ant
 		// Sample the markers
 		float max_intensity = 0.0f;
 		sf::Vector2f max_direction;
-		const uint32_t sample_count = 32;
+		const uint32_t sample_count = 50;
 		for (uint32_t i(0); i < sample_count; ++i) {
 			const uint32_t sample_x = to<uint32_t>(RNGf::getRange(min_range_x_f, max_range_x_f + 1.0f));
 			const uint32_t sample_y = to<uint32_t>(RNGf::getRange(min_range_y_f, max_range_y_f + 1.0f));
 			const sf::Vector2f marker_pos = cell_size_f * sf::Vector2f(to<float>(sample_x), to<float>(sample_y)) + sf::Vector2f(RNGf::getUnder(cell_size_f), RNGf::getUnder(cell_size_f));
-			const sf::Vector2f to_marker = marker_pos - position;
+			sf::Vector2f to_marker = marker_pos - position;
 			const float length = getLength(to_marker);
-			const sf::Vector2f to_marker_v = to_marker / length;
+			to_marker = to_marker / length;
 
 			const auto& cell = world.markers.getCell(sample_x, sample_y);
 			if (length < marker_detection_max_dist) {
-				if (dot(to_marker_v, dir_vec) > 0.3f) {
+				if (dot(to_marker, dir_vec) > 0.3f) {
 					// Check for food or colony
 					if (cell.permanent[phase]) {
-						max_direction = to_marker_v;
+						max_direction = to_marker;
 						break;
 					}
 					// Check for the most intense marker
 					if (cell.intensity[phase] > max_intensity) {
 						max_intensity = cell.intensity[phase];
-						max_direction = to_marker_v;
+						max_direction = to_marker;
 					}
 					// Randomly choose own path
 					if (RNGf::proba(liberty_coef)) {
