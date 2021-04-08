@@ -36,7 +36,7 @@ struct Ant
 
 		last_direction_update += dt;
 		if (last_direction_update > direction_update_period) {
-			findMarker(world);
+			findMarker(world, dt);
 			direction += RNGf::getFullRange(direction_noise_range);
 			last_direction_update = 0.0f;
 		}
@@ -59,8 +59,9 @@ struct Ant
 			positions.push_back(position);
 			velocities.push_back(v);
 			normals.push_back(normal);
-			v.x *= (normal.x ? -1.0f : 1.0f);
-			v.y *= (normal.y ? -1.0f : 1.0f);
+			v.x = (normal.x ? 0.1f * normal.x : v.x);
+			v.y = (normal.y ? 0.1f * normal.y : v.y);
+			v = getNormalized(v);
 			direction.setDirectionNow(v);
 		}
 		else {
@@ -103,7 +104,7 @@ struct Ant
 		}
 	}
 
-	void findMarker(World& world)
+	void findMarker(World& world, float dt)
 	{
 		// Init
 		const sf::Vector2f dir_vec = direction.getVec();
@@ -126,7 +127,8 @@ struct Ant
 		// Sample the markers
 		float max_intensity = 0.0f;
 		sf::Vector2f max_direction;
-		const uint32_t sample_count = 32;
+		MarkersGrid::Cell* max_cell = nullptr;
+		const uint32_t sample_count = 64;
 		for (uint32_t i(0); i < sample_count; ++i) {
 			const uint32_t sample_x = to<uint32_t>(RNGf::getRange(min_range_x_f, max_range_x_f + 1.0f));
 			const uint32_t sample_y = to<uint32_t>(RNGf::getRange(min_range_y_f, max_range_y_f + 1.0f));
@@ -135,7 +137,7 @@ struct Ant
 			const float length = getLength(to_marker);
 			to_marker = to_marker / length;
 
-			const auto& cell = world.markers.getCell(sample_x, sample_y);
+			auto& cell = world.markers.getCell(sample_x, sample_y);
 			if (length < marker_detection_max_dist) {
 				if (dot(to_marker, dir_vec) > 0.3f) {
 					// Check for food or colony
@@ -147,6 +149,7 @@ struct Ant
 					if (cell.intensity[phase] > max_intensity) {
 						max_intensity = cell.intensity[phase];
 						max_direction = to_marker;
+						max_cell = &cell;
 					}
 					// Randomly choose own path
 					if (RNGf::proba(liberty_coef)) {
@@ -155,9 +158,11 @@ struct Ant
 				}
 			}
 		}
-
 		// Update direction
 		if (max_intensity) {
+			if (RNGf::proba(0.2f)) {
+				max_cell->intensity[phase] *= 0.99f;
+			}
 			direction = getAngle(max_direction);
 		}
 	}
@@ -221,10 +226,10 @@ struct Ant
 	const float move_speed = 50.0f;
 	const float marker_detection_max_dist = 40.0f;
 	const float direction_update_period = 0.25f;
-	const float marker_period = 0.125f;
-	const float max_reserve = 8000.0f;
+	const float marker_period = 0.25f;
+	const float max_reserve = 100000.0f;
 	const float direction_noise_range = PI * 0.1f;
-	const float marker_reserve_consumption = 0.02f;
+	const float marker_reserve_consumption = 0.01f;
 	const float colony_size = 20.0f;
 
 	uint32_t hits;
