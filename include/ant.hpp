@@ -14,14 +14,12 @@ struct Ant
 {
 	Ant() = default;
 
-	Ant(float x, float y, float angle, uint32_t id_)
+	Ant(float x, float y, float angle)
 		: position(x, y)
 		, direction(angle)
 		, last_direction_update(RNGf::getUnder(1.0f) * direction_update_period)
 		, last_marker(RNGf::getUnder(1.0f) * marker_period)
 		, phase(Marker::Type::ToFood)
-		, reserve(max_reserve)
-		, id(id_)
 		, liberty_coef(RNGf::getRange(0.0001f, 0.001f))
 		, hits(0)
 		, markers_count(0.0f)
@@ -87,7 +85,6 @@ struct Ant
 			if (getLength(position - fp->position) < fp->radius) {
 				phase = Marker::ToHome;
 				direction.addNow(PI);
-				reserve = max_reserve;
 				fp->pick();
 				markers_count = 0.0f;
 				return;
@@ -101,9 +98,8 @@ struct Ant
 			if (phase == Marker::ToHome) {
 				phase = Marker::ToFood;
 				direction.addNow(PI);
-				markers_count = 0.0f;
 			}
-			reserve = max_reserve;
+			markers_count = 0.0f;
 		}
 	}
 
@@ -159,7 +155,9 @@ struct Ant
 		}
 		// Update direction
 		if (max_intensity) {
-			max_cell->intensity[phase] *= 0.99f;
+			if (RNGf::proba(0.3f)) {
+				max_cell->intensity[phase] *= 0.99f;
+			}
 			direction = getAngle(max_direction);
 		}
 	}
@@ -241,7 +239,6 @@ struct Ant
 	float markers_count;
 	float last_marker;
 	Marker::Type phase;
-	float reserve;
-	const uint32_t id;
 	float liberty_coef;
+	//const uint32_t id;
 };
