@@ -22,8 +22,9 @@ struct Ant
 		, phase(Marker::Type::ToFood)
 		, reserve(max_reserve)
 		, id(id_)
-		, liberty_coef(RNGf::getRange(0.001f, 0.01f))
+		, liberty_coef(RNGf::getRange(0.0001f, 0.001f))
 		, hits(0)
+		, markers_count(0.0f)
 	{
 	}
 
@@ -88,6 +89,7 @@ struct Ant
 				direction.addNow(PI);
 				reserve = max_reserve;
 				fp->pick();
+				markers_count = 0.0f;
 				return;
 			}
 		}
@@ -99,6 +101,7 @@ struct Ant
 			if (phase == Marker::ToHome) {
 				phase = Marker::ToFood;
 				direction.addNow(PI);
+				markers_count = 0.0f;
 			}
 			reserve = max_reserve;
 		}
@@ -130,9 +133,11 @@ struct Ant
 		MarkersGrid::Cell* max_cell = nullptr;
 		const uint32_t sample_count = 64;
 		for (uint32_t i(0); i < sample_count; ++i) {
+			/*const uint32_t sample_x = RNGu32::getRange(min_range_x, max_range_x);
+			const uint32_t sample_y = RNGu32::getRange(min_range_y, max_range_y);*/
 			const uint32_t sample_x = to<uint32_t>(RNGf::getRange(min_range_x_f, max_range_x_f + 1.0f));
 			const uint32_t sample_y = to<uint32_t>(RNGf::getRange(min_range_y_f, max_range_y_f + 1.0f));
-			const sf::Vector2f marker_pos = cell_size_f * sf::Vector2f(to<float>(sample_x), to<float>(sample_y)) + sf::Vector2f(RNGf::getUnder(cell_size_f), RNGf::getUnder(cell_size_f));
+			const sf::Vector2f marker_pos = cell_size_f * sf::Vector2f(to<float>(sample_x), to<float>(sample_y)) + cell_size_f * sf::Vector2f(RNGf::get(), RNGf::get());
 			sf::Vector2f to_marker = marker_pos - position;
 			const float length = getLength(to_marker);
 			to_marker = to_marker / length;
@@ -160,20 +165,17 @@ struct Ant
 		}
 		// Update direction
 		if (max_intensity) {
-			if (RNGf::proba(0.2f)) {
-				max_cell->intensity[phase] *= 0.99f;
-			}
+			max_cell->intensity[phase] *= 0.99f;
 			direction = getAngle(max_direction);
 		}
 	}
 
 	void addMarker(World& world)
 	{
-		if (reserve > 1.0f) {
-			world.addMarker(Marker(position, phase == Marker::ToFood ? Marker::ToHome : Marker::ToFood, reserve * marker_reserve_consumption));
-			reserve *= 1.0f - marker_reserve_consumption;
-		}
-
+		markers_count += 1.0f;
+		const float coef = 0.01f;
+		const float intensity = 10000.0f * exp(-coef * markers_count);
+		world.addMarker(Marker(position, phase == Marker::ToFood ? Marker::ToHome : Marker::ToFood, intensity));
 		last_marker = 0.0f;
 	}
 
@@ -226,7 +228,7 @@ struct Ant
 	const float move_speed = 50.0f;
 	const float marker_detection_max_dist = 40.0f;
 	const float direction_update_period = 0.25f;
-	const float marker_period = 0.25f;
+	const float marker_period = 0.125f;
 	const float max_reserve = 100000.0f;
 	const float direction_noise_range = PI * 0.1f;
 	const float marker_reserve_consumption = 0.01f;
@@ -242,6 +244,7 @@ struct Ant
 	Direction direction;
 
 	float last_direction_update;
+	float markers_count;
 	float last_marker;
 	Marker::Type phase;
 	float reserve;

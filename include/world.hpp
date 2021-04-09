@@ -247,7 +247,7 @@ struct World
 			for (uint32_t y(0); y < markers.size_height; y++) {
 				const uint32_t index = y * markers.size_width + x;
 				const auto& cell = markers.cells[index];
-				const float intensity_factor = 4.0f;
+				const float intensity_factor = 1.0f;
 				const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * cell.intensity[0];
 				const sf::Vector3f intensity_2_color = intensity_factor * to_food_color * cell.intensity[1];
 				const sf::Vector3f mixed_color(

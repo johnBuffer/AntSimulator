@@ -49,11 +49,11 @@ int main()
 		for (uint32_t x(0); x < wall_map.getSize().x; ++x) {
 			for (uint32_t y(0); y < wall_map.getSize().y; ++y) {
 				const sf::Vector2f position = float(world.grid_walls.cell_size) * sf::Vector2f(to<float>(x), to<float>(y));
-				if (wall_map.getPixel(x, y).r > 50) {
+				if (wall_map.getPixel(x, y).r > 100) {
 					world.addWall(position);
 				}
 				else if (wall_map.getPixel(x, y).g > 100) {
-					world.addFoodAt(position.x, position.y, 5.0f);
+					world.addFoodAt(position.x, position.y, 25.0f);
 				}
 			}
 		}
@@ -76,7 +76,7 @@ int main()
 					world.removeWall(world_position);
 				}
 				else {
-					world.addFoodAt(world_position.x, world_position.y, 10.0f);
+					world.addFoodAt(world_position.x, world_position.y, 10000.0f);
 				}
 				last_clic = world_position;
 			}
