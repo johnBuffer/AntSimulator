@@ -14,22 +14,14 @@ In order to compile this project you will need to:
 
 Detailed explanation [here](https://preshing.com/20170511/how-to-build-a-cmake-based-project/)
 
-### On Linux with `make`
- - Go in the repo folder
+### On Linux with `install.sh`
+- Go in the repo folder
 
 `cd the/repo/location`
-- Create a `build` directory
 
-`mkdir build`
- - Go into build
+- Execute `install.sh` script
 
-`cd build`
- - Execute command
-
-`cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release ..`
- - Execute command
-
-`make`
+`./install.sh`
 
 ### On Windows with CMake GUI and Visual Studio
  - Install the right SFML version or compile it (see [this](https://www.sfml-dev.org/tutorials/2.5/start-vc.php))
