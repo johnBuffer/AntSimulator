@@ -14,20 +14,29 @@ In order to compile this project you will need to:
 
 Detailed explanation [here](https://preshing.com/20170511/how-to-build-a-cmake-based-project/)
 
+### On Linux with `install.sh`
+- Go in the repo folder
+
+`cd the/repo/location`
+
+- Execute `install.sh` script
+
+`./install.sh`
+
 ### On Linux with `make`
- - Go in the repo folder
+- Go in the repo folder
 
 `cd the/repo/location`
 - Create a `build` directory
 
 `mkdir build`
- - Go into build
+- Go into build
 
 `cd build`
- - Execute command
+- Execute command
 
 `cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release ..`
- - Execute command
+- Execute command
 
 `make`
 
