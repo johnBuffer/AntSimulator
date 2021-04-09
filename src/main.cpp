@@ -76,7 +76,7 @@ int main()
 					world.removeWall(world_position);
 				}
 				else {
-					world.addFoodAt(world_position.x, world_position.y, 10000.0f);
+					world.addFoodAt(world_position.x, world_position.y, 20.0f);
 				}
 				last_clic = world_position;
 			}

@@ -112,7 +112,7 @@ struct Ant
 		// Init
 		const sf::Vector2f dir_vec = direction.getVec();
 		const uint32_t grid_cell_size = world.markers.cell_size;
-		const float radius = 24.0f;
+		const float radius = 32.0f;
 		const int32_t radius_cell = to<int32_t>(radius / grid_cell_size);
 		const int32_t cell_x = to<int32_t>(position.x / grid_cell_size);
 		const int32_t cell_y = to<int32_t>(position.y / grid_cell_size);
@@ -122,10 +122,6 @@ struct Ant
 		const int32_t max_range_y = std::min(int32_t(world.markers.size_height) - 2, cell_y + radius_cell);
 		
 		const float cell_size_f = to<float>(grid_cell_size);
-		const float min_range_x_f = to<float>(min_range_x);
-		const float min_range_y_f = to<float>(min_range_y);
-		const float max_range_x_f = to<float>(max_range_x);
-		const float max_range_y_f = to<float>(max_range_y);
 
 		// Sample the markers
 		float max_intensity = 0.0f;
@@ -133,10 +129,8 @@ struct Ant
 		MarkersGrid::Cell* max_cell = nullptr;
 		const uint32_t sample_count = 64;
 		for (uint32_t i(0); i < sample_count; ++i) {
-			/*const uint32_t sample_x = RNGu32::getRange(min_range_x, max_range_x);
-			const uint32_t sample_y = RNGu32::getRange(min_range_y, max_range_y);*/
-			const uint32_t sample_x = to<uint32_t>(RNGf::getRange(min_range_x_f, max_range_x_f + 1.0f));
-			const uint32_t sample_y = to<uint32_t>(RNGf::getRange(min_range_y_f, max_range_y_f + 1.0f));
+			const uint32_t sample_x = RNGu32::getRange(min_range_x, max_range_x);
+			const uint32_t sample_y = RNGu32::getRange(min_range_y, max_range_y);
 			const sf::Vector2f marker_pos = cell_size_f * sf::Vector2f(to<float>(sample_x), to<float>(sample_y)) + cell_size_f * sf::Vector2f(RNGf::get(), RNGf::get());
 			sf::Vector2f to_marker = marker_pos - position;
 			const float length = getLength(to_marker);
@@ -172,9 +166,9 @@ struct Ant
 
 	void addMarker(World& world)
 	{
-		markers_count += 1.0f;
+		markers_count += marker_period;
 		const float coef = 0.01f;
-		const float intensity = 10000.0f * exp(-coef * markers_count);
+		const float intensity = 1000.0f * exp(-coef * markers_count);
 		world.addMarker(Marker(position, phase == Marker::ToFood ? Marker::ToHome : Marker::ToFood, intensity));
 		last_marker = 0.0f;
 	}
@@ -227,7 +221,7 @@ struct Ant
 	const float length = 4.7f;
 	const float move_speed = 50.0f;
 	const float marker_detection_max_dist = 40.0f;
-	const float direction_update_period = 0.25f;
+	const float direction_update_period = 0.125f;
 	const float marker_period = 0.125f;
 	const float max_reserve = 100000.0f;
 	const float direction_noise_range = PI * 0.1f;
