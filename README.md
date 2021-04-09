@@ -23,23 +23,6 @@ Detailed explanation [here](https://preshing.com/20170511/how-to-build-a-cmake-b
 
 `./install.sh`
 
-### On Linux with `make`
-- Go in the repo folder
-
-`cd the/repo/location`
-- Create a `build` directory
-
-`mkdir build`
-- Go into build
-
-`cd build`
-- Execute command
-
-`cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release ..`
-- Execute command
-
-`make`
-
 ### On Windows with CMake GUI and Visual Studio
  - Install the right SFML version or compile it (see [this](https://www.sfml-dev.org/tutorials/2.5/start-vc.php))
  - Run CMake
