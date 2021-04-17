@@ -54,28 +54,21 @@ struct Ant
 		const sf::Vector2f next_position = position + (dt * move_speed) * v;
 		if (!world.grid_walls.isEmpty(next_position)) {
 			++hits;
-			const sf::Vector2f normal = getWallNormal(world, v);
-			positions.push_back(position);
-			velocities.push_back(v);
-			normals.push_back(normal);
-			v.x = (normal.x ? 0.1f * normal.x : v.x);
-			v.y = (normal.y ? 0.1f * normal.y : v.y);
-			v = getNormalized(v);
-			direction.setDirectionNow(v);
+			const float new_angle = RNGf::getFullRange(PI);
+			const sf::Vector2f new_direction(cos(new_angle), sin(new_angle));
+			direction.setDirectionNow(new_direction);
+			if (hits > 8) {
+				// Bad but nothing better for now
+				position = Conf::COLONY_POSITION;
+			}
 		}
 		else {
 			hits = 0;
-		}
+			position += (dt * move_speed) * v;
 
-		if (hits > 1) {
-			// Bad but nothing better for now
-			position = Conf::COLONY_POSITION;
+			position.x = (position.x < 0.0f || position.x > Conf::WIN_WIDTH) ? Conf::COLONY_POSITION.x : position.x;
+			position.y = (position.y < 0.0f || position.y > Conf::WIN_HEIGHT) ? Conf::COLONY_POSITION.y : position.y;
 		}
-		
-		position += (dt * move_speed) * v;
-
-		position.x = (position.x < 0.0f || position.x > Conf::WIN_WIDTH) ? Conf::COLONY_POSITION.x : position.x;
-		position.y = (position.y < 0.0f || position.y > Conf::WIN_HEIGHT) ? Conf::COLONY_POSITION.y : position.y;
 	}
 
 	void checkFood(World& world)
