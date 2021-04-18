@@ -7,10 +7,12 @@
 struct WorldRenderer : public AsyncRenderer
 {
 	const Grid<MarkerCell>& grid;
+	bool draw_markers;
 
 	WorldRenderer(Grid<MarkerCell>& grid_, DoubleObject<sf::VertexArray>& target)
 		: AsyncRenderer(target)
 		, grid(grid_)
+		, draw_markers(true)
 	{
 		AsyncRenderer::start();
 	}
@@ -44,8 +46,8 @@ struct WorldRenderer : public AsyncRenderer
 			for (int32_t y(0); y < grid.height; y++) {
 				const auto& cell = grid.getCst(sf::Vector2i(x, y));
 
-				sf::Color color = Conf::FOOD_COLOR;
-				if (!cell.food) {
+				sf::Color color = sf::Color::Black;
+				if (!cell.food && draw_markers) {
 					const float intensity_factor = 0.27f;
 					const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * cell.intensity[0];
 					const sf::Vector3f intensity_2_color = intensity_factor * to_food_color * cell.intensity[1];
@@ -61,7 +63,8 @@ struct WorldRenderer : public AsyncRenderer
 					va[4 * i + 2].texCoords = sf::Vector2f(100.0f - offset, 100.0f - offset);
 					va[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
 				}
-				else {
+				else if (cell.food) {
+					color = Conf::FOOD_COLOR;
 					const float offset = 4.0f;
 					va[4 * i + 0].texCoords = sf::Vector2f(100.0f + offset, offset);
 					va[4 * i + 1].texCoords = sf::Vector2f(200.0f - offset, offset);

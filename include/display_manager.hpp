@@ -36,7 +36,6 @@ public:
 
 	bool clic;
 	bool pause;
-	bool draw_markers;
 	bool update;
 	float render_time;
 	bool speed_mode;
