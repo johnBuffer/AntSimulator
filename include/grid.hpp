@@ -18,6 +18,26 @@ struct Grid
 		cells.resize(width * height);
 	}
 
+	const T& getCst(sf::Vector2i cell_coord) const
+	{
+		return cells[getIndexFromCoords(cell_coord)];
+	}
+
+	const T& getCst(sf::Vector2f position) const
+	{
+		return getCst(getCellCoords(position));
+	}
+
+	T& get(sf::Vector2f position)
+	{
+		return const_cast<T&>(getCst(position));
+	}
+
+	T& get(sf::Vector2i cell_coord)
+	{
+		return const_cast<T&>(getCst(cell_coord));
+	}
+
 	sf::Vector2f getCellCenter(sf::Vector2f position)
 	{
 		const sf::Vector2i cell_coords = getCellCoords(position);
@@ -57,8 +77,23 @@ template<typename T>
 struct GridOfList : public Grid<GridListCell<T>>
 {
 	GridOfList(int32_t width_, int32_t height_, uint32_t cell_size_)
-		: Grid(width_, height_, cell_size)
+		: Grid(width_, height_, cell_size_)
 	{
+	}
+
+	T* emplaceAtPosition(sf::Vector2i pos)
+	{
+		if (checkCell(pos)) {
+			GridListCell<T>& c = get(pos);
+			c.data.emplace_back();
+			return &c.data.back();
+		}
+		return nullptr;
+	}
+
+	T* emplaceAtPosition(sf::Vector2f pos)
+	{
+		return emplaceAtPosition(getCellCoords(pos));
 	}
 
 	T* add(const T& obj)
@@ -69,13 +104,13 @@ struct GridOfList : public Grid<GridListCell<T>>
 	void clearAt(sf::Vector2f position)
 	{
 		auto cell_coords = getCellCoords(position);
-		cells[getIndexFromCoords(cell_coords)].clear();
+		cells[getIndexFromCoords(cell_coords)].data.clear();
 	}
 
 	T* add(const sf::Vector2i& cell_coords, const T& obj)
 	{
 		if (checkCell(cell_coords)) {
-			GridOfList<T>& cell = cells[getIndexFromCoords(cell_coords)];
+			GridListCell<T>& cell = cells[getIndexFromCoords(cell_coords)];
 			cell.data.emplace_back(obj);
 			return &cell.data.back();
 		}
@@ -91,8 +126,8 @@ struct GridOfList : public Grid<GridListCell<T>>
 			for (int32_t y(-1); y < 2; ++y) {
 				const sf::Vector2i coords = cell_coords + sf::Vector2i(x, y);
 				if (checkCell(coords)) {
-					const uint64_t index = getIndexFromCoords(coords);
-					for (GridListCell<T>& m : cells[index]) {
+					GridListCell<T>& c = get(coords);
+					for (T& m : c.data) {
 						result.push_back(&m);
 					}
 				}
@@ -118,7 +153,7 @@ struct GridOfList : public Grid<GridListCell<T>>
 		const sf::Vector2i cell_coords = getCellCoords(position);
 
 		if (checkCell(cell_coords)) {
-			return cells[getIndexFromCoords(cell_coords)].empty();
+			return getCst(cell_coords).data.empty();
 		}
 
 		return true;

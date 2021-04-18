@@ -24,7 +24,7 @@ struct World
 		for (int32_t x(0); x < grid_walls.width; x++) {
 			for (int32_t y(0); y < grid_walls.height; y++) {
 				if (x == 0 || x == grid_walls.width - 1 || y == 0 || y == grid_walls.height - 1) {
-					grid_walls.cells[grid_walls.getIndexFromCoords(sf::Vector2i(x, y))].emplace_back();
+					grid_walls.emplaceAtPosition(sf::Vector2i(x, y));
 				}
 			}
 		}
@@ -69,8 +69,8 @@ struct World
 
 	void removeExpiredFood()
 	{
-		for (std::list<Food>& l : grid_food.cells) {
-			l.remove_if([&](const Food& m) {
+		for (GridListCell<Food>& c : grid_food.cells) {
+			c.data.remove_if([&](const Food& m) {
 				if (m.isDone()) {
 					markers.remove(m.position.x, m.position.y, Marker::Type::ToFood);
 					return true;
@@ -103,8 +103,8 @@ struct World
 
 	void renderFood(sf::RenderTarget& target, const sf::RenderStates& states) const
 	{
-		for (const std::list<Food>& l : grid_food.cells) {
-			for (const Food& f : l) {
+		for (const GridListCell<Food>& c : grid_food.cells) {
+			for (const Food& f : c.data) {
 				f.render(target, states);
 			}
 		}
@@ -118,7 +118,7 @@ struct World
 			for (int32_t y(0); y < grid_walls.height; y++) {
 				const uint32_t index = y * grid_walls.width + x;
 				sf::Color color(sf::Color(255, 0, 0, 0));
-				if (grid_walls.cells[index].size()) {
+				if (grid_walls.cells[index].data.size()) {
 					color = sf::Color(94, 87, 87);
 				}
 
