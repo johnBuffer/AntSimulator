@@ -1,36 +1,21 @@
 #pragma once
-#include <thread>
-#include <mutex>
-#include <iostream>
-#include "double_buffer.hpp"
+#include "async_va_renderer.hpp"
 #include "grid.hpp"
+#include "config.hpp"
 
 
-struct WallsRenderer
+struct WallsRenderer : public AsyncRenderer
 {
 	const GridOfNumber<uint32_t>& grid;
-	DoubleObject<sf::VertexArray>& vertex_array;
-	std::thread thread;
-	bool run;
-	std::mutex mutex;
 
 	WallsRenderer(GridOfNumber<uint32_t>& grid_, DoubleObject<sf::VertexArray>& target)
-		: grid(grid_)
-		, vertex_array(target)
-		, run(true)
+		: AsyncRenderer(target)
+		, grid(grid_)
 	{
-		initializeVertexArray(vertex_array.getCurrent());
-		initializeVertexArray(vertex_array.getLast());
-		thread = std::thread([this]() {update(); });
+		AsyncRenderer::start();
 	}
 
-	~WallsRenderer()
-	{
-		run = false;
-		thread.join();
-	}
-
-	void initializeVertexArray(sf::VertexArray& va)
+	void initializeVertexArray(sf::VertexArray& va) override
 	{
 		va = sf::VertexArray(sf::Quads, grid.width * grid.height * 4);
 		uint64_t i = 0;
@@ -47,14 +32,7 @@ struct WallsRenderer
 		}
 	}
 
-	void update()
-	{
-		while (run) {
-			updateVertexArray();
-		}
-	}
-
-	void updateVertexArray()
+	void updateVertexArray() override
 	{
 		sf::VertexArray& va_walls = vertex_array.getLast();
 		uint64_t i = 0;
@@ -72,11 +50,6 @@ struct WallsRenderer
 				va_walls[4 * i + 3].color = color;
 				++i;
 			}
-		}
-
-		if (mutex.try_lock()) {
-			vertex_array.swap();
-			mutex.unlock();
 		}
 	}
 };

@@ -1,37 +1,21 @@
 #pragma once
-#include <thread>
-#include <mutex>
-#include <iostream>
-#include "double_buffer.hpp"
+#include "async_va_renderer.hpp"
 #include "grid.hpp"
 #include "config.hpp"
 
 
-struct WorldRenderer
+struct WorldRenderer : public AsyncRenderer
 {
 	const Grid<MarkerCell>& grid;
-	DoubleObject<sf::VertexArray>& vertex_array;
-	std::thread thread;
-	bool run;
-	std::mutex mutex;
 
 	WorldRenderer(Grid<MarkerCell>& grid_, DoubleObject<sf::VertexArray>& target)
-		: grid(grid_)
-		, vertex_array(target)
-		, run(true)
+		: AsyncRenderer(target)
+		, grid(grid_)
 	{
-		initializeVertexArray(vertex_array.getCurrent());
-		initializeVertexArray(vertex_array.getLast());
-		thread = std::thread([this]() {update(); });
+		AsyncRenderer::start();
 	}
 
-	~WorldRenderer()
-	{
-		run = false;
-		thread.join();
-	}
-
-	void initializeVertexArray(sf::VertexArray& va)
+	void initializeVertexArray(sf::VertexArray& va) override
 	{
 		va = sf::VertexArray(sf::Quads, grid.width * grid.height * 4);
 		uint64_t i = 0;
@@ -48,14 +32,7 @@ struct WorldRenderer
 		}
 	}
 
-	void update()
-	{
-		while (run) {
-			updateVertexArray();
-		}
-	}
-
-	void updateVertexArray()
+	void updateVertexArray() override
 	{
 		sf::VertexArray& va = vertex_array.getLast();
 		const sf::Vector3f to_home_color(Conf::TO_HOME_COLOR.r / 255.0f, Conf::TO_HOME_COLOR.g / 255.0f, Conf::TO_HOME_COLOR.b / 255.0f);
@@ -69,7 +46,7 @@ struct WorldRenderer
 
 				sf::Color color = Conf::FOOD_COLOR;
 				if (!cell.food) {
-					const float intensity_factor = 0.3f;
+					const float intensity_factor = 0.27f;
 					const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * cell.intensity[0];
 					const sf::Vector3f intensity_2_color = intensity_factor * to_food_color * cell.intensity[1];
 					const sf::Vector3f mixed_color(
@@ -97,11 +74,6 @@ struct WorldRenderer
 				va[4 * i + 3].color = color;
 				++i;
 			}
-		}
-
-		if (mutex.try_lock()) {
-			vertex_array.swap();
-			mutex.unlock();
 		}
 	}
 };

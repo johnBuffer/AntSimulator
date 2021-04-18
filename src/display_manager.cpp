@@ -26,8 +26,6 @@ DisplayManager::DisplayManager(sf::RenderTarget& target, sf::RenderWindow& windo
 
 	m_offsetX = m_windowOffsetX;
 	m_offsetY = m_windowOffsetY;
-
-    m_texture.loadFromFile("res/circle.png");
 }
 
 sf::Vector2f DisplayManager::worldCoordToDisplayCoord(const sf::Vector2f& worldCoord)

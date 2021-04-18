@@ -34,7 +34,6 @@ int main()
 
 	World world(Conf::WIN_WIDTH, Conf::WIN_HEIGHT);
 	Colony colony(Conf::COLONY_POSITION.x, Conf::COLONY_POSITION.y, Conf::ANTS_COUNT);
-	//Colony colony(250, 250, 512);
 	for (uint32_t i(0); i < 64; ++i) {
 		float angle = float(i) / 64.0f * (2.0f * PI);
 		world.addMarker(colony.position + 16.0f * sf::Vector2f(cos(angle), sin(angle)), Mode::ToHome, 10.0f, true);
@@ -44,16 +43,13 @@ int main()
 
 	sf::Vector2f last_clic;
 
-	sf::Image wall_map;
-	if (wall_map.loadFromFile("map.bmp")) {
-		for (uint32_t x(0); x < wall_map.getSize().x; ++x) {
-			for (uint32_t y(0); y < wall_map.getSize().y; ++y) {
-				const sf::Vector2f position = float(world.grid_walls.cell_size) * sf::Vector2f(to<float>(x), to<float>(y));
-				if (wall_map.getPixel(x, y).r > 100) {
-					world.addWall(position);
-				}
-				else if (wall_map.getPixel(x, y).g > 100) {
-					world.addFoodAt(position.x, position.y, 25);
+	sf::Image food_map;
+	if (food_map.loadFromFile("map.bmp")) {
+		for (uint32_t x(0); x < food_map.getSize().x; ++x) {
+			for (uint32_t y(0); y < food_map.getSize().y; ++y) {
+				const sf::Vector2f position = float(world.markers.cell_size) * sf::Vector2f(to<float>(x), to<float>(y));
+				if (food_map.getPixel(x, y).g > 100) {
+					world.addFoodAt(position.x, position.y, 5);
 				}
 			}
 		}
@@ -62,7 +58,6 @@ int main()
 	while (window.isOpen())
 	{
 		display_manager.processEvents();
-
 		// Add food on clic
 		if (display_manager.clic) {
 			const sf::Vector2i mouse_position = sf::Mouse::getPosition(window);

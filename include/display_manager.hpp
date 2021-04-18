@@ -53,7 +53,6 @@ public:
 private:
 	sf::RenderTarget& m_target;
 	sf::RenderWindow& m_window;
-    sf::Texture m_texture;
 	sf::VertexArray m_va;
 
 	World& m_world;
