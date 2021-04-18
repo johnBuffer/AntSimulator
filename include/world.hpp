@@ -9,6 +9,7 @@
 #include "wall.hpp"
 #include "grid.hpp"
 #include "ant_mode.hpp"
+#include "markers_renderer.hpp"
 
 
 struct World
@@ -19,6 +20,7 @@ struct World
 		, size(to<float>(width), to<float>(height))
 		, va_walls(sf::Quads)
 		, va_markers(sf::Quads)
+		, renderer(markers, va_markers, mutex)
 	{
 		for (int32_t x(0); x < grid_walls.width; x++) {
 			for (int32_t y(0); y < grid_walls.height; y++) {
@@ -39,22 +41,6 @@ struct World
 					va_walls[4 * i + 1].position = position + sf::Vector2f(cell_size, 0.0f);
 					va_walls[4 * i + 2].position = position + sf::Vector2f(cell_size, cell_size);
 					va_walls[4 * i + 3].position = position + sf::Vector2f(0.0f, cell_size);
-					++i;
-				}
-			}
-		}
-
-		va_markers.resize(4 * markers.cells.size());
-		{
-			uint64_t i = 0;
-			const float cell_size = to<float>(markers.cell_size);
-			for (int32_t x(0); x < markers.width; x++) {
-				for (int32_t y(0); y < markers.height; y++) {
-					const sf::Vector2f position(x * cell_size, y * cell_size);
-					va_markers[4 * i + 0].position = position;
-					va_markers[4 * i + 1].position = position + sf::Vector2f(cell_size, 0.0f);
-					va_markers[4 * i + 2].position = position + sf::Vector2f(cell_size, cell_size);
-					va_markers[4 * i + 3].position = position + sf::Vector2f(0.0f, cell_size);
 					++i;
 				}
 			}
@@ -104,51 +90,12 @@ struct World
 		target.draw(va_walls, states);
 	}
 
-	void renderMarkers(sf::RenderTarget& target, sf::RenderStates states) const
+	void renderMarkers(sf::RenderTarget& target, sf::RenderStates states)
 	{
-		const sf::Vector3f to_home_color(Conf::TO_HOME_COLOR.r / 255.0f, Conf::TO_HOME_COLOR.g / 255.0f, Conf::TO_HOME_COLOR.b / 255.0f);
-		const sf::Vector3f to_food_color(Conf::TO_FOOD_COLOR.r / 255.0f, Conf::TO_FOOD_COLOR.g / 255.0f, Conf::TO_FOOD_COLOR.b / 255.0f);
-
 		states.texture = &(*Conf::MARKER_TEXTURE);
-		uint64_t i = 0;
-		const float cell_size = to<float>(markers.cell_size);
-		for (int32_t x(0); x < markers.width; x++) {
-			for (int32_t y(0); y < markers.height; y++) {
-				const uint64_t index = markers.getIndexFromCoords(sf::Vector2i(x, y));
-				const auto& cell = markers.cells[index];
-
-				sf::Color color = Conf::FOOD_COLOR;
-				if (!cell.food) {
-					const float intensity_factor = 0.3f;
-					const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * cell.intensity[0];
-					const sf::Vector3f intensity_2_color = intensity_factor * to_food_color * cell.intensity[1];
-					const sf::Vector3f mixed_color(
-						std::min(255.0f, intensity_1_color.x + intensity_2_color.x),
-						std::min(255.0f, intensity_1_color.y + intensity_2_color.y),
-						std::min(255.0f, intensity_1_color.z + intensity_2_color.z)
-					);
-					color = sf::Color(sf::Color(to<uint8_t>(mixed_color.x), to<uint8_t>(mixed_color.y), to<uint8_t>(mixed_color.z)));
-					const float offset = 32.0f;
-					va_markers[4 * i + 0].texCoords = sf::Vector2f(offset, offset);
-					va_markers[4 * i + 1].texCoords = sf::Vector2f(100.0f - offset, offset);
-					va_markers[4 * i + 2].texCoords = sf::Vector2f(100.0f - offset, 100.0f - offset);
-					va_markers[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
-				}
-				else {
-					va_markers[4 * i + 0].texCoords = sf::Vector2f(100.0f, 0.0f);
-					va_markers[4 * i + 1].texCoords = sf::Vector2f(200.0f, 0.0f);
-					va_markers[4 * i + 2].texCoords = sf::Vector2f(200.0f, 100.0f);
-					va_markers[4 * i + 3].texCoords = sf::Vector2f(100.0f, 100.0f);
-				}
-				va_markers[4 * i + 0].color = color;
-				va_markers[4 * i + 1].color = color;
-				va_markers[4 * i + 2].color = color;
-				va_markers[4 * i + 3].color = color;
-				++i;
-			}
-		}
-
+		//mutex.lock();
 		target.draw(va_markers, states);
+		//mutex.unlock();
 	}
 
 	void addFoodAt(float x, float y, uint32_t quantity)
@@ -164,4 +111,6 @@ struct World
 
 	mutable sf::VertexArray va_walls;
 	mutable sf::VertexArray va_markers;
+	std::mutex mutex;
+	WorldRenderer renderer;
 };
