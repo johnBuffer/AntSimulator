@@ -113,18 +113,18 @@ struct Ant
 		float max_intensity = 0.0f;
 		sf::Vector2f max_direction;
 		MarkerCell* max_cell = nullptr;
+		// Sample the world
 		const uint32_t sample_count = 64;
 		for (uint32_t i(0); i < sample_count; ++i) {
 			const uint32_t sample_x = RNGu32::getRange(min_range_x, max_range_x);
 			const uint32_t sample_y = RNGu32::getRange(min_range_y, max_range_y);
-			const sf::Vector2f marker_pos = cell_size_f * sf::Vector2f(to<float>(sample_x), to<float>(sample_y)) + cell_size_f * sf::Vector2f(RNGf::get(), RNGf::get());
+			const sf::Vector2f marker_pos = cell_size_f * sf::Vector2f(to<float>(sample_x), to<float>(sample_y));
 			sf::Vector2f to_marker = marker_pos - position;
-			const float length = getLength(to_marker);
-			to_marker = to_marker / length;
-
-			auto& cell = world.markers.get(sf::Vector2i(sample_x, sample_y));
-			if (length < marker_detection_max_dist) {
+			const float length2 = getLength2(to_marker);
+			if (length2 < marker_detection_max_dist * marker_detection_max_dist) {
+				to_marker = to_marker / sqrt(length2);
 				if (dot(to_marker, dir_vec) > 0.3f) {
+					auto& cell = world.markers.get(sf::Vector2i(sample_x, sample_y));
 					// Check for food or colony
 					if (cell.permanent[static_cast<uint32_t>(phase)]) {
 						max_direction = to_marker;
