@@ -1,7 +1,6 @@
 #pragma once
 
 #include <list>
-#include "food.hpp"
 #include "world.hpp"
 #include "config.hpp"
 #include "direction.hpp"

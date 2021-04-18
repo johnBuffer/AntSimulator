@@ -1,26 +1,27 @@
 #pragma once
 #include <thread>
 #include <mutex>
-#include "world.hpp"
+#include <iostream>
+#include "double_buffer.hpp"
+#include "grid.hpp"
+#include "config.hpp"
 
 
 struct WorldRenderer
 {
 	const Grid<MarkerCell>& grid;
-	sf::VertexArray& target_vertex_array;
-	std::mutex& access_mutex;
-	sf::VertexArray vertex_array;
+	DoubleObject<sf::VertexArray>& vertex_array;
 	std::thread thread;
 	bool run;
+	std::mutex mutex;
 
-	WorldRenderer(Grid<MarkerCell>& grid_, sf::VertexArray& target, std::mutex& mutex)
+	WorldRenderer(Grid<MarkerCell>& grid_, DoubleObject<sf::VertexArray>& target)
 		: grid(grid_)
-		, target_vertex_array(target)
-		, access_mutex(mutex)
-		, vertex_array(sf::Quads)
+		, vertex_array(target)
 		, run(true)
 	{
-		initializeVertexArray(vertex_array);
+		initializeVertexArray(vertex_array.getCurrent());
+		initializeVertexArray(vertex_array.getLast());
 		thread = std::thread([this]() {update(); });
 	}
 
@@ -32,7 +33,7 @@ struct WorldRenderer
 
 	void initializeVertexArray(sf::VertexArray& va)
 	{
-		va.resize(grid.width * grid.height * 4);
+		va = sf::VertexArray(sf::Quads, grid.width * grid.height * 4);
 		uint64_t i = 0;
 		const float cell_size = to<float>(grid.cell_size);
 		for (int32_t x(0); x < grid.width; x++) {
@@ -56,6 +57,7 @@ struct WorldRenderer
 
 	void updateVertexArray()
 	{
+		sf::VertexArray& va = vertex_array.getLast();
 		const sf::Vector3f to_home_color(Conf::TO_HOME_COLOR.r / 255.0f, Conf::TO_HOME_COLOR.g / 255.0f, Conf::TO_HOME_COLOR.b / 255.0f);
 		const sf::Vector3f to_food_color(Conf::TO_FOOD_COLOR.r / 255.0f, Conf::TO_FOOD_COLOR.g / 255.0f, Conf::TO_FOOD_COLOR.b / 255.0f);
 
@@ -77,28 +79,29 @@ struct WorldRenderer
 					);
 					color = sf::Color(sf::Color(to<uint8_t>(mixed_color.x), to<uint8_t>(mixed_color.y), to<uint8_t>(mixed_color.z)));
 					const float offset = 32.0f;
-					vertex_array[4 * i + 0].texCoords = sf::Vector2f(offset, offset);
-					vertex_array[4 * i + 1].texCoords = sf::Vector2f(100.0f - offset, offset);
-					vertex_array[4 * i + 2].texCoords = sf::Vector2f(100.0f - offset, 100.0f - offset);
-					vertex_array[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
+					va[4 * i + 0].texCoords = sf::Vector2f(offset, offset);
+					va[4 * i + 1].texCoords = sf::Vector2f(100.0f - offset, offset);
+					va[4 * i + 2].texCoords = sf::Vector2f(100.0f - offset, 100.0f - offset);
+					va[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
 				}
 				else {
 					const float offset = 4.0f;
-					vertex_array[4 * i + 0].texCoords = sf::Vector2f(100.0f + offset, offset);
-					vertex_array[4 * i + 1].texCoords = sf::Vector2f(200.0f - offset, offset);
-					vertex_array[4 * i + 2].texCoords = sf::Vector2f(200.0f - offset, 100.0f - offset);
-					vertex_array[4 * i + 3].texCoords = sf::Vector2f(100.0f + offset, 100.0f - offset);
+					va[4 * i + 0].texCoords = sf::Vector2f(100.0f + offset, offset);
+					va[4 * i + 1].texCoords = sf::Vector2f(200.0f - offset, offset);
+					va[4 * i + 2].texCoords = sf::Vector2f(200.0f - offset, 100.0f - offset);
+					va[4 * i + 3].texCoords = sf::Vector2f(100.0f + offset, 100.0f - offset);
 				}
-				vertex_array[4 * i + 0].color = color;
-				vertex_array[4 * i + 1].color = color;
-				vertex_array[4 * i + 2].color = color;
-				vertex_array[4 * i + 3].color = color;
+				va[4 * i + 0].color = color;
+				va[4 * i + 1].color = color;
+				va[4 * i + 2].color = color;
+				va[4 * i + 3].color = color;
 				++i;
 			}
 		}
 
-		//access_mutex.lock();
-		target_vertex_array = vertex_array;
-		//access_mutex.unlock();
+		if (mutex.try_lock()) {
+			vertex_array.swap();
+			mutex.unlock();
+		}
 	}
 };
