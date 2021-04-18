@@ -53,7 +53,7 @@ int main()
 					world.addWall(position);
 				}
 				else if (wall_map.getPixel(x, y).g > 100) {
-					world.addFoodAt(position.x, position.y, 25.0f);
+					world.addFoodAt(position.x, position.y, 25);
 				}
 			}
 		}
@@ -76,7 +76,7 @@ int main()
 					world.removeWall(world_position);
 				}
 				else {
-					world.addFoodAt(world_position.x, world_position.y, 20.0f);
+					world.addFoodAt(world_position.x, world_position.y, 20);
 				}
 				last_clic = world_position;
 			}

@@ -71,7 +71,6 @@ void DisplayManager::draw()
 	if (draw_markers) {
 		m_world.renderMarkers(m_target, rs_ground);
 	}
-	m_world.renderFood(m_target, rs_ground);
 	// Render ants
 	if (render_ants) {
 		m_colony.render(m_target, rs);

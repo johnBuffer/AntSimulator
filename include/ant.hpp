@@ -53,7 +53,7 @@ struct Ant
 	{
 		sf::Vector2f v = direction.getVec();
 		const sf::Vector2f next_position = position + (dt * move_speed) * v;
-		if (!world.grid_walls.isEmpty(next_position)) {
+		if (world.grid_walls.get(next_position)) {
 			++hits;
 			const float new_angle = RNGf::getFullRange(PI);
 			const sf::Vector2f new_direction(cos(new_angle), sin(new_angle));
@@ -74,15 +74,12 @@ struct Ant
 
 	void checkFood(World& world)
 	{
-		const std::list<Food*> food_spots = world.grid_food.getAllAt(position);
-		for (Food* fp : food_spots) {
-			if (getLength(position - fp->position) < fp->radius) {
-				phase = Mode::ToHome;
-				direction.addNow(PI);
-				fp->pick();
-				markers_count = 0.0f;
-				return;
-			}
+		if (world.markers.isOnFood(position)) {
+			phase = Mode::ToHome;
+			direction.addNow(PI);
+			world.markers.pickFood(position);
+			markers_count = 0.0f;
+			return;
 		}
 	}
 

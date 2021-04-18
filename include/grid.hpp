@@ -73,12 +73,14 @@ struct GridOfNumber : public Grid<T>
 	{
 	}
 
-	void setCellValue(sf::Vector2i pos, T value)
+	template<typename VType>
+	void setCellValue(sf::Vector2<VType> pos, T value)
 	{
 		get(pos) = value;
 	}
 
-	void addToCell(sf::Vector2i pos, T value)
+	template<typename VType>
+	void addToCell(sf::Vector2<VType> pos, T value)
 	{
 		get(pos) += value;
 	}
