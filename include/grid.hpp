@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <list>
+#include <SFML/System.hpp>
 
 
 template<typename T>
@@ -60,6 +61,26 @@ struct Grid
 		const int32_t y_cell = to<int32_t>(position.y / cell_size);
 
 		return sf::Vector2i(x_cell, y_cell);
+	}
+};
+
+
+template<typename T>
+struct GridOfNumber : public Grid<T>
+{
+	GridOfNumber(int32_t width_, int32_t height_, uint32_t cell_size_)
+		: Grid(width_, height_, cell_size_)
+	{
+	}
+
+	void setCellValue(sf::Vector2i pos, T value)
+	{
+		get(pos) = value;
+	}
+
+	void addToCell(sf::Vector2i pos, T value)
+	{
+		get(pos) += value;
 	}
 };
 

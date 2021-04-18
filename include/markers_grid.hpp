@@ -1,79 +1,59 @@
 #pragma once
 #include <vector>
 
-#include "marker.hpp"
+#include "ant_mode.hpp"
 #include "utils.hpp"
+#include "grid.hpp"
 
 
-struct MarkersGrid
+struct MarkerCell
 {
-	struct Cell
+	float intensity[2];
+	bool permanent[2];
+
+	MarkerCell()
+		: intensity{ 0.0f, 0.0f }
+		, permanent{ false, false }
+	{}
+
+	void update(float dt)
 	{
-		float intensity[2];
-		bool permanent[2];
+		// Update intensities
+		intensity[0] -= (!permanent[0]) * dt;
+		intensity[1] -= (!permanent[1]) * dt;
+		// Avoid negative values
+		intensity[0] = std::max(0.0f, intensity[0]);
+		intensity[1] = std::max(0.0f, intensity[1]);
+	}
+};
 
-		Cell()
-			: intensity{0.0f, 0.0f}
-			, permanent{false, false}
-		{}
 
-		void update(float dt)
-		{
-			// Update intensities
-			intensity[0] -= (!permanent[0]) * dt;
-			intensity[1] -= (!permanent[1]) * dt;
-			// Avoid negative values
-			intensity[0] = std::max(0.0f, intensity[0]);
-			intensity[1] = std::max(0.0f, intensity[1]);
-		}
-	};
-
-	uint32_t grid_width;
-	uint32_t grid_height;
-	uint32_t size_width;
-	uint32_t size_height;
-	uint32_t cell_size;
-	std::vector<Cell> cells;
-
-	MarkersGrid(uint32_t width, uint32_t height, uint32_t cell_size_)
-		: grid_width(width)
-		, grid_height(height)
-		, size_width(width / cell_size_)
-		, size_height(height / cell_size_)
-		, cell_size(cell_size_)
+struct MarkersGrid : public Grid<MarkerCell>
+{
+	MarkersGrid(uint32_t width_, uint32_t height_, uint32_t cell_size_)
+		: Grid(width_, height_, cell_size_)
 	{
-		cells.resize(size_width * size_height);
 	}
 
-	void addMarker(float x, float y, Marker::Type type, float intensity, bool permanent = false)
+	void addMarker(sf::Vector2f pos, Mode type, float intensity, bool permanent = false)
 	{
-		Cell& cell = getCellAt(x, y);
-		cell.permanent[type] |= permanent;
-		cell.intensity[type] = std::max(cell.intensity[type], intensity);
+		MarkerCell& cell = get(pos);
+		const uint32_t mode_index = to<uint32_t>(type);
+		cell.permanent[mode_index] |= permanent;
+		cell.intensity[mode_index] = std::max(cell.intensity[mode_index], intensity);
 	}
 
-	void remove(float x, float y, Marker::Type type)
+	void remove(sf::Vector2f pos, Mode type)
 	{
-		Cell& cell = getCellAt(x, y);
-		cell.permanent[type] = false;
-		cell.intensity[type] = 0.0f;
-	}
-
-	Cell& getCell(uint32_t x, uint32_t y)
-	{
-		return cells[y * size_width + x];
-	}
-
-	Cell& getCellAt(float x, float y)
-	{
-		const uint32_t cell_x = to<uint32_t>(x / cell_size);
-		const uint32_t cell_y = to<uint32_t>(y / cell_size);
-		return getCell(cell_x, cell_y);
+		MarkerCell& cell = get(pos);
+		const uint32_t mode_index = to<uint32_t>(type);
+		cell.permanent[mode_index] = false;
+		cell.intensity[mode_index] = 0.0f;
 	}
 
 	void update(float dt)
 	{
-		for (Cell& c : cells) {
+		for (MarkerCell& c : cells) {
 			c.update(dt);
 		}
 	}

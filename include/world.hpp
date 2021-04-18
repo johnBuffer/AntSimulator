@@ -8,6 +8,7 @@
 #include "utils.hpp"
 #include "wall.hpp"
 #include "grid.hpp"
+#include "ant_mode.hpp"
 
 
 
@@ -49,8 +50,8 @@ struct World
 		{
 			uint64_t i = 0;
 			const float cell_size = to<float>(markers.cell_size);
-			for (uint32_t x(0); x < markers.size_width; x++) {
-				for (uint32_t y(0); y < markers.size_height; y++) {
+			for (int32_t x(0); x < markers.width; x++) {
+				for (int32_t y(0); y < markers.height; y++) {
 					const sf::Vector2f position(x * cell_size, y * cell_size);
 					va_markers[4 * i + 0].position = position;
 					va_markers[4 * i + 1].position = position + sf::Vector2f(cell_size, 0.0f);
@@ -72,7 +73,7 @@ struct World
 		for (GridListCell<Food>& c : grid_food.cells) {
 			c.data.remove_if([&](const Food& m) {
 				if (m.isDone()) {
-					markers.remove(m.position.x, m.position.y, Marker::Type::ToFood);
+					markers.remove(m.position, Mode::ToFood);
 					return true;
 				}
 				return false;
@@ -86,9 +87,9 @@ struct World
 		markers.update(dt);
 	}
 
-	void addMarker(const Marker& marker)
+	void addMarker(sf::Vector2f pos, Mode type, float intensity, bool permanent = false)
 	{
-		markers.addMarker(marker.position.x, marker.position.y, marker.type, marker.intensity, marker.permanent);
+		markers.addMarker(pos, type, intensity, permanent);
 	}
 
 	void addWall(const sf::Vector2f& position)
@@ -141,9 +142,9 @@ struct World
 		states.texture = &(*Conf::MARKER_TEXTURE);
 		uint64_t i = 0;
 		const float cell_size = to<float>(markers.cell_size);
-		for (uint32_t x(0); x < markers.size_width; x++) {
-			for (uint32_t y(0); y < markers.size_height; y++) {
-				const uint32_t index = y * markers.size_width + x;
+		for (int32_t x(0); x < markers.width; x++) {
+			for (int32_t y(0); y < markers.height; y++) {
+				const uint64_t index = markers.getIndexFromCoords(sf::Vector2i(x, y));
 				const auto& cell = markers.cells[index];
 				const float intensity_factor = 0.3f;
 				const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * cell.intensity[0];
@@ -168,7 +169,7 @@ struct World
 
 	void addFoodAt(float x, float y, float quantity)
 	{
-		addMarker(Marker(sf::Vector2f(x, y), Marker::ToFood, 100000000.0f, true));
+		addMarker(sf::Vector2f(x, y), Mode::ToFood, 100000000.0f, true);
 		grid_food.add(Food(x, y, 4.0f, quantity));
 	}
 
