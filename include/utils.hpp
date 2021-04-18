@@ -13,9 +13,16 @@ float getRandUnder(float width);
 
 
 template<typename T>
+float getLength2(sf::Vector2<T> v)
+{
+	return v.x * v.x + v.y * v.y;
+}
+
+
+template<typename T>
 float getLength(sf::Vector2<T> v)
 {
-	return sqrt(v.x * v.x + v.y * v.y);
+	return sqrt(getLength2(v));
 }
 
 template<typename T>

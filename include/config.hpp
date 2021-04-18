@@ -57,7 +57,6 @@ template<typename T>
 float DefaultConf<T>::COLONY_SIZE = 20.0f;
 template<typename T>
 sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(DefaultConf<T>::WIN_WIDTH * 0.5f, DefaultConf<T>::WIN_HEIGHT * 0.5f);
-//sf::Vector2f Conf::COLONY_POSITION = sf::Vector2f(100.0f, 100.0f);
 
 template<typename T>
 std::shared_ptr<sf::Texture> DefaultConf<T>::ANT_TEXTURE;

@@ -1,13 +1,13 @@
 #pragma once
 
 #include <list>
-#include "marker.hpp"
-#include "food.hpp"
 #include "world.hpp"
 #include "config.hpp"
-#include <iostream>
 #include "direction.hpp"
 #include "number_generator.hpp"
+#include "ant_mode.hpp"
+
+#include <iostream>
 
 
 struct Ant
@@ -19,7 +19,7 @@ struct Ant
 		, direction(angle)
 		, last_direction_update(RNGf::getUnder(1.0f) * direction_update_period)
 		, last_marker(RNGf::getUnder(1.0f) * marker_period)
-		, phase(Marker::Type::ToFood)
+		, phase(Mode::ToFood)
 		, liberty_coef(RNGf::getRange(0.0001f, 0.001f))
 		, hits(0)
 		, markers_count(0.0f)
@@ -29,7 +29,7 @@ struct Ant
 	void update(const float dt, World& world)
 	{
 		updatePosition(world, dt);
-		if (phase == Marker::ToFood) {
+		if (phase == Mode::ToFood) {
 			checkFood(world);
 		}
 
@@ -52,51 +52,41 @@ struct Ant
 	{
 		sf::Vector2f v = direction.getVec();
 		const sf::Vector2f next_position = position + (dt * move_speed) * v;
-		if (!world.grid_walls.isEmpty(next_position)) {
+		if (world.grid_walls.get(next_position)) {
 			++hits;
-			const sf::Vector2f normal = getWallNormal(world, v);
-			positions.push_back(position);
-			velocities.push_back(v);
-			normals.push_back(normal);
-			v.x = (normal.x ? 0.1f * normal.x : v.x);
-			v.y = (normal.y ? 0.1f * normal.y : v.y);
-			v = getNormalized(v);
-			direction.setDirectionNow(v);
+			const float new_angle = RNGf::getFullRange(PI);
+			const sf::Vector2f new_direction(cos(new_angle), sin(new_angle));
+			direction.setDirectionNow(new_direction);
+			if (hits > 8) {
+				// Bad but nothing better for now
+				position = Conf::COLONY_POSITION;
+			}
 		}
 		else {
 			hits = 0;
-		}
+			position += (dt * move_speed) * v;
 
-		if (hits > 1) {
-			// Bad but nothing better for now
-			position = Conf::COLONY_POSITION;
+			position.x = (position.x < 0.0f || position.x > Conf::WIN_WIDTH) ? Conf::COLONY_POSITION.x : position.x;
+			position.y = (position.y < 0.0f || position.y > Conf::WIN_HEIGHT) ? Conf::COLONY_POSITION.y : position.y;
 		}
-		
-		position += (dt * move_speed) * v;
-
-		position.x = (position.x < 0.0f || position.x > Conf::WIN_WIDTH) ? Conf::COLONY_POSITION.x : position.x;
-		position.y = (position.y < 0.0f || position.y > Conf::WIN_HEIGHT) ? Conf::COLONY_POSITION.y : position.y;
 	}
 
 	void checkFood(World& world)
 	{
-		const std::list<Food*> food_spots = world.grid_food.getAllAt(position);
-		for (Food* fp : food_spots) {
-			if (getLength(position - fp->position) < fp->radius) {
-				phase = Marker::ToHome;
-				direction.addNow(PI);
-				fp->pick();
-				markers_count = 0.0f;
-				return;
-			}
+		if (world.markers.isOnFood(position)) {
+			phase = Mode::ToHome;
+			direction.addNow(PI);
+			world.markers.pickFood(position);
+			markers_count = 0.0f;
+			return;
 		}
 	}
 
 	void checkColony(const sf::Vector2f colony_position)
 	{
 		if (getLength(position - colony_position) < colony_size) {
-			if (phase == Marker::ToHome) {
-				phase = Marker::ToFood;
+			if (phase == Mode::ToHome) {
+				phase = Mode::ToFood;
 				direction.addNow(PI);
 			}
 			markers_count = 0.0f;
@@ -114,35 +104,35 @@ struct Ant
 		const int32_t cell_y = to<int32_t>(position.y / grid_cell_size);
 		const int32_t min_range_x = std::max(1, cell_x - radius_cell);
 		const int32_t min_range_y = std::max(1, cell_y - radius_cell);
-		const int32_t max_range_x = std::min(int32_t(world.markers.size_width) - 2, cell_x + radius_cell);
-		const int32_t max_range_y = std::min(int32_t(world.markers.size_height) - 2, cell_y + radius_cell);
+		const int32_t max_range_x = std::min(int32_t(world.markers.width) - 2, cell_x + radius_cell);
+		const int32_t max_range_y = std::min(int32_t(world.markers.height) - 2, cell_y + radius_cell);
 		
 		const float cell_size_f = to<float>(grid_cell_size);
 
 		// Sample the markers
 		float max_intensity = 0.0f;
 		sf::Vector2f max_direction;
-		MarkersGrid::Cell* max_cell = nullptr;
+		MarkerCell* max_cell = nullptr;
+		// Sample the world
 		const uint32_t sample_count = 64;
 		for (uint32_t i(0); i < sample_count; ++i) {
 			const uint32_t sample_x = RNGu32::getRange(min_range_x, max_range_x);
 			const uint32_t sample_y = RNGu32::getRange(min_range_y, max_range_y);
-			const sf::Vector2f marker_pos = cell_size_f * sf::Vector2f(to<float>(sample_x), to<float>(sample_y)) + cell_size_f * sf::Vector2f(RNGf::get(), RNGf::get());
+			const sf::Vector2f marker_pos = cell_size_f * sf::Vector2f(to<float>(sample_x), to<float>(sample_y));
 			sf::Vector2f to_marker = marker_pos - position;
-			const float length = getLength(to_marker);
-			to_marker = to_marker / length;
-
-			auto& cell = world.markers.getCell(sample_x, sample_y);
-			if (length < marker_detection_max_dist) {
+			const float length2 = getLength2(to_marker);
+			if (length2 < marker_detection_max_dist * marker_detection_max_dist) {
+				to_marker = to_marker / sqrt(length2);
 				if (dot(to_marker, dir_vec) > 0.3f) {
+					auto& cell = world.markers.get(sf::Vector2i(sample_x, sample_y));
 					// Check for food or colony
-					if (cell.permanent[phase]) {
+					if (cell.permanent[static_cast<uint32_t>(phase)]) {
 						max_direction = to_marker;
 						break;
 					}
 					// Check for the most intense marker
-					if (cell.intensity[phase] > max_intensity) {
-						max_intensity = cell.intensity[phase];
+					if (cell.intensity[static_cast<uint32_t>(phase)] > max_intensity) {
+						max_intensity = cell.intensity[static_cast<uint32_t>(phase)];
 						max_direction = to_marker;
 						max_cell = &cell;
 					}
@@ -156,7 +146,7 @@ struct Ant
 		// Update direction
 		if (max_intensity) {
 			if (RNGf::proba(0.3f)) {
-				max_cell->intensity[phase] *= 0.99f;
+				max_cell->intensity[static_cast<uint32_t>(phase)] *= 0.99f;
 			}
 			direction = getAngle(max_direction);
 		}
@@ -167,13 +157,13 @@ struct Ant
 		markers_count += marker_period;
 		const float coef = 0.01f;
 		const float intensity = 1000.0f * exp(-coef * markers_count);
-		world.addMarker(Marker(position, phase == Marker::ToFood ? Marker::ToHome : Marker::ToFood, intensity));
+		world.addMarker(position, phase == Mode::ToFood ? Mode::ToHome : Mode::ToFood, intensity);
 		last_marker = 0.0f;
 	}
 
 	void render_food(sf::RenderTarget& target, const sf::RenderStates& states) const
 	{
-		if (phase == Marker::ToHome) {
+		if (phase == Mode::ToHome) {
 			const float radius = 2.0f;
 			sf::CircleShape circle(radius);
 			circle.setOrigin(radius, radius);
@@ -238,7 +228,7 @@ struct Ant
 	float last_direction_update;
 	float markers_count;
 	float last_marker;
-	Marker::Type phase;
+	Mode phase;
 	float liberty_coef;
 	//const uint32_t id;
 };
