@@ -65,7 +65,7 @@ struct Ant
 		else {
 			hits = 0;
 			position += (dt * move_speed) * v;
-
+			// Ants outside the map go back to home
 			position.x = (position.x < 0.0f || position.x > Conf::WIN_WIDTH) ? Conf::COLONY_POSITION.x : position.x;
 			position.y = (position.y < 0.0f || position.y > Conf::WIN_HEIGHT) ? Conf::COLONY_POSITION.y : position.y;
 		}
@@ -96,51 +96,37 @@ struct Ant
 	void findMarker(World& world, float dt)
 	{
 		// Init
-		const sf::Vector2f dir_vec = direction.getVec();
-		const uint32_t grid_cell_size = world.markers.cell_size;
-		const float radius = 32.0f;
-		const int32_t radius_cell = to<int32_t>(radius / grid_cell_size);
-		const int32_t cell_x = to<int32_t>(position.x / grid_cell_size);
-		const int32_t cell_y = to<int32_t>(position.y / grid_cell_size);
-		const int32_t min_range_x = std::max(1, cell_x - radius_cell);
-		const int32_t min_range_y = std::max(1, cell_y - radius_cell);
-		const int32_t max_range_x = std::min(int32_t(world.markers.width) - 2, cell_x + radius_cell);
-		const int32_t max_range_y = std::min(int32_t(world.markers.height) - 2, cell_y + radius_cell);
-		
-		const float cell_size_f = to<float>(grid_cell_size);
-
-		// Sample the markers
+		const float sample_angle_range = PI * 0.25f;
+		const float current_angle = direction.getCurrentAngle();
 		float max_intensity = 0.0f;
 		sf::Vector2f max_direction;
 		MarkerCell* max_cell = nullptr;
 		// Sample the world
-		const uint32_t sample_count = 64;
-		for (uint32_t i(0); i < sample_count; ++i) {
-			const uint32_t sample_x = RNGu32::getRange(min_range_x, max_range_x);
-			const uint32_t sample_y = RNGu32::getRange(min_range_y, max_range_y);
-			const sf::Vector2f marker_pos = cell_size_f * sf::Vector2f(to<float>(sample_x), to<float>(sample_y));
-			sf::Vector2f to_marker = marker_pos - position;
-			const float length2 = getLength2(to_marker);
-			if (length2 < marker_detection_max_dist * marker_detection_max_dist) {
-				to_marker = to_marker / sqrt(length2);
-				if (dot(to_marker, dir_vec) > 0.3f) {
-					auto& cell = world.markers.get(sf::Vector2i(sample_x, sample_y));
-					// Check for food or colony
-					if (cell.permanent[static_cast<uint32_t>(phase)]) {
-						max_direction = to_marker;
-						break;
-					}
-					// Check for the most intense marker
-					if (cell.intensity[static_cast<uint32_t>(phase)] > max_intensity) {
-						max_intensity = cell.intensity[static_cast<uint32_t>(phase)];
-						max_direction = to_marker;
-						max_cell = &cell;
-					}
-					// Randomly choose own path
-					if (RNGf::proba(liberty_coef)) {
-						break;
-					}
-				}
+		const uint32_t sample_count = 24;
+		for (uint32_t i(sample_count); i--;) {
+			// Get random point in range
+			const float sample_angle = current_angle + RNGf::getRange(sample_angle_range);
+			const float distance = RNGf::getUnder(marker_detection_max_dist);
+			const sf::Vector2f to_marker(cos(sample_angle), sin(sample_angle));
+			auto* cell = world.markers.getSafe(position + distance * to_marker);
+			// Check cell
+			if (!cell) {
+				continue;
+			}
+			// Check for food or colony
+			if (cell->permanent[static_cast<uint32_t>(phase)]) {
+				max_direction = to_marker;
+				break;
+			}
+			// Check for the most intense marker
+			if (cell->intensity[static_cast<uint32_t>(phase)] > max_intensity) {
+				max_intensity = cell->intensity[static_cast<uint32_t>(phase)];
+				max_direction = to_marker;
+				max_cell = cell;
+			}
+			// Randomly choose own path
+			if (RNGf::proba(liberty_coef)) {
+				break;
 			}
 		}
 		// Update direction
@@ -211,24 +197,17 @@ struct Ant
 	const float marker_detection_max_dist = 40.0f;
 	const float direction_update_period = 0.125f;
 	const float marker_period = 0.125f;
-	const float max_reserve = 100000.0f;
 	const float direction_noise_range = PI * 0.1f;
-	const float marker_reserve_consumption = 0.01f;
 	const float colony_size = 20.0f;
 
 	uint32_t hits;
-	std::vector<sf::Vector2f> normals;
-	std::vector<sf::Vector2f> positions;
-	std::vector<sf::Vector2f> velocities;
 
+	Mode phase;
 	sf::Vector2f position;
-	
 	Direction direction;
 
 	float last_direction_update;
 	float markers_count;
 	float last_marker;
-	Mode phase;
 	float liberty_coef;
-	//const uint32_t id;
 };

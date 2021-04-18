@@ -19,6 +19,15 @@ struct Grid
 		cells.resize(width * height);
 	}
 
+	T* getSafe(sf::Vector2f pos)
+	{
+		sf::Vector2i cell_coords = getCellCoords(pos);
+		if (checkCell(cell_coords)) {
+			return &get(cell_coords);
+		}
+		return nullptr;
+	}
+
 	const T& getCst(sf::Vector2i cell_coord) const
 	{
 		return cells[getIndexFromCoords(cell_coord)];
@@ -47,7 +56,7 @@ struct Grid
 
 	bool checkCell(const sf::Vector2i& cell_coords) const
 	{
-		return cell_coords.x > -1 && cell_coords.x < width&& cell_coords.y > -1 && cell_coords.y < height;
+		return cell_coords.x > -1 && cell_coords.x < width && cell_coords.y > -1 && cell_coords.y < height;
 	}
 
 	uint64_t getIndexFromCoords(const sf::Vector2i& cell_coords) const
