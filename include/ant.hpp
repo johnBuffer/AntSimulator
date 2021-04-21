@@ -52,7 +52,7 @@ struct Ant
 	{
 		sf::Vector2f v = direction.getVec();
 		const sf::Vector2f next_position = position + (dt * move_speed) * v;
-		if (world.grid_walls.get(next_position)) {
+		if (world.markers.get(next_position).wall) {
 			++hits;
 			const float new_angle = RNGf::getFullRange(PI);
 			const sf::Vector2f new_direction(cos(new_angle), sin(new_angle));
@@ -157,26 +157,6 @@ struct Ant
 			circle.setFillColor(Conf::FOOD_COLOR);
 			target.draw(circle, states);
 		}
-	}
-
-	sf::Vector2f getWallNormal(World& world, const sf::Vector2f& v) const
-	{
-		const float cell_size_f = to<float>(world.grid_walls.cell_size);
-		const float inv_direction[]{ 1.0f / v.x, 1.0f / v.y };
-		const float t_d[]{ std::abs(cell_size_f * inv_direction[0]), std::abs(cell_size_f * inv_direction[1]) };
-		const int32_t step[]{v.x >= 0.0f ? 1 : -1, v.y >= 0.0f ? 1 : -1 };
-		const sf::Vector2i cell_coords = world.grid_walls.getCellCoords(position);
-
-		float t_max[]{
-			((cell_coords.x + (step[0] > 0)) * cell_size_f - position.x) * inv_direction[0],
-			((cell_coords.y + (step[1] > 0)) * cell_size_f - position.y) * inv_direction[1]
-		};
-
-		if (t_max[0] < t_max[1]) {
-			return sf::Vector2f(to<float>(-step[0]), 0.0f);
-		}
-
-		return sf::Vector2f(0.0f, to<float>(-step[1]));
 	}
 
 	void render_in(sf::VertexArray& va, const uint32_t index) const

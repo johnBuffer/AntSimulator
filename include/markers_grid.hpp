@@ -14,11 +14,13 @@ struct MarkerCell
 	bool permanent[2];
 	// Food quantity in the cell
 	uint32_t food;
+	uint32_t wall;
 
 	MarkerCell()
 		: intensity{ 0.0f, 0.0f }
 		, permanent{ false, false }
 		, food(0)
+		, wall(0)
 	{}
 
 	void update(float dt)
