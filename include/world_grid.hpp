@@ -43,6 +43,23 @@ struct WorldCell
 };
 
 
+struct HitPoint
+{
+	const WorldCell* cell;
+	sf::Vector2f normal;
+
+	HitPoint()
+		: cell(nullptr)
+	{}
+
+	HitPoint(const WorldCell& c, sf::Vector2f n)
+		: cell(&c)
+		, normal(n)
+	{}
+
+};
+
+
 struct WorldGrid : public Grid<WorldCell>
 {
 	WorldGrid(uint32_t width_, uint32_t height_, uint32_t cell_size_)
@@ -91,35 +108,33 @@ struct WorldGrid : public Grid<WorldCell>
 		get(pos).pick();
 	}
 
-	const WorldCell* getFirstHit(sf::Vector2f p, sf::Vector2f d, float dist) const
+	const WorldCell* getFirstHit(sf::Vector2f p, sf::Vector2f d, float max_dist) const
 	{
-		const sf::Vector2f inv_d(1.0f / d.x, 1.0f / d.y);
 		sf::Vector2i cell_p = getCellCoords(p);
-		const sf::Vector2i step(d.y < 0.0f ? -1.0f : 1.0f, d.y < 0.0f ? -1.0f : 1.0f);
-		// Compute the value of t for first intersection in x and y
-		float t_max_x = ((cell_p.x + (step.x > 0)) * cell_size - p.x) * inv_d.x;
-		float t_max_y = ((cell_p.y + (step.y > 0)) * cell_size - p.y) * inv_d.y;
-		// Compute how much (in units of t) we can move along the ray
-		// before reaching the cell's width or height
+		const sf::Vector2i step(d.y < 0.0f ? -1 : 1, d.y < 0.0f ? -1 : 1);
+		const sf::Vector2f inv_d(1.0f / d.x, 1.0f / d.y);
 		const float t_dx = std::abs(float(cell_size) * inv_d.x);
 		const float t_dy = std::abs(float(cell_size) * inv_d.y);
-
-		while (1) {
-			if (t_max_x < t_max_y) {
-				t_max_x += t_dx;
-				cell_x += step_x;
+		float t_max_x = ((cell_p.x + (step.x > 0)) * cell_size - p.x) * inv_d.x;
+		float t_max_y = ((cell_p.y + (step.y > 0)) * cell_size - p.y) * inv_d.y;
+		float dist = 0.0f;
+		while (dist < max_dist) {
+			const uint32_t b = t_max_x < t_max_y;
+			// Advance in grid
+			dist += b * t_max_x + (!b) * t_max_y;
+			t_max_x += t_dx * b;
+			t_max_y += t_dy * (!b);
+			cell_p.x += step.x * b;
+			cell_p.y += step.y * (!b);
+			if (!checkCoords(cell_p)) {
+				return nullptr;
 			}
 			else {
-				t_max_y += t_dy;
-				cell_y += step_y;
-			}
+				const WorldCell& cell = getCst(cell_p);
+				if (cell.wall) {
 
-			if ((step_x > 0 && cell_x > end_x) || (step_x < 0 && cell_x < end_x)
-				|| (step_y > 0 && cell_y > end_y) || (step_y < 0 && cell_y < end_y)) {
-				std::cout << occupied.size() << std::endl;
-				break;
+				}
 			}
 		}
-	}
 	}
 };

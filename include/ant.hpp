@@ -100,7 +100,7 @@ struct Ant
 		const float current_angle = direction.getCurrentAngle();
 		float max_intensity = 0.0f;
 		sf::Vector2f max_direction;
-		MarkerCell* max_cell = nullptr;
+		WorldCell* max_cell = nullptr;
 		// Sample the world
 		const uint32_t sample_count = 24;
 		for (uint32_t i(sample_count); i--;) {

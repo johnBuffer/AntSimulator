@@ -2,14 +2,15 @@
 #include "async_va_renderer.hpp"
 #include "grid.hpp"
 #include "config.hpp"
+#include "world_grid.hpp"
 
 
 struct WorldRenderer : public AsyncRenderer
 {
-	const Grid<MarkerCell>& grid;
+	const Grid<WorldCell>& grid;
 	bool draw_markers;
 
-	WorldRenderer(Grid<MarkerCell>& grid_, DoubleObject<sf::VertexArray>& target)
+	WorldRenderer(Grid<WorldCell>& grid_, DoubleObject<sf::VertexArray>& target)
 		: AsyncRenderer(target)
 		, grid(grid_)
 		, draw_markers(true)
