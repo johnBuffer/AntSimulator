@@ -2,14 +2,15 @@
 #include "async_va_renderer.hpp"
 #include "grid.hpp"
 #include "config.hpp"
+#include "world_grid.hpp"
 
 
 struct WorldRenderer : public AsyncRenderer
 {
-	const Grid<MarkerCell>& grid;
+	const Grid<WorldCell>& grid;
 	bool draw_markers;
 
-	WorldRenderer(Grid<MarkerCell>& grid_, DoubleObject<sf::VertexArray>& target)
+	WorldRenderer(Grid<WorldCell>& grid_, DoubleObject<sf::VertexArray>& target)
 		: AsyncRenderer(target)
 		, grid(grid_)
 		, draw_markers(true)
@@ -73,10 +74,10 @@ struct WorldRenderer : public AsyncRenderer
 				else if (cell.wall) {
 					color = Conf::WALL_COLOR;
 					const float offset = 4.0f;
-					va[4 * i + 0].texCoords = sf::Vector2f(100.0f + offset, offset);
-					va[4 * i + 1].texCoords = sf::Vector2f(200.0f - offset, offset);
-					va[4 * i + 2].texCoords = sf::Vector2f(200.0f - offset, 100.0f - offset);
-					va[4 * i + 3].texCoords = sf::Vector2f(100.0f + offset, 100.0f - offset);
+					va[4 * i + 0].texCoords = sf::Vector2f(200.0f + offset, offset);
+					va[4 * i + 1].texCoords = sf::Vector2f(300.0f - offset, offset);
+					va[4 * i + 2].texCoords = sf::Vector2f(300.0f - offset, 100.0f - offset);
+					va[4 * i + 3].texCoords = sf::Vector2f(200.0f + offset, 100.0f - offset);
 				}
 				va[4 * i + 0].color = color;
 				va[4 * i + 1].color = color;

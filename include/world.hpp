@@ -3,17 +3,23 @@
 #include <vector>
 #include <SFML/System.hpp>
 
-#include "markers_grid.hpp"
+#include "world_grid.hpp"
 #include "utils.hpp"
 #include "wall.hpp"
 #include "grid.hpp"
 #include "ant_mode.hpp"
-#include "markers_renderer.hpp"
+#include "world_renderer.hpp"
 #include "walls_renderer.hpp"
 
 
 struct World
 {
+	sf::Vector2f size;
+	WorldGrid markers;
+	DoubleObject<sf::VertexArray> va_markers;
+	DoubleObject<sf::VertexArray> va_walls;
+	WorldRenderer renderer;
+
 	World(uint32_t width, uint32_t height)
 		: markers(width, height, 4)
 		, size(to<float>(width), to<float>(height))
@@ -62,10 +68,4 @@ struct World
 		addMarker(pos, Mode::ToFood, 100000000.0f, true);
 		markers.addFood(pos, quantity);
 	}
-
-	sf::Vector2f size;
-	MarkersGrid markers;
-	DoubleObject<sf::VertexArray> va_markers;
-	DoubleObject<sf::VertexArray> va_walls;
-	WorldRenderer renderer;
 };
