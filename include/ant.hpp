@@ -52,13 +52,15 @@ struct Ant
 	{
 		sf::Vector2f v = direction.getVec();
 		const sf::Vector2f next_position = position + (dt * move_speed) * v;
-		if (world.markers.get(next_position).wall) {
+		const HitPoint intersection = world.markers.getFirstHit(position, v, dt * move_speed);
+		if (intersection.cell) {
 			++hits;
-			const float new_angle = RNGf::getFullRange(PI);
-			const sf::Vector2f new_direction(cos(new_angle), sin(new_angle));
-			direction.setDirectionNow(new_direction);
-			if (hits > 8) {
-				// Bad but nothing better for now
+			v.x *= intersection.normal.x ? -1.0f : 1.0f;
+			v.y *= intersection.normal.y ? -1.0f : 1.0f;
+			direction.setDirectionNow(v);
+			const uint32_t hits_threshold = 8;
+			if (hits > hits_threshold) {
+				// If an ant gets stuck, reset its position
 				position = Conf::COLONY_POSITION;
 			}
 		}

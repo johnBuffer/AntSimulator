@@ -112,7 +112,7 @@ struct WorldGrid : public Grid<WorldCell>
 	{
 		HitPoint intersection;
 		sf::Vector2i cell_p = getCellCoords(p);
-		const sf::Vector2i step(d.y < 0.0f ? -1 : 1, d.y < 0.0f ? -1 : 1);
+		const sf::Vector2i step(d.x < 0.0f ? -1 : 1, d.y < 0.0f ? -1 : 1);
 		const sf::Vector2f inv_d(1.0f / d.x, 1.0f / d.y);
 		const float t_dx = std::abs(float(cell_size) * inv_d.x);
 		const float t_dy = std::abs(float(cell_size) * inv_d.y);
@@ -134,7 +134,7 @@ struct WorldGrid : public Grid<WorldCell>
 				const WorldCell& cell = getCst(cell_p);
 				if (cell.wall) {
 					intersection.cell = &cell;
-					intersection.normal = sf::Vector2f(b, !b);
+					intersection.normal = sf::Vector2f(to<float>(b), to<float>(!b));
 					return intersection;
 				}
 			}
