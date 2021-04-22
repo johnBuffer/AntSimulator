@@ -108,8 +108,9 @@ struct WorldGrid : public Grid<WorldCell>
 		get(pos).pick();
 	}
 
-	const WorldCell* getFirstHit(sf::Vector2f p, sf::Vector2f d, float max_dist) const
+	HitPoint getFirstHit(sf::Vector2f p, sf::Vector2f d, float max_dist) const
 	{
+		HitPoint intersection;
 		sf::Vector2i cell_p = getCellCoords(p);
 		const sf::Vector2i step(d.y < 0.0f ? -1 : 1, d.y < 0.0f ? -1 : 1);
 		const sf::Vector2f inv_d(1.0f / d.x, 1.0f / d.y);
@@ -127,14 +128,17 @@ struct WorldGrid : public Grid<WorldCell>
 			cell_p.x += step.x * b;
 			cell_p.y += step.y * (!b);
 			if (!checkCoords(cell_p)) {
-				return nullptr;
+				return intersection;
 			}
 			else {
 				const WorldCell& cell = getCst(cell_p);
 				if (cell.wall) {
-
+					intersection.cell = &cell;
+					intersection.normal = sf::Vector2f(b, !b);
+					return intersection;
 				}
 			}
 		}
+		return intersection;
 	}
 };
