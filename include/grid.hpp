@@ -75,34 +75,11 @@ struct Grid
 
 
 template<typename T>
-struct GridOfNumber : public Grid<T>
-{
-	GridOfNumber(int32_t width_, int32_t height_, uint32_t cell_size_)
-		: Grid(width_, height_, cell_size_)
-	{
-	}
-
-	template<typename VType>
-	void setCellValue(sf::Vector2<VType> pos, T value)
-	{
-		get(pos) = value;
-	}
-
-	template<typename VType>
-	void addToCell(sf::Vector2<VType> pos, T value)
-	{
-		get(pos) += value;
-	}
-};
-
-
-template<typename T>
 struct GridListCell
 {
 	bool empty;
 	std::list<T> data;
 };
-
 
 
 template<typename T>
