@@ -54,11 +54,11 @@ struct Ant
 	{
 		sf::Vector2f v = direction.getVec();
 		const sf::Vector2f next_position = position + (dt * move_speed) * v;
-		const HitPoint intersection = world.map.getFirstHit(position, v, dt * move_speed);
-		if (intersection.cell) {
+		const HitPoint hit = world.map.getFirstHit(position, v, dt * move_speed);
+		if (hit.cell) {
 			++hits;
-			v.x *= intersection.normal.x ? -1.0f : 1.0f;
-			v.y *= intersection.normal.y ? -1.0f : 1.0f;
+			v.x *= hit.normal.x ? -1.0f : 1.0f;
+			v.y *= hit.normal.y ? -1.0f : 1.0f;
 			direction.setDirectionNow(v);
 			const uint32_t hits_threshold = 8;
 			if (hits > hits_threshold) {
