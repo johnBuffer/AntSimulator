@@ -46,7 +46,9 @@ struct World
 
 	void addWall(const sf::Vector2f& position)
 	{
-		markers.get(position).wall = 1;
+		if (markers.checkCoords(position)) {
+			markers.get(position).wall = 1;
+		}
 	}
 
 	void removeWall(const sf::Vector2f& position)

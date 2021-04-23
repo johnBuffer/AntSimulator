@@ -17,6 +17,8 @@ struct DefaultConf
 	static sf::Vector2f COLONY_POSITION;
 	static uint32_t WIN_WIDTH;
 	static uint32_t WIN_HEIGHT;
+	static uint32_t WORLD_WIDTH;
+	static uint32_t WORLD_HEIGHT;
 	static uint32_t ANTS_COUNT;
 	static std::shared_ptr<sf::Texture> ANT_TEXTURE;
 	static std::shared_ptr<sf::Texture> MARKER_TEXTURE;
@@ -54,6 +56,10 @@ template<typename T>
 uint32_t DefaultConf<T>::WIN_WIDTH = 1920;
 template<typename T>
 uint32_t DefaultConf<T>::WIN_HEIGHT = 1080;
+template<typename T>
+uint32_t DefaultConf<T>::WORLD_WIDTH = 2000;
+template<typename T>
+uint32_t DefaultConf<T>::WORLD_HEIGHT = 1000;
 template<typename T>
 uint32_t DefaultConf<T>::ANTS_COUNT = 1024;
 template<typename T>

@@ -54,6 +54,11 @@ struct Grid
 		return float(cell_size) * sf::Vector2f(cell_coords.x + 0.5f, cell_coords.y + 0.5f);
 	}
 
+	bool checkCoords(const sf::Vector2f& position) const
+	{
+		return checkCoords(getCellCoords(position));
+	}
+
 	bool checkCoords(const sf::Vector2i& cell_coords) const
 	{
 		return cell_coords.x > -1 && cell_coords.x < width && cell_coords.y > -1 && cell_coords.y < height;
