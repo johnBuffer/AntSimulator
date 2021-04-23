@@ -102,24 +102,24 @@ struct GridOfList : public Grid<GridListCell<T>>
 
 	T* emplaceAtPosition(sf::Vector2f pos)
 	{
-		return emplaceAtPosition(getCellCoords(pos));
+		return emplaceAtPosition(Grid<T>::getCellCoords(pos));
 	}
 
 	T* add(const T& obj)
 	{
-		return add(getCellCoords(obj.position), obj);
+		return add(Grid<T>::getCellCoords(obj.position), obj);
 	}
 
 	void clearAt(sf::Vector2f position)
 	{
-		auto cell_coords = getCellCoords(position);
-		cells[getIndexFromCoords(cell_coords)].data.clear();
+		auto cell_coords = Grid<T>::getCellCoords(position);
+		cells[Grid<T>::getIndexFromCoords(cell_coords)].data.clear();
 	}
 
 	T* add(const sf::Vector2i& cell_coords, const T& obj)
 	{
-		if (checkCell(cell_coords)) {
-			GridListCell<T>& cell = cells[getIndexFromCoords(cell_coords)];
+		if (checkCoords(cell_coords)) {
+			GridListCell<T>& cell = cells[Grid<T>::getIndexFromCoords(cell_coords)];
 			cell.data.emplace_back(obj);
 			return &cell.data.back();
 		}
@@ -129,12 +129,12 @@ struct GridOfList : public Grid<GridListCell<T>>
 	std::list<T*> getAllAt(const sf::Vector2f& position)
 	{
 		std::list<T*> result;
-		const sf::Vector2i cell_coords = getCellCoords(position);
+		const sf::Vector2i cell_coords = Grid<T>::getCellCoords(position);
 
 		for (int32_t x(-1); x < 2; ++x) {
 			for (int32_t y(-1); y < 2; ++y) {
 				const sf::Vector2i coords = cell_coords + sf::Vector2i(x, y);
-				if (checkCell(coords)) {
+				if (Grid<T>::checkCell(coords)) {
 					GridListCell<T>& c = get(coords);
 					for (T& m : c.data) {
 						result.push_back(&m);
@@ -150,7 +150,7 @@ struct GridOfList : public Grid<GridListCell<T>>
 	{
 		const sf::Vector2i cell_coords = getCellCoords(position);
 
-		if (checkCell(cell_coords)) {
+		if (checkCoords(cell_coords)) {
 			return &cells[getIndexFromCoords(cell_coords)];
 		}
 
@@ -161,7 +161,7 @@ struct GridOfList : public Grid<GridListCell<T>>
 	{
 		const sf::Vector2i cell_coords = getCellCoords(position);
 
-		if (checkCell(cell_coords)) {
+		if (checkCoords(cell_coords)) {
 			return getCst(cell_coords).data.empty();
 		}
 
