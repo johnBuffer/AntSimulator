@@ -7,6 +7,7 @@
 #include "number_generator.hpp"
 #include "ant_mode.hpp"
 #include "cooldown.hpp"
+#include "colony_base.hpp"
 
 #include <iostream>
 
@@ -86,12 +87,13 @@ struct Ant
 		}
 	}
 
-	void checkColony(const sf::Vector2f colony_position)
+	void checkColony(ColonyBase& base)
 	{
-		if (getLength(position - colony_position) < colony_size) {
+		if (getLength(position - base.position) < base.radius) {
 			if (phase == Mode::ToHome) {
 				phase = Mode::ToFood;
 				direction.addNow(PI);
+				base.addFood(1.0f);
 			}
 			markers_count = 0.0f;
 		}

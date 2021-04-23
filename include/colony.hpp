@@ -43,7 +43,7 @@ struct Colony
 		}
 
 		for (Ant& ant : ants) {
-			ant.checkColony(position);
+			ant.checkColony(base);
 		}
 	}
 
