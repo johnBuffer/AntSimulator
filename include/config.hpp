@@ -12,6 +12,7 @@ struct DefaultConf
 	const static sf::Color TO_FOOD_COLOR;
 	const static sf::Color TO_HOME_COLOR;
 	const static sf::Color COLONY_COLOR;
+	const static sf::Color WALL_COLOR;
 	static float COLONY_SIZE;
 	static sf::Vector2f COLONY_POSITION;
 	static uint32_t WIN_WIDTH;
@@ -47,6 +48,8 @@ template<typename T>
 const sf::Color DefaultConf<T>::TO_HOME_COLOR = sf::Color(255, 0, 0);
 template<typename T>
 const sf::Color DefaultConf<T>::COLONY_COLOR = DefaultConf<T>::ANT_COLOR;
+template<typename T>
+const sf::Color DefaultConf<T>::WALL_COLOR = sf::Color(94, 87, 87);
 template<typename T>
 uint32_t DefaultConf<T>::WIN_WIDTH = 1920;
 template<typename T>
