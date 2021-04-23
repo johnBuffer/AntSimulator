@@ -98,7 +98,7 @@ struct Ant
 	void findMarker(World& world, float dt)
 	{
 		// Init
-		const float sample_angle_range = PI * 0.25f;
+		const float sample_angle_range = PI * 0.75f;
 		const float current_angle = direction.getCurrentAngle();
 		float max_intensity = 0.0f;
 		sf::Vector2f max_direction;
