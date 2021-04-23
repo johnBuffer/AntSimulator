@@ -65,7 +65,7 @@ void DisplayManager::draw()
 	sf::RenderStates rs = rs_ground;
 
 	// Render markers
-	m_world.renderMarkers(m_target, rs_ground);
+	m_world.renderMap(m_target, rs_ground);
 
 	// Render ants
 	if (render_ants) {

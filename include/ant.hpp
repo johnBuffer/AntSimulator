@@ -54,7 +54,7 @@ struct Ant
 	{
 		sf::Vector2f v = direction.getVec();
 		const sf::Vector2f next_position = position + (dt * move_speed) * v;
-		const HitPoint intersection = world.markers.getFirstHit(position, v, dt * move_speed);
+		const HitPoint intersection = world.map.getFirstHit(position, v, dt * move_speed);
 		if (intersection.cell) {
 			++hits;
 			v.x *= intersection.normal.x ? -1.0f : 1.0f;
@@ -77,10 +77,10 @@ struct Ant
 
 	void checkFood(World& world)
 	{
-		if (world.markers.isOnFood(position)) {
+		if (world.map.isOnFood(position)) {
 			phase = Mode::ToHome;
 			direction.addNow(PI);
-			world.markers.pickFood(position);
+			world.map.pickFood(position);
 			markers_count = 0.0f;
 			return;
 		}
@@ -112,7 +112,7 @@ struct Ant
 			const float sample_angle = current_angle + RNGf::getRange(sample_angle_range);
 			const float distance = RNGf::getUnder(marker_detection_max_dist);
 			const sf::Vector2f to_marker(cos(sample_angle), sin(sample_angle));
-			auto* cell = world.markers.getSafe(position + distance * to_marker);
+			auto* cell = world.map.getSafe(position + distance * to_marker);
 			// Check cell
 			if (!cell) {
 				continue;
