@@ -6,6 +6,7 @@
 #include "direction.hpp"
 #include "number_generator.hpp"
 #include "ant_mode.hpp"
+#include "cooldown.hpp"
 
 #include <iostream>
 
@@ -17,8 +18,8 @@ struct Ant
 	Ant(float x, float y, float angle)
 		: position(x, y)
 		, direction(angle)
-		, last_direction_update(RNGf::getUnder(1.0f) * direction_update_period)
-		, last_marker(RNGf::getUnder(1.0f) * marker_period)
+		, direction_update(direction_update_period, RNGf::getUnder(1.0f) * direction_update_period)
+		, marker_add(marker_period, RNGf::getUnder(1.0f) * marker_period)
 		, phase(Mode::ToFood)
 		, liberty_coef(RNGf::getRange(0.0001f, 0.001f))
 		, hits(0)
@@ -33,16 +34,17 @@ struct Ant
 			checkFood(world);
 		}
 
-		last_direction_update += dt;
-		if (last_direction_update > direction_update_period) {
+		direction_update.update(dt);
+		if (direction_update.ready()) {
 			findMarker(world, dt);
 			direction += RNGf::getFullRange(direction_noise_range);
-			last_direction_update = 0.0f;
+			direction_update.reset();
 		}
 
-		last_marker += dt;
-		if (last_marker >= marker_period) {
+		marker_add.update(dt);
+		if (marker_add.ready()) {
 			addMarker(world);
+			marker_add.reset();
 		}
 
 		direction.update(dt);
@@ -146,7 +148,6 @@ struct Ant
 		const float coef = 0.01f;
 		const float intensity = 1000.0f * exp(-coef * markers_count);
 		world.addMarker(position, phase == Mode::ToFood ? Mode::ToHome : Mode::ToFood, intensity);
-		last_marker = 0.0f;
 	}
 
 	void render_food(sf::RenderTarget& target, const sf::RenderStates& states) const
@@ -187,8 +188,8 @@ struct Ant
 	Direction direction;
 	uint32_t hits;
 
-	float last_direction_update;
+	Cooldown direction_update;
+	Cooldown marker_add;
 	float markers_count;
-	float last_marker;
 	float liberty_coef;
 };
