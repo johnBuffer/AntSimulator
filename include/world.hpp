@@ -69,7 +69,7 @@ struct World
 	{
 		const sf::Vector2f pos(x, y);
 		if (markers.checkCoords(pos)) {
-			addMarker(pos, Mode::ToFood, 100000000.0f, true);
+			addMarker(pos, Mode::ToFood, 1.0f, true);
 			markers.addFood(pos, quantity);
 		}
 	}
