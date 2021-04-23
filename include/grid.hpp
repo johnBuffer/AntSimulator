@@ -92,7 +92,7 @@ struct GridOfList : public Grid<GridListCell<T>>
 
 	T* emplaceAtPosition(sf::Vector2i pos)
 	{
-		if (checkCoords(pos)) {
+		if (Grid<T>::checkCoords(pos)) {
 			GridListCell<T>& c = get(pos);
 			c.data.emplace_back();
 			return &c.data.back();
