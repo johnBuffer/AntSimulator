@@ -52,7 +52,9 @@ struct World
 
 	void removeWall(const sf::Vector2f& position)
 	{
-		markers.get(position).wall = 0;
+		if (markers.checkCoords(position)) {
+			markers.get(position).wall = 0;
+		}
 	}
 
 	void renderMarkers(sf::RenderTarget& target, sf::RenderStates states)
@@ -66,7 +68,9 @@ struct World
 	void addFoodAt(float x, float y, uint32_t quantity)
 	{
 		const sf::Vector2f pos(x, y);
-		addMarker(pos, Mode::ToFood, 100000000.0f, true);
-		markers.addFood(pos, quantity);
+		if (markers.checkCoords(pos)) {
+			addMarker(pos, Mode::ToFood, 100000000.0f, true);
+			markers.addFood(pos, quantity);
+		}
 	}
 };
