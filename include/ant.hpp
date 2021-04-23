@@ -96,13 +96,13 @@ struct Ant
 	void findMarker(World& world, float dt)
 	{
 		// Init
-		const float sample_angle_range = PI * 0.25f;
+		const float sample_angle_range = PI * 0.8f;
 		const float current_angle = direction.getCurrentAngle();
 		float max_intensity = 0.0f;
 		sf::Vector2f max_direction;
 		MarkerCell* max_cell = nullptr;
 		// Sample the world
-		const uint32_t sample_count = 24;
+		const uint32_t sample_count = 32;
 		for (uint32_t i(sample_count); i--;) {
 			// Get random point in range
 			const float sample_angle = current_angle + RNGf::getRange(sample_angle_range);
@@ -131,7 +131,7 @@ struct Ant
 		}
 		// Update direction
 		if (max_intensity) {
-			if (RNGf::proba(0.3f)) {
+			if (RNGf::proba(0.4f) && phase == Mode::ToFood) {
 				max_cell->intensity[static_cast<uint32_t>(phase)] *= 0.99f;
 			}
 			direction = getAngle(max_direction);
@@ -200,11 +200,10 @@ struct Ant
 	const float direction_noise_range = PI * 0.1f;
 	const float colony_size = 20.0f;
 
-	uint32_t hits;
-
 	Mode phase;
 	sf::Vector2f position;
 	Direction direction;
+	uint32_t hits;
 
 	float last_direction_update;
 	float markers_count;

@@ -50,6 +50,8 @@ int main()
 				const sf::Vector2f position = float(world.markers.cell_size) * sf::Vector2f(to<float>(x), to<float>(y));
 				if (food_map.getPixel(x, y).g > 100) {
 					world.addFoodAt(position.x, position.y, 5);
+				} else if (food_map.getPixel(x, y).r > 100) {
+					world.addWall(position);
 				}
 			}
 		}
