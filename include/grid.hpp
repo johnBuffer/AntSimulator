@@ -86,7 +86,7 @@ template<typename T>
 struct GridOfList : public Grid<GridListCell<T>>
 {
 	GridOfList(int32_t width_, int32_t height_, uint32_t cell_size_)
-		: Grid(width_, height_, cell_size_)
+		: Grid<T>(width_, height_, cell_size_)
 	{
 	}
 
