@@ -40,6 +40,16 @@ struct WorldCell
 	{
 		food -= bool(food);
 	}
+
+	float getIntensity(Mode mode) const
+	{
+		return intensity[to<uint32_t>(mode)];
+	}
+
+	bool isPermanent(Mode mode) const
+	{
+		return permanent[to<uint32_t>(mode)];
+	}
 };
 
 

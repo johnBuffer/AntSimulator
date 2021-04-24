@@ -7,6 +7,7 @@ struct ColonyBase
 	sf::Vector2f position;
 	float radius;
 	float food;
+	float max_food = 100.0f;
 
 	ColonyBase()
 		: radius(0.0f)
@@ -22,6 +23,7 @@ struct ColonyBase
 	void addFood(float quantity)
 	{
 		food += quantity;
+		food = std::min(max_food, food);
 	}
 
 	bool useFood(float quantity)

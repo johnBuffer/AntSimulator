@@ -36,8 +36,12 @@ int main()
 	Colony colony(Conf::COLONY_POSITION.x, Conf::COLONY_POSITION.y, Conf::ANTS_COUNT);
 	for (uint32_t i(0); i < 64; ++i) {
 		float angle = float(i) / 64.0f * (2.0f * PI);
-		world.addMarker(colony.position + 16.0f * sf::Vector2f(cos(angle), sin(angle)), Mode::ToHome, 10.0f, true);
+		world.addMarker(colony.base.position + 16.0f * sf::Vector2f(cos(angle), sin(angle)), Mode::ToHome, 10.0f, true);
 	}
+
+	const float GUI_MARGIN = 20.0f;
+	colony.population.x = GUI_MARGIN;
+	colony.population.y = Conf::WIN_HEIGHT - colony.population.height - GUI_MARGIN;
 	
 	DisplayManager display_manager(window, window, world, colony);
 

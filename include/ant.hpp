@@ -14,6 +14,28 @@
 
 struct Ant
 {
+	// Parameters
+	float width = 3.0f;
+	float length = 4.7f;
+	float move_speed = 50.0f;
+	float marker_detection_max_dist = 40.0f;
+	float direction_update_period = 0.125f;
+	float marker_period = 0.125f;
+	float direction_noise_range = PI * 0.1f;
+	float colony_size = 20.0f;
+
+	Mode phase;
+	sf::Vector2f position;
+	Direction direction;
+	uint32_t hits;
+
+	Cooldown direction_update;
+	Cooldown marker_add;
+	float markers_count;
+	float liberty_coef;
+	float autonomy;
+	float max_autonomy = 120.0f;
+
 	Ant() = default;
 
 	Ant(float x, float y, float angle)
@@ -25,11 +47,19 @@ struct Ant
 		, liberty_coef(RNGf::getRange(0.0001f, 0.001f))
 		, hits(0)
 		, markers_count(0.0f)
+		, autonomy(0.0f)
 	{
 	}
 
 	void update(const float dt, World& world)
 	{
+		autonomy += dt;
+		const float autonomy_threshold = 0.3f;
+		if (autonomy > autonomy_threshold * max_autonomy && phase != Mode::Refill) {
+			phase = Mode::Refill;
+			direction.addNow(PI);
+		}
+
 		updatePosition(world, dt);
 		if (phase == Mode::ToFood) {
 			checkFood(world);
@@ -95,8 +125,24 @@ struct Ant
 				direction.addNow(PI);
 				base.addFood(1.0f);
 			}
+			else if (phase == Mode::Refill) {
+				const float refill_cost = 1.0f;
+				if (base.useFood(refill_cost)) {
+					autonomy = 0.0f;
+					phase = Mode::ToFood;
+					direction.addNow(PI);
+				}
+			}
 			markers_count = 0.0f;
 		}
+	}
+
+	Mode getMarkersSamplingType() const
+	{
+		if (phase == Mode::ToHome || phase == Mode::Refill) {
+			return Mode::ToHome;
+		}
+		return Mode::ToFood;
 	}
 
 	void findMarker(World& world, float dt)
@@ -107,6 +153,7 @@ struct Ant
 		float max_intensity = 0.0f;
 		sf::Vector2f max_direction;
 		WorldCell* max_cell = nullptr;
+		const Mode marker_phase = getMarkersSamplingType();
 		// Sample the world
 		const uint32_t sample_count = 32;
 		for (uint32_t i(sample_count); i--;) {
@@ -120,13 +167,13 @@ struct Ant
 				continue;
 			}
 			// Check for food or colony
-			if (cell->permanent[static_cast<uint32_t>(phase)]) {
+			if (cell->isPermanent(marker_phase)) {
 				max_direction = to_marker;
 				break;
 			}
 			// Check for the most intense marker
-			if (cell->intensity[static_cast<uint32_t>(phase)] > max_intensity) {
-				max_intensity = cell->intensity[static_cast<uint32_t>(phase)];
+			if (cell->getIntensity(marker_phase) > max_intensity) {
+				max_intensity = cell->getIntensity(marker_phase);
 				max_direction = to_marker;
 				max_cell = cell;
 			}
@@ -146,10 +193,12 @@ struct Ant
 
 	void addMarker(World& world)
 	{
-		markers_count += marker_period;
-		const float coef = 0.01f;
-		const float intensity = 1000.0f * exp(-coef * markers_count);
-		world.addMarker(position, phase == Mode::ToFood ? Mode::ToHome : Mode::ToFood, intensity);
+		if (phase != Mode::Refill) {
+			markers_count += marker_period;
+			const float coef = 0.01f;
+			const float intensity = 1000.0f * exp(-coef * markers_count);
+			world.addMarker(position, phase == Mode::ToFood ? Mode::ToHome : Mode::ToFood, intensity);
+		}
 	}
 
 	void render_food(sf::RenderTarget& target, const sf::RenderStates& states) const
@@ -174,24 +223,4 @@ struct Ant
 		va[index + 2].position = position + width * nrm_vec - length * dir_vec;
 		va[index + 3].position = position - width * nrm_vec - length * dir_vec;
 	}
-
-	// Parameters
-	const float width = 3.0f;
-	const float length = 4.7f;
-	const float move_speed = 50.0f;
-	const float marker_detection_max_dist = 40.0f;
-	const float direction_update_period = 0.125f;
-	const float marker_period = 0.125f;
-	const float direction_noise_range = PI * 0.1f;
-	const float colony_size = 20.0f;
-
-	Mode phase;
-	sf::Vector2f position;
-	Direction direction;
-	uint32_t hits;
-
-	Cooldown direction_update;
-	Cooldown marker_add;
-	float markers_count;
-	float liberty_coef;
 };

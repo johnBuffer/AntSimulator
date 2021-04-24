@@ -1,4 +1,5 @@
 #include "display_manager.hpp"
+#include "colony_renderer.hpp"
 
 
 DisplayManager::DisplayManager(sf::RenderTarget& target, sf::RenderWindow& window, World& world, Colony& colony)
@@ -72,12 +73,7 @@ void DisplayManager::draw()
 		m_colony.render(m_target, rs);
 	}
 
-	const float size = m_colony.size;
-	sf::CircleShape circle(size);
-	circle.setOrigin(size, size);
-	circle.setPosition(m_colony.position);
-	circle.setFillColor(Conf::COLONY_COLOR);
-	m_target.draw(circle, rs_ground);
+	ColonyRenderer::render(m_colony, m_target, rs_ground);
 
 	render_time = clock.getElapsedTime().asMicroseconds() * 0.001f;
 }
