@@ -48,15 +48,20 @@ struct WorldRenderer : public AsyncRenderer
 				const auto& cell = grid.getCst(sf::Vector2i(x, y));
 				sf::Color color = sf::Color::Black;
 				if (!cell.food && !cell.wall && draw_markers) {
-					const float intensity_factor = 0.27f;
-					const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * cell.intensity[0];
-					const sf::Vector3f intensity_2_color = intensity_factor * to_food_color * cell.intensity[1];
-					const sf::Vector3f mixed_color(
-						std::min(255.0f, intensity_1_color.x + intensity_2_color.x),
-						std::min(255.0f, intensity_1_color.y + intensity_2_color.y),
-						std::min(255.0f, intensity_1_color.z + intensity_2_color.z)
-					);
-					color = sf::Color(sf::Color(to<uint8_t>(mixed_color.x), to<uint8_t>(mixed_color.y), to<uint8_t>(mixed_color.z)));
+					if (cell.repellent) {
+						color = sf::Color::Blue;
+					}
+					else {
+						const float intensity_factor = 0.27f;
+						const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * cell.intensity[0];
+						const sf::Vector3f intensity_2_color = intensity_factor * to_food_color * cell.intensity[1];
+						const sf::Vector3f mixed_color(
+							std::min(255.0f, intensity_1_color.x + intensity_2_color.x),
+							std::min(255.0f, intensity_1_color.y + intensity_2_color.y),
+							std::min(255.0f, intensity_1_color.z + intensity_2_color.z)
+						);
+						color = sf::Color(sf::Color(to<uint8_t>(mixed_color.x), to<uint8_t>(mixed_color.y), to<uint8_t>(mixed_color.z)));
+					}
 					const float offset = 32.0f;
 					va[4 * i + 0].texCoords = sf::Vector2f(offset, offset);
 					va[4 * i + 1].texCoords = sf::Vector2f(100.0f - offset, offset);

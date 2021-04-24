@@ -15,12 +15,15 @@ struct WorldCell
 	// Food quantity in the cell
 	uint32_t food;
 	uint32_t wall;
+	// Repellent
+	float repellent;
 
 	WorldCell()
 		: intensity{ 0.0f, 0.0f }
 		, permanent{ false, false }
 		, food(0)
 		, wall(0)
+		, repellent(0.0f)
 	{}
 
 	void update(float dt)
@@ -34,11 +37,16 @@ struct WorldCell
 		// Remove food marker if no food
 		intensity[1] = intensity[1] * to<float>(!bool(!food && permanent[1]));
 		permanent[1] &= to<bool>(food);
+		// Update repellents
+		repellent -= dt;
+		repellent = std::max(0.0f, repellent);
 	}
 
-	void pick()
+	bool pick()
 	{
+		const bool last = (food == 1.0f);
 		food -= bool(food);
+		return last;
 	}
 
 	float getIntensity(Mode mode) const
@@ -113,9 +121,9 @@ struct WorldGrid : public Grid<WorldCell>
 		return getCst(pos).food;
 	}
 
-	void pickFood(sf::Vector2f pos)
+	bool pickFood(sf::Vector2f pos)
 	{
-		get(pos).pick();
+		return get(pos).pick();
 	}
 
 	HitPoint getFirstHit(sf::Vector2f p, sf::Vector2f d, float max_dist) const

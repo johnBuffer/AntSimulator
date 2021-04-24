@@ -25,10 +25,10 @@ struct Colony
 		, ants_va(sf::Quads, 4 * n)
 		, ants_creation_cooldown(2.0f)
 		, population(400, sf::Vector2f(800.0f, 200.0f), sf::Vector2f())
-		, population_update(1.0f)
+		, population_update(3.0f)
 	{
 		base.food = 9.0f;
-		uint32_t ants_count = 8;
+		uint32_t ants_count = 16;
 		for (uint32_t i(ants_count); i--;) {
 			ants.emplace_back(x, y, getRandRange(2.0f * PI));
 		}
@@ -49,7 +49,7 @@ struct Colony
 
 	void update(float dt, World& world)
 	{
-		const float ant_cost = 10.0f;
+		const float ant_cost = 5.0f;
 		ants_creation_cooldown.update(dt);
 		if (ants_creation_cooldown.ready() && ants.size() < max_ants_count && base.useFood(ant_cost)) {
 			ants.emplace_back(base.position.x, base.position.y, getRandRange(2.0f * PI));

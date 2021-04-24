@@ -43,6 +43,11 @@ struct World
 		map.addMarker(pos, type, intensity, permanent);
 	}
 
+	void addMarkerRepellent(sf::Vector2f pos, float amount)
+	{
+		map.get(pos).repellent += amount;
+	}
+
 	void addWall(const sf::Vector2f& position)
 	{
 		if (map.checkCoords(position)) {
