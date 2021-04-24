@@ -61,7 +61,7 @@ uint32_t DefaultConf<T>::WORLD_WIDTH = 1920;
 template<typename T>
 uint32_t DefaultConf<T>::WORLD_HEIGHT = 1080;
 template<typename T>
-uint32_t DefaultConf<T>::ANTS_COUNT = 1024;
+uint32_t DefaultConf<T>::ANTS_COUNT = 2048;
 template<typename T>
 float DefaultConf<T>::COLONY_SIZE = 20.0f;
 template<typename T>

@@ -23,8 +23,8 @@ struct Colony
 		: base(sf::Vector2f(x, y), 20.0f)
 		, max_ants_count(n)
 		, ants_va(sf::Quads, 4 * n)
-		, ants_creation_cooldown(2.0f)
-		, population(400, sf::Vector2f(800.0f, 200.0f), sf::Vector2f())
+		, ants_creation_cooldown(10.0f)
+		, population(800, sf::Vector2f(800.0f, 200.0f), sf::Vector2f())
 		, population_update(3.0f)
 	{
 		base.food = 9.0f;

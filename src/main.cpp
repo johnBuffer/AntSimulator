@@ -29,7 +29,7 @@ int main()
 
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 4;
-	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", sf::Style::Default, settings);
+	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", sf::Style::Fullscreen, settings);
 	window.setFramerateLimit(60);
 
 	World world(Conf::WORLD_WIDTH, Conf::WORLD_HEIGHT);

@@ -206,9 +206,9 @@ struct Ant
 		}
 		// Check for repellent
 		if (phase == Mode::ToFood && max_repellent && !found_permanent) {
-			const float repellent_probe_factor = 0.1f;
+			const float repellent_probe_factor = 0.05f;
 			if (RNGf::proba(repellent_probe_factor*(1.0f - max_intensity * 0.001f))) {
-				phase = Mode::Flee;
+				//phase = Mode::Flee;
 				direction.addNow(RNGf::getUnder(2.0f * PI));
 				flee_time.reset();
 				return;
@@ -220,7 +220,7 @@ struct Ant
 		}
 		// Update direction
 		if (max_intensity) {
-			if (RNGf::proba(0.4f) && phase == Mode::ToFood) {
+			if (RNGf::proba(0.2f) && phase == Mode::ToFood) {
 				max_cell->intensity[static_cast<uint32_t>(phase)] *= 0.99f;
 			}
 			direction = getAngle(max_direction);
