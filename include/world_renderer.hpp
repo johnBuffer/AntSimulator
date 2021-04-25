@@ -15,6 +15,7 @@ struct WorldRenderer : public AsyncRenderer
 		: AsyncRenderer(target)
 		, grid(grid_)
 		, draw_markers(true)
+		, draw_density(false)
 	{
 		AsyncRenderer::start();
 	}

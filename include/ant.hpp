@@ -23,7 +23,7 @@ struct Ant
 	float marker_period = 0.125f;
 	float direction_noise_range = PI * 0.1f;
 	float colony_size = 20.0f;
-	float repellent_period = 100.0f;
+	float repellent_period = 32.0f;
 
 	Mode phase;
 	sf::Vector2f position;
@@ -36,7 +36,7 @@ struct Ant
 	float markers_count;
 	float liberty_coef;
 	float autonomy;
-	float max_autonomy = 300.0f;
+	float max_autonomy = 250.0f;
 
 	Ant() = default;
 

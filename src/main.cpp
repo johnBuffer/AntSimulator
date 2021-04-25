@@ -53,7 +53,7 @@ int main()
 			for (uint32_t y(0); y < food_map.getSize().y; ++y) {
 				const sf::Vector2f position = float(world.map.cell_size) * sf::Vector2f(to<float>(x), to<float>(y));
 				if (food_map.getPixel(x, y).g > 100) {
-					world.addFoodAt(position.x, position.y, 10);
+					world.addFoodAt(position.x, position.y, 7);
 				} else if (food_map.getPixel(x, y).r > 100) {
 					world.addWall(position);
 				}
