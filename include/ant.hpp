@@ -61,7 +61,9 @@ struct Ant
 		if (phase == Mode::ToFood) {
 			checkFood(world);
 		}
-
+		// Get current cell
+		WorldCell& cell = world.map.get(position);
+		cell.addPresence();
 		search_markers.update(dt);
 		direction_update.update(dt);
 		if (direction_update.ready()) {
@@ -69,19 +71,18 @@ struct Ant
 				findMarker(world, dt);
 			}
 			else {
-				WorldCell& cell = world.map.get(position);
 				cell.degrade();
 			}
 			direction += RNGf::getFullRange(direction_noise_range);
 			direction_update.reset();
 		}
-
+		// Add marker
 		marker_add.update(dt);
 		if (marker_add.ready()) {
 			addMarker(world);
 			marker_add.reset();
 		}
-
+		// Update current direction
 		direction.update(dt);
 	}
 

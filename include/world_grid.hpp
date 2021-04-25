@@ -17,6 +17,8 @@ struct WorldCell
 	uint32_t wall;
 	// Repellent
 	float repellent;
+	// Density of ants a a certain point
+	float density;
 
 	WorldCell()
 		: intensity{ 0.0f, 0.0f }
@@ -24,6 +26,7 @@ struct WorldCell
 		, food(0)
 		, wall(0)
 		, repellent(0.0f)
+		, density(0.0f)
 	{}
 
 	void update(float dt)
@@ -40,6 +43,8 @@ struct WorldCell
 		// Update repellents
 		repellent -= dt;
 		repellent = std::max(0.0f, repellent);
+		// Update density
+		density *= 0.99f;
 	}
 
 	bool pick()
@@ -62,6 +67,11 @@ struct WorldCell
 	void degrade()
 	{
 		intensity[to<uint32_t>(Mode::ToFood)] *= 0.25f;
+	}
+
+	void addPresence()
+	{
+		density += 1.0f;
 	}
 };
 

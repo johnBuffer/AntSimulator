@@ -9,6 +9,7 @@ struct WorldRenderer : public AsyncRenderer
 {
 	const Grid<WorldCell>& grid;
 	bool draw_markers;
+	bool draw_density;
 
 	WorldRenderer(Grid<WorldCell>& grid_, DoubleObject<sf::VertexArray>& target)
 		: AsyncRenderer(target)
@@ -47,20 +48,26 @@ struct WorldRenderer : public AsyncRenderer
 			for (int32_t y(0); y < grid.height; y++) {
 				const auto& cell = grid.getCst(sf::Vector2i(x, y));
 				sf::Color color = sf::Color::Black;
-				if (!cell.food && !cell.wall && draw_markers) {
-					if (cell.repellent) {
-						color = sf::Color::Blue;
+				if (!cell.food && !cell.wall) {
+					if (draw_density) {
+						const uint8_t density_color = to<uint8_t>(std::min(255.0f, 10.0f * cell.density));
+						color = sf::Color(density_color, density_color, density_color);
 					}
-					else {
-						const float intensity_factor = 0.128f;
-						const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * cell.intensity[0];
-						const sf::Vector3f intensity_2_color = intensity_factor * to_food_color * cell.intensity[1];
-						const sf::Vector3f mixed_color(
-							std::min(255.0f, intensity_1_color.x + intensity_2_color.x),
-							std::min(255.0f, intensity_1_color.y + intensity_2_color.y),
-							std::min(255.0f, intensity_1_color.z + intensity_2_color.z)
-						);
-						color = sf::Color(sf::Color(to<uint8_t>(mixed_color.x), to<uint8_t>(mixed_color.y), to<uint8_t>(mixed_color.z)));
+					else if (draw_markers) {
+						if (cell.repellent) {
+							color = sf::Color::Blue;
+						}
+						else {
+							const float intensity_factor = 0.128f;
+							const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * cell.intensity[0];
+							const sf::Vector3f intensity_2_color = intensity_factor * to_food_color * cell.intensity[1];
+							const sf::Vector3f mixed_color(
+								std::min(255.0f, intensity_1_color.x + intensity_2_color.x),
+								std::min(255.0f, intensity_1_color.y + intensity_2_color.y),
+								std::min(255.0f, intensity_1_color.z + intensity_2_color.z)
+							);
+							color = sf::Color(sf::Color(to<uint8_t>(mixed_color.x), to<uint8_t>(mixed_color.y), to<uint8_t>(mixed_color.z)));
+						}
 					}
 					const float offset = 32.0f;
 					va[4 * i + 0].texCoords = sf::Vector2f(offset, offset);

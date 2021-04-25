@@ -96,6 +96,7 @@ void DisplayManager::processEvents()
 			else if ((event.key.code == sf::Keyboard::Subtract)) zoom(0.8f);
 			else if ((event.key.code == sf::Keyboard::Add)) zoom(1.2f);
 			else if ((event.key.code == sf::Keyboard::Space)) update = !update;
+			else if ((event.key.code == sf::Keyboard::D)) m_world.renderer.draw_density = !m_world.renderer.draw_density;
 			else if ((event.key.code == sf::Keyboard::P)) pause = !pause;
 			else if ((event.key.code == sf::Keyboard::E)) {
 				remove_wall = !remove_wall;
