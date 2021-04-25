@@ -24,7 +24,7 @@ struct Colony
 		, max_ants_count(n)
 		, ants_va(sf::Quads, 4 * n)
 		, ants_creation_cooldown(10.0f)
-		, population(800, sf::Vector2f(800.0f, 200.0f), sf::Vector2f())
+		, population(800, sf::Vector2f(800.0f, 100.0f), sf::Vector2f())
 		, population_update(3.0f)
 	{
 		base.food = 9.0f;

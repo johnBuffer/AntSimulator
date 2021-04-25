@@ -230,12 +230,13 @@ struct Ant
 	void addMarker(World& world)
 	{
 		markers_count += marker_period;
-		const float coef = 0.01f;
-		const float intensity = 1000.0f * exp(-coef * markers_count);
+		
 		if (phase == Mode::ToHome || phase == Mode::ToFood) {
+			const float intensity = getMarkerIntensity(0.01f);
 			world.addMarker(position, phase == Mode::ToFood ? Mode::ToHome : Mode::ToFood, intensity);
 		}
 		else if (phase == Mode::ToHomeNoFood) {
+			const float intensity = getMarkerIntensity(0.1f);
 			world.addMarkerRepellent(position, intensity);
 		}
 	}
@@ -261,5 +262,10 @@ struct Ant
 		va[index + 1].position = position + width * nrm_vec + length * dir_vec;
 		va[index + 2].position = position + width * nrm_vec - length * dir_vec;
 		va[index + 3].position = position - width * nrm_vec - length * dir_vec;
+	}
+
+	float getMarkerIntensity(float coef)
+	{
+		return 1000.0f * exp(-coef * markers_count);
 	}
 };
