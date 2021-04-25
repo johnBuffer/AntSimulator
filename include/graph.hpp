@@ -17,7 +17,7 @@ struct Graphic
 	bool full;
 
 	Graphic(uint32_t values_count, sf::Vector2f size, sf::Vector2f position)
-		: va(sf::Quads, values_count * 4)
+		: va(sf::TriangleStrip, values_count * 2)
 		, values(values_count, 0.0f)
 		, max_value(0.0f)
 		, width(size.x)
@@ -64,15 +64,11 @@ struct Graphic
 		for (uint64_t i(0); i < size; ++i) {
 			const uint64_t index = full ? (current_index + 1 + i) % size : i;
 			const float bh = values[index] * hf;
-			va[4 * i + 0].position = sf::Vector2f(x + i * bw      , y + height);
-			va[4 * i + 1].position = sf::Vector2f(x + (i + 1) * bw, y + height);
-			va[4 * i + 2].position = sf::Vector2f(x + (i + 1) * bw, y + height - bh);
-			va[4 * i + 3].position = sf::Vector2f(x + i * bw      , y + height - bh);
+			va[2 * i + 0].position = sf::Vector2f(x + i * bw, y + height);
+			va[2 * i + 1].position = sf::Vector2f(x + i * bw, y + height - bh);
 
-			va[4 * i + 0].color = color;
-			va[4 * i + 1].color = color;
-			va[4 * i + 2].color = color;
-			va[4 * i + 3].color = color;
+			va[2 * i + 0].color = color;
+			va[2 * i + 1].color = color;
 		}
 
 		target.draw(va);

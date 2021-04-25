@@ -52,7 +52,7 @@ struct WorldRenderer : public AsyncRenderer
 						color = sf::Color::Blue;
 					}
 					else {
-						const float intensity_factor = 0.27f;
+						const float intensity_factor = 0.128f;
 						const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * cell.intensity[0];
 						const sf::Vector3f intensity_2_color = intensity_factor * to_food_color * cell.intensity[1];
 						const sf::Vector3f mixed_color(

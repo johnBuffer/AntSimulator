@@ -58,6 +58,11 @@ struct WorldCell
 	{
 		return permanent[to<uint32_t>(mode)];
 	}
+
+	void degrade()
+	{
+		intensity[to<uint32_t>(Mode::ToFood)] *= 0.25f;
+	}
 };
 
 

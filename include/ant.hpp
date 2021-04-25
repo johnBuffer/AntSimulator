@@ -23,7 +23,7 @@ struct Ant
 	float marker_period = 0.125f;
 	float direction_noise_range = PI * 0.1f;
 	float colony_size = 20.0f;
-	float repellent_period = 2.0f;
+	float repellent_period = 100.0f;
 
 	Mode phase;
 	sf::Vector2f position;
@@ -32,7 +32,7 @@ struct Ant
 
 	Cooldown direction_update;
 	Cooldown marker_add;
-	Cooldown flee_time;
+	Cooldown search_markers;
 	float markers_count;
 	float liberty_coef;
 	float autonomy;
@@ -45,34 +45,32 @@ struct Ant
 		, direction(angle)
 		, direction_update(direction_update_period, RNGf::getUnder(1.0f) * direction_update_period)
 		, marker_add(marker_period, RNGf::getUnder(1.0f) * marker_period)
-		, flee_time(5.0f, 5.0f)
+		, search_markers(5.0f, 5.0f)
 		, phase(Mode::ToFood)
-		, liberty_coef(RNGf::getRange(0.0001f, 0.001f))
+		, liberty_coef(RNGf::getRange(0.001f, 0.01f))
 		, hits(0)
 		, markers_count(0.0f)
 		, autonomy(0.0f)
 	{
 	}
 
-	void update(const float dt, World& world)
+	void update(float dt, World& world)
 	{
 		autonomy += dt;
-		/*const float autonomy_threshold = 0.3f;
-		if (autonomy > autonomy_threshold * max_autonomy && phase != Mode::Refill && phase != Mode::ToHome) {
-			phase = Mode::Refill;
-			direction.addNow(PI);
-		}*/
-
 		updatePosition(world, dt);
 		if (phase == Mode::ToFood) {
 			checkFood(world);
 		}
 
-		flee_time.update(dt);
+		search_markers.update(dt);
 		direction_update.update(dt);
 		if (direction_update.ready()) {
-			if (flee_time.ready()) {
+			if (search_markers.ready()) {
 				findMarker(world, dt);
+			}
+			else {
+				WorldCell& cell = world.map.get(position);
+				cell.degrade();
 			}
 			direction += RNGf::getFullRange(direction_noise_range);
 			direction_update.reset();
@@ -118,12 +116,13 @@ struct Ant
 			phase = Mode::ToHome;
 			direction.addNow(PI);
 			autonomy = 0.0f;
+			markers_count = 0.0f;
 			if (world.map.pickFood(position)) {
 				phase = Mode::ToHomeNoFood;
 				marker_add.target = repellent_period;
 				marker_add.value = RNGf::getUnder(marker_add.target);
+				world.addMarkerRepellent(position, getMarkerIntensity(0.1f));
 			}
-			markers_count = 0.0f;
 			return;
 		}
 	}
@@ -159,7 +158,7 @@ struct Ant
 	void findMarker(World& world, float dt)
 	{
 		// Init
-		const float sample_angle_range = PI * 0.8f;
+		const float sample_angle_range = PI * 0.75f;
 		const float current_angle = direction.getCurrentAngle();
 		float max_intensity = 0.0f;
 		// To objective stuff
@@ -206,11 +205,11 @@ struct Ant
 		}
 		// Check for repellent
 		if (phase == Mode::ToFood && max_repellent && !found_permanent) {
-			const float repellent_probe_factor = 0.05f;
-			if (RNGf::proba(repellent_probe_factor*(1.0f - max_intensity * 0.001f))) {
+			const float repellent_probe_factor = 0.1f;
+			if (RNGf::proba(repellent_probe_factor*(1.0f - max_intensity * 0.0005f))) {
 				//phase = Mode::Flee;
 				direction.addNow(RNGf::getUnder(2.0f * PI));
-				flee_time.reset();
+				search_markers.reset();
 				return;
 			}
 		}
@@ -229,10 +228,9 @@ struct Ant
 
 	void addMarker(World& world)
 	{
-		markers_count += marker_period;
-		
+		markers_count += marker_add.target;
 		if (phase == Mode::ToHome || phase == Mode::ToFood) {
-			const float intensity = getMarkerIntensity(0.01f);
+			const float intensity = getMarkerIntensity(0.005f);
 			world.addMarker(position, phase == Mode::ToFood ? Mode::ToHome : Mode::ToFood, intensity);
 		}
 		else if (phase == Mode::ToHomeNoFood) {
@@ -266,6 +264,6 @@ struct Ant
 
 	float getMarkerIntensity(float coef)
 	{
-		return 1000.0f * exp(-coef * markers_count);
+		return 2000.0f * exp(-coef * markers_count);
 	}
 };
