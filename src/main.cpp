@@ -5,7 +5,7 @@
 #include "colony.hpp"
 #include "config.hpp"
 #include "display_manager.hpp"
-
+#include "distance_field_builder.hpp"
 
 
 void loadUserConf()
@@ -52,14 +52,21 @@ int main()
 		for (uint32_t x(0); x < food_map.getSize().x; ++x) {
 			for (uint32_t y(0); y < food_map.getSize().y; ++y) {
 				const sf::Vector2f position = float(world.map.cell_size) * sf::Vector2f(to<float>(x), to<float>(y));
-				if (food_map.getPixel(x, y).g > 100) {
-					world.addFoodAt(position.x, position.y, 7);
+				if (food_map.getPixel(x, y).g > 120) {
+					world.addFoodAt(position.x, position.y, 2);
 				} else if (food_map.getPixel(x, y).r > 100) {
 					world.addWall(position);
 				}
 			}
 		}
 	}
+
+	DistanceFieldBuilder::computeDistance(world.map);
+
+	display_manager.pause = true;
+	display_manager.render_ants = true;
+	world.renderer.draw_density = false;
+	world.renderer.draw_markers = false;
 
 	while (window.isOpen())
 	{

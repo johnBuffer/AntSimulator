@@ -19,6 +19,8 @@ struct WorldCell
 	float repellent;
 	// Density of ants a a certain point
 	float density;
+	// Dist to wall
+	float wall_dist;
 
 	WorldCell()
 		: intensity{ 0.0f, 0.0f }
@@ -27,6 +29,7 @@ struct WorldCell
 		, wall(0)
 		, repellent(0.0f)
 		, density(0.0f)
+		, wall_dist(0.0f)
 	{}
 
 	void update(float dt)

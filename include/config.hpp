@@ -14,6 +14,7 @@ struct DefaultConf
 	const static sf::Color COLONY_COLOR;
 	const static sf::Color WALL_COLOR;
 	static float COLONY_SIZE;
+	static float MARKER_INTENSITY;
 	static sf::Vector2f COLONY_POSITION;
 	static uint32_t WIN_WIDTH;
 	static uint32_t WIN_HEIGHT;
@@ -61,11 +62,15 @@ uint32_t DefaultConf<T>::WORLD_WIDTH = 1920;
 template<typename T>
 uint32_t DefaultConf<T>::WORLD_HEIGHT = 1080;
 template<typename T>
-uint32_t DefaultConf<T>::ANTS_COUNT = 2048;
+uint32_t DefaultConf<T>::ANTS_COUNT = 3000;
 template<typename T>
 float DefaultConf<T>::COLONY_SIZE = 20.0f;
 template<typename T>
-sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(100.0f, 100.0f);
+float DefaultConf<T>::MARKER_INTENSITY = 1000.0f;
+template<typename T>
+sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(DefaultConf<T>::WIN_WIDTH / 2, DefaultConf<T>::WIN_HEIGHT / 2 + 400.0f);
+//sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(110.0f, 80.0f);
+//sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(420.0f, 514.0f);
 
 template<typename T>
 std::shared_ptr<sf::Texture> DefaultConf<T>::ANT_TEXTURE;

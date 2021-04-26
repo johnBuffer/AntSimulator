@@ -42,6 +42,7 @@ struct WorldRenderer : public AsyncRenderer
 		sf::VertexArray& va = vertex_array.getLast();
 		const sf::Vector3f to_home_color(Conf::TO_HOME_COLOR.r / 255.0f, Conf::TO_HOME_COLOR.g / 255.0f, Conf::TO_HOME_COLOR.b / 255.0f);
 		const sf::Vector3f to_food_color(Conf::TO_FOOD_COLOR.r / 255.0f, Conf::TO_FOOD_COLOR.g / 255.0f, Conf::TO_FOOD_COLOR.b / 255.0f);
+		const float intensity_factor = 255.0f / Conf::MARKER_INTENSITY;
 
 		uint64_t i = 0;
 		const float cell_size = to<float>(grid.cell_size);
@@ -51,15 +52,23 @@ struct WorldRenderer : public AsyncRenderer
 				sf::Color color = sf::Color::Black;
 				if (!cell.food && !cell.wall) {
 					if (draw_density) {
-						const uint8_t density_color = to<uint8_t>(std::min(255.0f, 10.0f * cell.density));
-						color = sf::Color(density_color, density_color, density_color);
+						const float density_color = 0.025f * cell.density;
+						color = sf::Color(
+							std::min(255.0f, 255.0f * density_color),
+							std::min(255.0f, 73.0f * density_color),
+							std::min(255.0f, 68.0f * density_color)
+						);
+						const float offset = 4.0f;
+						va[4 * i + 0].texCoords = sf::Vector2f(200.0f + offset, offset);
+						va[4 * i + 1].texCoords = sf::Vector2f(300.0f - offset, offset);
+						va[4 * i + 2].texCoords = sf::Vector2f(300.0f - offset, 100.0f - offset);
+						va[4 * i + 3].texCoords = sf::Vector2f(200.0f + offset, 100.0f - offset);
 					}
 					else if (draw_markers) {
 						if (cell.repellent) {
 							color = sf::Color::Blue;
 						}
 						else {
-							const float intensity_factor = 0.128f;
 							const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * cell.intensity[0];
 							const sf::Vector3f intensity_2_color = intensity_factor * to_food_color * cell.intensity[1];
 							const sf::Vector3f mixed_color(
@@ -67,14 +76,14 @@ struct WorldRenderer : public AsyncRenderer
 								std::min(255.0f, intensity_1_color.y + intensity_2_color.y),
 								std::min(255.0f, intensity_1_color.z + intensity_2_color.z)
 							);
-							color = sf::Color(sf::Color(to<uint8_t>(mixed_color.x), to<uint8_t>(mixed_color.y), to<uint8_t>(mixed_color.z)));
+							color = sf::Color(to<uint8_t>(mixed_color.x), to<uint8_t>(mixed_color.y), to<uint8_t>(mixed_color.z));
 						}
+						const float offset = 32.0f;
+						va[4 * i + 0].texCoords = sf::Vector2f(offset, offset);
+						va[4 * i + 1].texCoords = sf::Vector2f(100.0f - offset, offset);
+						va[4 * i + 2].texCoords = sf::Vector2f(100.0f - offset, 100.0f - offset);
+						va[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
 					}
-					const float offset = 32.0f;
-					va[4 * i + 0].texCoords = sf::Vector2f(offset, offset);
-					va[4 * i + 1].texCoords = sf::Vector2f(100.0f - offset, offset);
-					va[4 * i + 2].texCoords = sf::Vector2f(100.0f - offset, 100.0f - offset);
-					va[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
 				}
 				else if (cell.food) {
 					color = Conf::FOOD_COLOR;

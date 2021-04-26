@@ -22,6 +22,11 @@ struct Grid
 	T* getSafe(sf::Vector2f pos)
 	{
 		sf::Vector2i cell_coords = getCellCoords(pos);
+		return getSafe(cell_coords);
+	}
+
+	T* getSafe(sf::Vector2i cell_coords)
+	{
 		if (checkCoords(cell_coords)) {
 			return &get(cell_coords);
 		}
