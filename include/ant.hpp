@@ -22,8 +22,7 @@ struct Ant
 	float direction_update_period = 0.125f;
 	float marker_period = 0.125f;
 	float direction_noise_range = PI * 0.1f;
-	float colony_size = 20.0f;
-	float repellent_period = 128.0f;
+	float repellent_period = 16.0f;
 
 	Mode phase;
 	sf::Vector2f position;
@@ -36,7 +35,7 @@ struct Ant
 	float markers_count;
 	float liberty_coef;
 	float autonomy;
-	float max_autonomy = 250000.0f;
+	float max_autonomy = 250.0f;
 
 	Ant() = default;
 
@@ -194,7 +193,7 @@ struct Ant
 				found_permanent = true;
 				break;
 			}
-			// Explore more
+			// Avoid walls
 			total_wall_cell += 1.0f;
 			wall_sum += cell->wall_dist;
 			const float dir_coef = 1.0f;
@@ -218,7 +217,7 @@ struct Ant
 		// Check for repellent
 		if (phase == Mode::ToFood && max_repellent && !found_permanent) {
 			const float repellent_probe_factor = 0.1f;
-			if (RNGf::proba(repellent_probe_factor*(1.0f - max_intensity * 0.0005f))) {
+			if (RNGf::proba(repellent_probe_factor*(1.0f - max_intensity / Conf::MARKER_INTENSITY))) {
 				//phase = Mode::Flee;
 				direction.addNow(RNGf::getUnder(2.0f * PI));
 				search_markers.reset();
@@ -237,13 +236,13 @@ struct Ant
 			direction = getAngle(max_direction);
 		}
 
-		/*if (wall_sum) {
-			const float explore_coef = 4.0f;
-			const float avoid_ratio = std::min(1.0f, explore_coef * wall_sum / total_wall_cell);
+		if (wall_sum) {
+			const float avoid_coef = 2.0f;
+			const float avoid_ratio = std::min(1.0f, avoid_coef * wall_sum / total_wall_cell);
 			max_explore = getNormalized(max_explore);
 			const sf::Vector2f dir = avoid_ratio * max_explore + (1.0f - avoid_ratio) * max_direction;
 			direction = getAngle(dir);
-		}*/
+		}
 	}
 
 	void addMarker(World& world)

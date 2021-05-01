@@ -33,7 +33,7 @@ struct CircularGauge
 		sf::VertexArray va(sf::TriangleStrip, 2 * quality);
 		for (uint32_t i(0); i < quality; ++i) {
 			const float angle = max_angle * (i / float(quality - 1));
-			const sf::Vector2f vec(cos(angle), sin(angle));
+			const sf::Vector2f vec(-cos(angle), -sin(angle));
 			const sf::Vector2f point_1 = position + inner_radius * vec;
 			const sf::Vector2f point_2 = position + outer_radius * vec;
 			va[2 * i].position = point_1;
@@ -55,11 +55,11 @@ struct ColonyRenderer
 		circle.setFillColor(Conf::COLONY_COLOR);
 		target.draw(circle, states);
 
-		/*CircularGauge food_gauge(colony.base.position, 12.0f, 17.0f, sf::Color::White);
+		CircularGauge food_gauge(colony.base.position, 12.0f, 17.0f, sf::Color::White);
 		food_gauge.max_value = colony.base.max_food;
 		food_gauge.current_value = colony.base.food;
 		food_gauge.render(target, states);
 
-		colony.population.render(target);*/
+		colony.population.render(target);
 	}
 };

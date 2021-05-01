@@ -44,6 +44,7 @@ int main()
 	colony.population.y = Conf::WIN_HEIGHT - colony.population.height - GUI_MARGIN;
 	
 	DisplayManager display_manager(window, window, world, colony);
+	display_manager.setZoom(1.02f);
 
 	sf::Vector2f last_clic;
 
@@ -52,10 +53,12 @@ int main()
 		for (uint32_t x(0); x < food_map.getSize().x; ++x) {
 			for (uint32_t y(0); y < food_map.getSize().y; ++y) {
 				const sf::Vector2f position = float(world.map.cell_size) * sf::Vector2f(to<float>(x), to<float>(y));
-				if (food_map.getPixel(x, y).g > 120) {
-					world.addFoodAt(position.x, position.y, 2);
-				} else if (food_map.getPixel(x, y).r > 100) {
+				if (food_map.getPixel(x, y).r > 100) {
 					world.addWall(position);
+				}
+				else if (food_map.getPixel(x, y).g > 0) {
+					const float green = food_map.getPixel(x, y).g;
+					world.addFoodAt(position.x, position.y, green * 0.05f);
 				}
 			}
 		}
