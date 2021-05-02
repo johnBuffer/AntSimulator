@@ -12,8 +12,6 @@
 
 struct Ant
 {
-	Ant() = default;
-
 	Ant(float x, float y, float angle)
 		: position(x, y)
 		, direction(angle)
