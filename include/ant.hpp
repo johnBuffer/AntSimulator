@@ -29,7 +29,7 @@ struct Ant
 
 		last_direction_update += dt;
 		if (last_direction_update > direction_update_period) {
-			findMarker(world, dt);
+			findMarker(world);
 			direction += RNGf::getFullRange(direction_noise_range);
 			last_direction_update = 0.0f;
 		}
@@ -88,7 +88,7 @@ struct Ant
 		}
 	}
 
-	void findMarker(World& world, float dt)
+	void findMarker(World& world)
 	{
 		// Init
 		const float sample_angle_range = PI * 0.8f;
