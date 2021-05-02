@@ -15,10 +15,6 @@ struct Ant
 	Ant(float x, float y, float angle)
 		: position(x, y)
 		, direction(angle)
-		, last_direction_update(RNGf::getUnder(1.0f) * direction_update_period)
-		, last_marker(RNGf::getUnder(1.0f) * marker_period)
-		, phase(Mode::ToFood)
-		, liberty_coef(RNGf::getRange(0.0001f, 0.001f))
 		, hits(0)
 		, markers_count(0.0f)
 	{
@@ -179,13 +175,13 @@ struct Ant
 	const float direction_noise_range = PI * 0.1f;
 	const float colony_size = 20.0f;
 
-	Mode phase;
+	Mode phase{Mode::ToFood};
 	sf::Vector2f position;
 	Direction direction;
 	uint32_t hits;
 
-	float last_direction_update;
+	float last_direction_update = RNGf::getUnder(1.0f) * direction_update_period;
 	float markers_count;
-	float last_marker;
-	float liberty_coef;
+	float last_marker = RNGf::getUnder(1.0f) * marker_period;
+	float liberty_coef = RNGf::getRange(0.0001f, 0.001f);
 };

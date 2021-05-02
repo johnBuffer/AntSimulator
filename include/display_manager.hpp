@@ -34,15 +34,15 @@ public:
 	sf::Vector2f worldCoordToDisplayCoord(const sf::Vector2f&);
 	sf::Vector2f displayCoordToWorldCoord(const sf::Vector2f&);
 
-	bool clic;
-	bool pause;
-	bool update;
+	bool clic = false;
+	bool pause = false;
+	bool update = true;
 	float render_time;
-	bool speed_mode;
-	bool debug_mode;
-	bool wall_mode;
-	bool render_ants;
-	bool remove_wall;
+	bool speed_mode = false;
+	bool debug_mode = false;
+	bool wall_mode = false;
+	bool render_ants = true;
+	bool remove_wall = false;
 
 	sf::Vector2f getClicPosition() const
 	{
@@ -52,13 +52,16 @@ public:
 private:
 	sf::RenderTarget& m_target;
 	sf::RenderWindow& m_window;
-	sf::VertexArray m_va;
+	sf::VertexArray m_va{sf::Quads, 0};
 
 	World& m_world;
 	Colony& m_colony;
 
-	bool m_mouse_button_pressed;
+	bool m_mouse_button_pressed = false;
 	sf::Vector2i m_drag_clic_position, m_clic_position;
 
-    float m_zoom, m_offsetX, m_offsetY, m_windowOffsetX, m_windowOffsetY;
+    float m_zoom = 1.0f;
+	float m_windowOffsetX, m_windowOffsetY;
+	float m_offsetX = 0.0f;
+	float m_offsetY = 0.0f;
 };
