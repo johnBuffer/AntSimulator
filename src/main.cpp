@@ -58,7 +58,7 @@ int main()
 				}
 				else if (food_map.getPixel(x, y).g > 0) {
 					const float green = food_map.getPixel(x, y).g;
-					world.addFoodAt(position.x, position.y, green * 0.05f);
+					world.addFoodAt(position.x, position.y, green * 0.025f);
 				}
 			}
 		}

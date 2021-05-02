@@ -17,12 +17,12 @@ struct Ant
 	// Parameters
 	float width = 3.0f;
 	float length = 4.7f;
-	float move_speed = 50.0f;
+	float move_speed = 30.0f;
 	float marker_detection_max_dist = 40.0f;
 	float direction_update_period = 0.125f;
 	float marker_period = 0.125f;
-	float direction_noise_range = PI * 0.1f;
-	float repellent_period = 16.0f;
+	float direction_noise_range = PI * 0.07f;
+	float repellent_period = 32.0f;
 
 	Mode phase;
 	sf::Vector2f position;
@@ -237,7 +237,7 @@ struct Ant
 		}
 
 		if (wall_sum) {
-			const float avoid_coef = 2.0f;
+			const float avoid_coef = 8.0f;
 			const float avoid_ratio = std::min(1.0f, avoid_coef * wall_sum / total_wall_cell);
 			max_explore = getNormalized(max_explore);
 			const sf::Vector2f dir = avoid_ratio * max_explore + (1.0f - avoid_ratio) * max_direction;
@@ -249,12 +249,12 @@ struct Ant
 	{
 		markers_count += marker_add.target;
 		if (phase == Mode::ToHome || phase == Mode::ToFood) {
-			const float intensity = getMarkerIntensity(0.05f);
+			const float intensity = getMarkerIntensity(0.025f);
 			world.addMarker(position, phase == Mode::ToFood ? Mode::ToHome : Mode::ToFood, intensity);
 		}
 		else if (phase == Mode::ToHomeNoFood) {
 			const float intensity = getMarkerIntensity(0.1f);
-			world.addMarkerRepellent(position, intensity);
+			world.addMarkerRepellent(position, 0.01f * intensity);
 		}
 	}
 

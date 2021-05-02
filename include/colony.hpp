@@ -49,7 +49,7 @@ struct Colony
 
 	void update(float dt, World& world)
 	{
-		const float ant_cost = 10.0f;
+		const float ant_cost = 2.0f;
 		ants_creation_cooldown.update(dt);
 		if (ants_creation_cooldown.ready() && ants.size() < max_ants_count && base.useFood(ant_cost)) {
 			ants.emplace_back(base.position.x, base.position.y, getRandRange(2.0f * PI));
