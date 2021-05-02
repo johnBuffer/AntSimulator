@@ -49,7 +49,6 @@ struct Ant
 	void updatePosition(World& world, float dt)
 	{
 		sf::Vector2f v = direction.getVec();
-		const sf::Vector2f next_position = position + (dt * move_speed) * v;
 		const HitPoint intersection = world.markers.getFirstHit(position, v, dt * move_speed);
 		if (intersection.cell) {
 			++hits;
