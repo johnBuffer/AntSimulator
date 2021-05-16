@@ -159,7 +159,7 @@ struct Ant
 	void findMarker(World& world, float dt)
 	{
 		// Init
-		const float sample_angle_range = PI * 0.85f;
+		const float sample_angle_range = PI * 0.6f;
 		const float current_angle = direction.getCurrentAngle();
 		float max_intensity = 0.0f;
 		// To objective stuff
@@ -178,8 +178,9 @@ struct Ant
 			const float distance = RNGf::getUnder(marker_detection_max_dist);
 			const sf::Vector2f to_marker(cos(sample_angle), sin(sample_angle));
 			auto* cell = world.map.getSafe(position + distance * to_marker);
+			const HitPoint hit_result = world.map.getFirstHit(position, to_marker, marker_detection_max_dist);
 			// Check cell
-			if (!cell) {
+			if (!cell || hit_result.isDistanceUnder(distance)) {
 				continue;
 			}
 			// Check for food or colony
@@ -194,8 +195,9 @@ struct Ant
 				repellent_cell = cell;
 			}
 			// Check for the most intense marker
-			if (cell->getIntensity(marker_phase) > max_intensity) {
-				max_intensity = cell->getIntensity(marker_phase);
+			const float marker_intensity = cell->getIntensity(marker_phase) * (hit_result.distance > -1.0f ? (hit_result.distance / marker_detection_max_dist) : 1.0f);
+			if (marker_intensity > max_intensity) {
+				max_intensity = marker_intensity;
 				max_direction = to_marker;
 				max_cell = cell;
 			}
@@ -206,8 +208,8 @@ struct Ant
 		}
 		// Check for repellent
 		if (phase == Mode::ToFood && max_repellent && !found_permanent) {
-			const float repellent_probe_factor = 0.1f;
-			if (RNGf::proba(repellent_probe_factor*(1.0f - max_intensity / Conf::MARKER_INTENSITY))) {
+			const float repellent_prob_factor = 0.1f;
+			if (RNGf::proba(repellent_prob_factor*(1.0f - max_intensity / Conf::MARKER_INTENSITY))) {
 				//phase = Mode::Flee;
 				direction.addNow(RNGf::getUnder(2.0f * PI));
 				search_markers.reset();

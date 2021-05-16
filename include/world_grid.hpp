@@ -96,6 +96,10 @@ struct HitPoint
 		, distance(dist)
 	{}
 
+	bool isDistanceUnder(float d) const
+	{
+		return (distance != -1.0f) && (distance < d);
+	}
 };
 
 
