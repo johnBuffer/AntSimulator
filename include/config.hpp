@@ -66,11 +66,11 @@ uint32_t DefaultConf<T>::ANTS_COUNT = 3000;
 template<typename T>
 float DefaultConf<T>::COLONY_SIZE = 20.0f;
 template<typename T>
-float DefaultConf<T>::MARKER_INTENSITY = 10000.0f;
+float DefaultConf<T>::MARKER_INTENSITY = 20000.0f;
 template<typename T>
 sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(100.0f, 100.0f);
 //sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(110.0f, 80.0f);
-//sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(420.0f, 514.0f);
+//sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(1100.0f, 514.0f);
 
 template<typename T>
 std::shared_ptr<sf::Texture> DefaultConf<T>::ANT_TEXTURE;

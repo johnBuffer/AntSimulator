@@ -38,8 +38,8 @@ struct WorldCell
 		intensity[0] -= (!permanent[0]) * dt;
 		intensity[1] -= (!permanent[1]) * dt;
 		// Avoid negative values
-		intensity[0] = std::max(0.0f, intensity[0]);
-		intensity[1] = std::max(0.0f, intensity[1]);
+		intensity[0] = std::max(0.1f, intensity[0]);
+		intensity[1] = std::max(0.1f, intensity[1]);
 		// Remove food marker if no food
 		intensity[1] = intensity[1] * to<float>(!bool(!food && permanent[1]));
 		permanent[1] &= to<bool>(food);
@@ -52,8 +52,8 @@ struct WorldCell
 
 	bool pick()
 	{
-		const bool last = (food == 1.0f);
-		food -= bool(food);
+		const bool last = (food <= 1.0f);
+		food = (food - bool(food)) * float(!last);
 		return last;
 	}
 

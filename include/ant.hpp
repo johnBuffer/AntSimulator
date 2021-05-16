@@ -35,7 +35,7 @@ struct Ant
 	float markers_count;
 	float liberty_coef;
 	float autonomy;
-	float max_autonomy = 250.0f;
+	float max_autonomy = 400.0f;
 
 	Ant() = default;
 
@@ -72,7 +72,7 @@ struct Ant
 			else {
 				cell.degrade();
 			}
-			direction += RNGf::getFullRange(direction_noise_range);
+			//direction += RNGf::getFullRange(direction_noise_range);
 			direction_update.reset();
 		}
 		// Add marker
@@ -140,10 +140,8 @@ struct Ant
 			// Refill
 			const float refill_cost = 1.0f;
 			const float needed_refill = refill_cost * (autonomy / max_autonomy);
-			if (base.useFood(needed_refill)) {
-				autonomy = 0.0f;
-				phase = Mode::ToFood;
-			}
+			autonomy = 0.0f;
+			phase = Mode::ToFood;
 			markers_count = 0.0f;
 		}
 	}
@@ -159,7 +157,10 @@ struct Ant
 	void findMarker(World& world, float dt)
 	{
 		// Init
-		const float sample_angle_range = PI * 0.6f;
+		/*constexpr float angle_range_to_home = PI * 0.7f;
+		constexpr float angle_range_to_food = PI * 0.25f;*/
+		const Mode marker_phase = getMarkersSamplingType();
+		const float sample_angle_range = PI * 0.4f;
 		const float current_angle = direction.getCurrentAngle();
 		float max_intensity = 0.0f;
 		// To objective stuff
@@ -170,8 +171,7 @@ struct Ant
 		float max_repellent = 0.0f;
 		WorldCell* repellent_cell = nullptr;
 		// Sample the world
-		const Mode marker_phase = getMarkersSamplingType();
-		const uint32_t sample_count = 32;
+		const uint32_t sample_count = 28;
 		for (uint32_t i(sample_count); i--;) {
 			// Get random point in range
 			const float sample_angle = current_angle + RNGf::getRange(sample_angle_range);
@@ -195,7 +195,7 @@ struct Ant
 				repellent_cell = cell;
 			}
 			// Check for the most intense marker
-			const float marker_intensity = cell->getIntensity(marker_phase) * (hit_result.distance > -1.0f ? (hit_result.distance / marker_detection_max_dist) : 1.0f);
+			const float marker_intensity = cell->getIntensity(marker_phase) * cell->wall_dist;
 			if (marker_intensity > max_intensity) {
 				max_intensity = marker_intensity;
 				max_direction = to_marker;
@@ -222,8 +222,8 @@ struct Ant
 		}
 		// Update direction
 		if (max_intensity) {
-			if (RNGf::proba(0.8f) && phase == Mode::ToFood) {
-				max_cell->intensity[static_cast<uint32_t>(phase)] *= 0.98f;
+			if (RNGf::proba(0.2f) && phase == Mode::ToFood) {
+				max_cell->intensity[static_cast<uint32_t>(phase)] *= 0.99f;
 			}
 			direction = getAngle(max_direction);
 		}
@@ -233,7 +233,7 @@ struct Ant
 	{
 		markers_count += marker_add.target;
 		if (phase == Mode::ToHome || phase == Mode::ToFood) {
-			const float intensity = getMarkerIntensity(0.025f);
+			const float intensity = getMarkerIntensity(0.016f);
 			world.addMarker(position, phase == Mode::ToFood ? Mode::ToHome : Mode::ToFood, intensity);
 		}
 		else if (phase == Mode::ToHomeNoFood) {

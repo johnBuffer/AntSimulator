@@ -22,7 +22,7 @@ struct DistanceFieldBuilder
 	static float getMinDist(int32_t x, int32_t y, WorldGrid& grid)
 	{
 		const sf::Vector2f cell_pos(x, y);
-		const int32_t max_iteration = 4;
+		const int32_t max_iteration = 5;
 		float min_dist = max_iteration;
 		for (int32_t dx(-max_iteration); dx <= max_iteration; ++dx) {
 			for (int32_t dy(-max_iteration); dy <= max_iteration; ++dy) {
@@ -38,7 +38,7 @@ struct DistanceFieldBuilder
 				}
 			}
 		}
-		min_dist = (float(max_iteration) - min_dist) / float(max_iteration);
+		min_dist = std::min(1.0f, min_dist / float(max_iteration));
 		return min_dist;
 	}
 };

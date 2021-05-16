@@ -27,7 +27,7 @@ struct Colony
 		, population(800, sf::Vector2f(800.0f, 100.0f), sf::Vector2f())
 		, population_update(3.0f)
 	{
-		base.food = 9.0f;
+		base.food = 0.0f;
 		uint32_t ants_count = 8;
 		for (uint32_t i(ants_count); i--;) {
 			ants.emplace_back(x, y, getRandRange(2.0f * PI));
