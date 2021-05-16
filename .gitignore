@@ -2,3 +2,4 @@ build/
 .vscode
 .clangd
 compile_commands.json
+.DS_Store
