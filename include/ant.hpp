@@ -160,7 +160,7 @@ struct Ant
 		/*constexpr float angle_range_to_home = PI * 0.7f;
 		constexpr float angle_range_to_food = PI * 0.25f;*/
 		const Mode marker_phase = getMarkersSamplingType();
-		const float sample_angle_range = PI * 0.4f;
+		const float sample_angle_range = PI * 0.3f;
 		const float current_angle = direction.getCurrentAngle();
 		float max_intensity = 0.0f;
 		// To objective stuff

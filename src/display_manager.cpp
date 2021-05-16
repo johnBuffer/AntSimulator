@@ -73,7 +73,7 @@ void DisplayManager::draw()
 		m_colony.render(m_target, rs);
 	}
 
-	ColonyRenderer::render(m_colony, m_target, rs_ground);
+	colony_renderer.render(m_colony, m_target, rs_ground);
 
 	render_time = clock.getElapsedTime().asMicroseconds() * 0.001f;
 }

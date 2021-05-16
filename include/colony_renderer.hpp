@@ -46,7 +46,15 @@ struct CircularGauge
 
 struct ColonyRenderer
 {
-	static void render(const Colony& colony, sf::RenderTarget& target, sf::RenderStates& states)
+	sf::Font font;
+	sf::Text text;
+
+	ColonyRenderer()
+	{
+		font.loadFromFile("res/font.ttf");
+	}
+
+	void render(const Colony& colony, sf::RenderTarget& target, sf::RenderStates& states)
 	{
 		const float size = colony.base.radius;
 		sf::CircleShape circle(size);

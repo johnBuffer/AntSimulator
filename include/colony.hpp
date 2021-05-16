@@ -23,7 +23,7 @@ struct Colony
 		: base(sf::Vector2f(x, y), 20.0f)
 		, max_ants_count(n)
 		, ants_va(sf::Quads, 4 * n)
-		, ants_creation_cooldown(10.0f)
+		, ants_creation_cooldown(0.1f)
 		, population(800, sf::Vector2f(800.0f, 100.0f), sf::Vector2f())
 		, population_update(3.0f)
 	{
@@ -53,6 +53,7 @@ struct Colony
 		ants_creation_cooldown.update(dt);
 		if (ants_creation_cooldown.ready() && ants.size() < max_ants_count && base.useFood(ant_cost)) {
 			ants.emplace_back(base.position.x, base.position.y, getRandRange(2.0f * PI));
+			ants_creation_cooldown.reset();
 		}
 		
 		for (Ant& ant : ants) {
