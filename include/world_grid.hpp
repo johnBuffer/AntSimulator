@@ -83,14 +83,17 @@ struct HitPoint
 {
 	const WorldCell* cell;
 	sf::Vector2f normal;
+	float distance;
 
 	HitPoint()
 		: cell(nullptr)
+		, distance(-1.0f)
 	{}
 
-	HitPoint(const WorldCell& c, sf::Vector2f n)
+	HitPoint(const WorldCell& c, sf::Vector2f n, float dist)
 		: cell(&c)
 		, normal(n)
+		, distance(dist)
 	{}
 
 };
@@ -171,6 +174,7 @@ struct WorldGrid : public Grid<WorldCell>
 				if (cell.wall) {
 					intersection.cell = &cell;
 					intersection.normal = sf::Vector2f(to<float>(b), to<float>(!b));
+					intersection.distance = dist;
 					return intersection;
 				}
 			}

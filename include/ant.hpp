@@ -169,11 +169,6 @@ struct Ant
 		// Repellent stuff
 		float max_repellent = 0.0f;
 		WorldCell* repellent_cell = nullptr;
-		// Explore
-		sf::Vector2f max_explore;
-		float max_wall_dist = -1.0f;
-		float wall_sum = 0.0f;
-		float total_wall_cell = 0.0f;
 		// Sample the world
 		const Mode marker_phase = getMarkersSamplingType();
 		const uint32_t sample_count = 32;
@@ -193,11 +188,6 @@ struct Ant
 				found_permanent = true;
 				break;
 			}
-			// Avoid walls
-			total_wall_cell += 1.0f;
-			wall_sum += cell->wall_dist;
-			const float dir_coef = 1.0f;
-			max_explore += to_marker * (1.0f - cell->wall_dist);
 			// Flee if repellent
 			if (cell->repellent > max_repellent) {
 				max_repellent = cell->repellent;
@@ -234,14 +224,6 @@ struct Ant
 				max_cell->intensity[static_cast<uint32_t>(phase)] *= 0.98f;
 			}
 			direction = getAngle(max_direction);
-		}
-
-		if (wall_sum) {
-			const float avoid_coef = 8.0f;
-			const float avoid_ratio = std::min(1.0f, avoid_coef * wall_sum / total_wall_cell);
-			max_explore = getNormalized(max_explore);
-			const sf::Vector2f dir = avoid_ratio * max_explore + (1.0f - avoid_ratio) * max_direction;
-			direction = getAngle(dir);
 		}
 	}
 
