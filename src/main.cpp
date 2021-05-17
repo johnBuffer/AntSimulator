@@ -29,7 +29,7 @@ int main()
 
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 4;
-	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", sf::Style::Fullscreen, settings);
+	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", sf::Style::Default, settings);
 	window.setFramerateLimit(60);
 
 	World world(Conf::WORLD_WIDTH, Conf::WORLD_HEIGHT);
@@ -71,6 +71,9 @@ int main()
 	world.renderer.draw_density = false;
 	world.renderer.draw_markers = false;
 
+	sf::Clock clock;
+	float last_frame_time = 1.0f;
+
 	while (window.isOpen())
 	{
 		display_manager.processEvents();
@@ -101,10 +104,14 @@ int main()
 		}
 
 		window.clear(sf::Color(94, 87, 87));
-		
+
 		display_manager.draw();
+		display_manager.text.setString("FPS " + toStr(1.0f / last_frame_time));
+		window.draw(display_manager.text);
 
 		window.display();
+
+		last_frame_time = clock.restart().asSeconds();
 	}
 
 	// Free textures

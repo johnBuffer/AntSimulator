@@ -52,6 +52,12 @@ struct ColonyRenderer
 	ColonyRenderer()
 	{
 		font.loadFromFile("res/font.ttf");
+		text.setFont(font);
+		text.setFillColor(sf::Color::White);
+		text.setCharacterSize(20);
+
+		text.setString("Population: ");
+		text.setOrigin(0.0f, text.getGlobalBounds().height * 2.0f);
 	}
 
 	void render(const Colony& colony, sf::RenderTarget& target, sf::RenderStates& states)
@@ -68,6 +74,9 @@ struct ColonyRenderer
 		food_gauge.current_value = colony.base.food;
 		food_gauge.render(target, states);
 
+		text.setPosition(colony.population.x, colony.population.y);
+		text.setString("Population " + toStr(colony.ants.size()));
+		target.draw(text);
 		colony.population.render(target);
 	}
 };

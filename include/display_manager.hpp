@@ -45,6 +45,8 @@ public:
 	bool render_ants;
 	bool remove_wall;
 	ColonyRenderer colony_renderer;
+	sf::Font font;
+	sf::Text text;
 
 	sf::Vector2f getClicPosition() const
 	{

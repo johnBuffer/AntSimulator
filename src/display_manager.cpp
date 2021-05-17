@@ -26,6 +26,12 @@ DisplayManager::DisplayManager(sf::RenderTarget& target, sf::RenderWindow& windo
 
 	m_offsetX = m_windowOffsetX;
 	m_offsetY = m_windowOffsetY;
+
+	font.loadFromFile("res/font.ttf");
+	text.setFont(font);
+	text.setCharacterSize(32);
+	text.setFillColor(sf::Color::White);
+	text.setPosition(4.0f, 0.0f);
 }
 
 sf::Vector2f DisplayManager::worldCoordToDisplayCoord(const sf::Vector2f& worldCoord)

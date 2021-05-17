@@ -23,7 +23,7 @@ struct Colony
 		: base(sf::Vector2f(x, y), 20.0f)
 		, max_ants_count(n)
 		, ants_va(sf::Quads, 4 * n)
-		, ants_creation_cooldown(0.1f)
+		, ants_creation_cooldown(0.125f)
 		, population(800, sf::Vector2f(800.0f, 100.0f), sf::Vector2f())
 		, population_update(3.0f)
 	{
@@ -87,7 +87,8 @@ struct Colony
 			a.render_in(ants_va, 4 * (index++));
 		}
 
-		const Ant placeholder(base.position.x, base.position.y, 0.0f);
+		constexpr float no_draw_position = -10000.0f;
+		const Ant placeholder(no_draw_position, no_draw_position, 0.0f);
 		for (uint32_t i(index); i < max_ants_count; ++i) {
 			placeholder.render_in(ants_va, 4 * i);
 		}

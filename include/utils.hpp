@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <cmath>
+#include <sstream>
 
 
 constexpr float PI = 3.14159265f;
@@ -35,6 +36,14 @@ template<typename T, typename U>
 T to(const U& u)
 {
 	return static_cast<T>(u);
+}
+
+template<typename T>
+std::string toStr(T v)
+{
+	std::stringstream sstr;
+	sstr << v;
+	return sstr.str();
 }
 
 
