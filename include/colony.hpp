@@ -15,7 +15,7 @@ struct Colony
 		, ants_va(sf::Quads, 4 * n)
 	{
 		for (uint32_t i(n); i--;) {
-			ants.emplace_back(x, y, getRandRange(2.0f * PI), n - i - 1);
+			ants.emplace_back(x, y, getRandRange(2.0f * PI));
 		}
 
 		for (uint64_t i(0); i < n; ++i) {

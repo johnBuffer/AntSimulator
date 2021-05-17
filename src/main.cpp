@@ -51,31 +51,31 @@ int main()
 
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 4;
+
 	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", sf::Style::None, settings);
 	window.setFramerateLimit(60);
 
-	World world(Conf::WIN_WIDTH, Conf::WIN_HEIGHT);
+	World world(Conf::WORLD_WIDTH, Conf::WORLD_HEIGHT);
 	Colony colony(Conf::COLONY_POSITION.x, Conf::COLONY_POSITION.y, Conf::ANTS_COUNT);
 
 	for (uint32_t i(0); i < 64; ++i) {
 		float angle = float(i) / 64.0f * (2.0f * PI);
-		world.addMarker(Marker(colony.position + 16.0f * sf::Vector2f(cos(angle), sin(angle)), Marker::ToHome, 10.0f, true));
+		world.addMarker(colony.position + 16.0f * sf::Vector2f(cos(angle), sin(angle)), Mode::ToHome, 10.0f, true);
 	}
 	
 	DisplayManager display_manager(window, window, world, colony);
 
 	sf::Vector2f last_clic;
 
-	sf::Image wall_map;
-	if (wall_map.loadFromFile("map.bmp")) {
-		for (uint32_t x(0); x < wall_map.getSize().x; ++x) {
-			for (uint32_t y(0); y < wall_map.getSize().y; ++y) {
-				const sf::Vector2f position = float(world.grid_walls.cell_size) * sf::Vector2f(to<float>(x), to<float>(y));
-				if (wall_map.getPixel(x, y).r > 50) {
+	sf::Image food_map;
+	if (food_map.loadFromFile("map.bmp")) {
+		for (uint32_t x(0); x < food_map.getSize().x; ++x) {
+			for (uint32_t y(0); y < food_map.getSize().y; ++y) {
+				const sf::Vector2f position = float(world.markers.cell_size) * sf::Vector2f(to<float>(x), to<float>(y));
+				if (food_map.getPixel(x, y).g > 100) {
+					world.addFoodAt(position.x, position.y, 5);
+				} else if (food_map.getPixel(x, y).r > 100) {
 					world.addWall(position);
-				}
-				else if (wall_map.getPixel(x, y).g > 100) {
-					world.addFoodAt(position.x, position.y, 5.0f);
 				}
 			}
 		}
@@ -84,7 +84,6 @@ int main()
 	while (window.isOpen())
 	{
 		display_manager.processEvents();
-
 		// Add food on clic
 		if (display_manager.clic) {
 			const sf::Vector2i mouse_position = sf::Mouse::getPosition(window);
@@ -98,7 +97,7 @@ int main()
 					world.removeWall(world_position);
 				}
 				else {
-					world.addFoodAt(world_position.x, world_position.y, 10.0f);
+					world.addFoodAt(world_position.x, world_position.y, 20);
 				}
 				last_clic = world_position;
 			}
