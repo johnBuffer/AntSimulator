@@ -16,7 +16,6 @@ DisplayManager::DisplayManager(sf::RenderTarget& target, sf::RenderWindow& windo
 	, clic(false)
 	, m_mouse_button_pressed(false)
 	, pause(false)
-	, draw_markers(true)
 	, wall_mode(false)
 	, render_ants(true)
 	, remove_wall(false)
@@ -26,8 +25,6 @@ DisplayManager::DisplayManager(sf::RenderTarget& target, sf::RenderWindow& windo
 
 	m_offsetX = m_windowOffsetX;
 	m_offsetY = m_windowOffsetY;
-
-    m_texture.loadFromFile("res/circle.png");
 }
 
 sf::Vector2f DisplayManager::worldCoordToDisplayCoord(const sf::Vector2f& worldCoord)
@@ -68,11 +65,8 @@ void DisplayManager::draw()
 	sf::RenderStates rs = rs_ground;
 
 	// Render markers
-	if (draw_markers) {
-		m_world.renderMarkers(m_target, rs_ground);
-	}
-	m_world.renderFood(m_target, rs_ground);
-	m_world.renderWalls(m_target, rs_ground);
+	m_world.renderMarkers(m_target, rs_ground);
+
 	// Render ants
 	if (render_ants) {
 		m_colony.render(m_target, rs);
@@ -114,7 +108,7 @@ void DisplayManager::processEvents()
 				}
 			}
 			else if ((event.key.code == sf::Keyboard::A)) render_ants = !render_ants;
-			else if ((event.key.code == sf::Keyboard::M)) draw_markers = !draw_markers;
+			else if ((event.key.code == sf::Keyboard::M)) m_world.renderer.draw_markers = !m_world.renderer.draw_markers;
 			else if ((event.key.code == sf::Keyboard::W)) {
 				wall_mode = !wall_mode;
 				if (wall_mode) {

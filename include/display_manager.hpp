@@ -36,7 +36,6 @@ public:
 
 	bool clic;
 	bool pause;
-	bool draw_markers;
 	bool update;
 	float render_time;
 	bool speed_mode;
@@ -53,7 +52,6 @@ public:
 private:
 	sf::RenderTarget& m_target;
 	sf::RenderWindow& m_window;
-    sf::Texture m_texture;
 	sf::VertexArray m_va;
 
 	World& m_world;
