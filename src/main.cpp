@@ -14,7 +14,7 @@ std::string getCurrentPath()
 	static constexpr size_t PATH_SIZE = 1024;
 	path.resize(PATH_SIZE);
 #if defined(__unix__)
-	size_t pos = readlink("/proc/self/exe", path.data(), PATH_SIZE);
+	size_t pos = readlink("/proc/self/exe", &path[0], PATH_SIZE);
 	path.resize(pos);
 	pos = path.rfind("/");
 	path.resize(++pos);
@@ -52,7 +52,7 @@ int main()
 
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 4;
-	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", sf::Style::Fullscreen, settings);
+	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", sf::Style::Default, settings);
 	window.setFramerateLimit(60);
 
 	World world(Conf::WORLD_WIDTH, Conf::WORLD_HEIGHT);
