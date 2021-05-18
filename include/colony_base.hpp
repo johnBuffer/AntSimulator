@@ -8,6 +8,10 @@ struct ColonyBase
 	float radius;
 	float food;
 	float max_food = 100.0f;
+	// Profiling
+	float food_acc;
+	RMean<float> food_acc_mean;
+	Cooldown food_acc_update;
 
 	ColonyBase()
 		: radius(0.0f)

@@ -20,7 +20,7 @@ struct Ant
 	float move_speed = 30.0f;
 	float marker_detection_max_dist = 40.0f;
 	float direction_update_period = 0.125f;
-	float marker_period = 0.125f;
+	float marker_period = 0.25f;
 	float direction_noise_range = PI * 0.07f;
 	float repellent_period = 32.0f;
 
@@ -35,7 +35,7 @@ struct Ant
 	float markers_count;
 	float liberty_coef;
 	float autonomy;
-	float max_autonomy = 40000.0f;
+	float max_autonomy = 400.0f;
 
 	Ant(float x, float y, float angle)
 		: position(x, y)
