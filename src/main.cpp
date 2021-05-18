@@ -2,15 +2,37 @@
 #include <vector>
 #include <list>
 #include <fstream>
+#include <unistd.h>
 #include "colony.hpp"
 #include "config.hpp"
 #include "display_manager.hpp"
 
 
+std::string getCurrentPath()
+{
+	std::string path;
+	static constexpr size_t PATH_SIZE = 1024;
+	path.resize(PATH_SIZE);
+#if defined(__unix__)
+	size_t pos = readlink("/proc/self/exe", path.data(), PATH_SIZE);
+	path.resize(pos);
+	pos = path.rfind("/");
+	path.resize(++pos);
+#endif
+
+#if defined(_WIN32)
+	char currentPath[PATH_SIZE];
+	_getcwd(currentPath, sizeof(currentPath));
+	path = std::string(currentPath);
+	path += "\\";
+#endif
+
+	return path;
+}
 
 void loadUserConf()
 {
-	std::ifstream conf_file("conf.txt");
+	std::ifstream conf_file(getCurrentPath() + "conf.txt");
 	if (conf_file) {
 		conf_file >> Conf::WIN_WIDTH;
 		conf_file >> Conf::WIN_HEIGHT;
@@ -26,6 +48,7 @@ int main()
 {
 	Conf::loadTextures();
 	loadUserConf();
+	Conf::COLONY_POSITION = sf::Vector2f(Conf::WIN_WIDTH * 0.5f, Conf::WIN_HEIGHT * 0.5f);
 
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 4;
