@@ -220,7 +220,7 @@ struct Ant
 		// Update direction
 		if (max_intensity) {
 			if (RNGf::proba(0.2f) && phase == Mode::ToFood) {
-				max_cell->intensity[static_cast<uint32_t>(phase)] *= 0.99f;
+				max_cell->intensity[to<uint32_t>(phase)] *= 0.99f;
 			}
 			direction = getAngle(max_direction);
 		}
@@ -239,16 +239,18 @@ struct Ant
 		}
 	}
 
-	void render_food(sf::RenderTarget& target, const sf::RenderStates& states) const
+	void render_food(sf::VertexArray& va, const uint32_t index) const
 	{
-		if (phase == Mode::ToHome) {
-			const float radius = 2.0f;
-			sf::CircleShape circle(radius);
-			circle.setOrigin(radius, radius);
-			circle.setPosition(position + length * 0.65f * direction.getVec());
-			circle.setFillColor(Conf::FOOD_COLOR);
-			target.draw(circle, states);
+		constexpr float radius = 2.0f;
+		sf::Vector2f food_pos(-10000.0f, -10000.0f);
+		if (phase == Mode::ToHome || phase == Mode::ToHomeNoFood) {
+			food_pos = position + length * 0.65f * direction.getVec();
 		}
+
+		va[index + 0].position = sf::Vector2f(food_pos.x - radius, food_pos.y - radius);
+		va[index + 1].position = sf::Vector2f(food_pos.x + radius, food_pos.y - radius);
+		va[index + 2].position = sf::Vector2f(food_pos.x + radius, food_pos.y + radius);
+		va[index + 3].position = sf::Vector2f(food_pos.x - radius, food_pos.y + radius);
 	}
 
 	void render_in(sf::VertexArray& va, const uint32_t index) const

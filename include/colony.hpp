@@ -14,7 +14,6 @@ struct Colony
 	ColonyBase base;
 	uint32_t max_ants_count;
 	std::vector<Ant> ants;
-	mutable sf::VertexArray ants_va;
 	Cooldown ants_creation_cooldown;
 	Graphic population;
 	Cooldown population_update;
@@ -22,7 +21,6 @@ struct Colony
 	Colony(float x, float y, uint32_t n)
 		: base(sf::Vector2f(x, y), 20.0f)
 		, max_ants_count(n)
-		, ants_va(sf::Quads, 4 * n)
 		, ants_creation_cooldown(0.125f)
 		, population(800, sf::Vector2f(800.0f, 100.0f), sf::Vector2f())
 		, population_update(3.0f)
@@ -31,19 +29,6 @@ struct Colony
 		uint32_t ants_count = 128;
 		for (uint32_t i(ants_count); i--;) {
 			ants.emplace_back(x, y, getRandRange(2.0f * PI));
-		}
-
-		for (uint64_t i(0); i < n; ++i) {
-			const uint64_t index = 4 * i;
-			ants_va[index + 0].color = Conf::ANT_COLOR;
-			ants_va[index + 1].color = Conf::ANT_COLOR;
-			ants_va[index + 2].color = Conf::ANT_COLOR;
-			ants_va[index + 3].color = Conf::ANT_COLOR;
-
-			ants_va[index + 0].texCoords = sf::Vector2f(0.0f, 0.0f);
-			ants_va[index + 1].texCoords = sf::Vector2f(73.0f, 0.0f);
-			ants_va[index + 2].texCoords = sf::Vector2f(73.0f, 107.0f);
-			ants_va[index + 3].texCoords = sf::Vector2f(0.0f, 107.0f);
 		}
 	}
 
@@ -74,27 +59,5 @@ struct Colony
 			population_update.reset();
 			population.next();
 		}
-	}
-
-	void render(sf::RenderTarget& target, const sf::RenderStates& states) const
-	{
-		for (const Ant& a : ants) {
-			a.render_food(target, states);
-		}
-
-		uint32_t index = 0;
-		for (const Ant& a : ants) {
-			a.render_in(ants_va, 4 * (index++));
-		}
-
-		constexpr float no_draw_position = -10000.0f;
-		const Ant placeholder(no_draw_position, no_draw_position, 0.0f);
-		for (uint32_t i(index); i < max_ants_count; ++i) {
-			placeholder.render_in(ants_va, 4 * i);
-		}
-
-		sf::RenderStates rs = states;
-		rs.texture = &(*Conf::ANT_TEXTURE);
-		target.draw(ants_va, rs);
 	}
 };

@@ -47,12 +47,8 @@ sf::Vector2f DisplayManager::worldCoordToDisplayCoord(const sf::Vector2f& worldC
 
 sf::Vector2f DisplayManager::displayCoordToWorldCoord(const sf::Vector2f& viewCoord)
 {
-    float viewCoordX = viewCoord.x;
-    float viewCoordY = viewCoord.y;
-
-    float worldCoordX = (viewCoordX-m_windowOffsetX)/m_zoom+m_offsetX;
-    float worldCoordY = (viewCoordY-m_windowOffsetY)/m_zoom+m_offsetY;
-
+    const float worldCoordX = (viewCoord.x-m_windowOffsetX)/m_zoom+m_offsetX;
+    const float worldCoordY = (viewCoord.y-m_windowOffsetY)/m_zoom+m_offsetY;
     return sf::Vector2f(worldCoordX, worldCoordY);
 }
 
@@ -76,9 +72,8 @@ void DisplayManager::draw()
 
 	// Render ants
 	if (render_ants) {
-		m_colony.render(m_target, rs);
+		colony_renderer.renderAnts(m_colony, m_target, rs);
 	}
-
 	colony_renderer.render(m_colony, m_target, rs_ground);
 
 	render_time = clock.getElapsedTime().asMicroseconds() * 0.001f;
