@@ -13,9 +13,14 @@ struct ColonyRenderer
 	sf::VertexArray ants_va;
 	sf::VertexArray ants_food_va;
 
+	Graphic population;
+	Cooldown population_update;
+
 	ColonyRenderer()
 		: ants_va(sf::Quads, 4 * Conf::ANTS_COUNT)
 		, ants_food_va(sf::Quads, 4 * Conf::ANTS_COUNT)
+		, population(800, sf::Vector2f(800.0f, 100.0f), sf::Vector2f())
+		, population_update(3.0f)
 	{
 		font.loadFromFile("res/font.ttf");
 		text.setFont(font);
@@ -68,6 +73,20 @@ struct ColonyRenderer
 		target.draw(ants_food_va, rs);
 		rs.texture = &(*Conf::ANT_TEXTURE);
 		target.draw(ants_va, rs);
+
+		const float GUI_MARGIN = 20.0f;
+		population.x = GUI_MARGIN;
+		population.y = Conf::WIN_HEIGHT - population.height - GUI_MARGIN;
+	}
+
+	void updatePopulation(const Colony& colony, float dt)
+	{
+		population.setLastValue(to<float>(colony.ants.size()));
+		population_update.update(dt);
+		if (population_update.ready()) {
+			population_update.reset();
+			population.next();
+		}
 	}
 
 	void render(const Colony& colony, sf::RenderTarget& target, sf::RenderStates& states)
@@ -83,10 +102,19 @@ struct ColonyRenderer
 		food_gauge.max_value = colony.base.max_food;
 		food_gauge.current_value = colony.base.food;
 		food_gauge.render(target, states);
+		
+		const float margin = 10.0f;
+		sf::RectangleShape population_background(sf::Vector2f(population.width + 2.0f * margin,
+															  population.height + 4.0f * margin));
+		population_background.setFillColor(sf::Color(50, 50, 50, 150));
+		population_background.setPosition(text.getPosition() - sf::Vector2f(margin, 3.0f * margin));
+		target.draw(population_background);
 
-		text.setPosition(colony.population.x, colony.population.y);
-		text.setString("Population " + toStr(colony.ants.size()));
+		const uint32_t ants_count = to<int32_t>(colony.ants.size());
+		text.setPosition(population.x, population.y);
+		text.setString("Population " + toStr(ants_count));
 		target.draw(text);
-		colony.population.render(target);
+
+		population.render(target);
 	}
 };

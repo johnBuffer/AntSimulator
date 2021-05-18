@@ -39,10 +39,6 @@ int main()
 		float angle = float(i) / 64.0f * (2.0f * PI);
 		world.addMarker(colony.base.position + 16.0f * sf::Vector2f(cos(angle), sin(angle)), Mode::ToHome, 10.0f, true);
 	}
-
-	const float GUI_MARGIN = 20.0f;
-	colony.population.x = GUI_MARGIN;
-	colony.population.y = Conf::WIN_HEIGHT - colony.population.height - GUI_MARGIN;
 	
 	DisplayManager display_manager(window, window, world, colony);
 	display_manager.setZoom(1.02f);
@@ -57,7 +53,7 @@ int main()
 				if (food_map.getPixel(x, y).r > 100) {
 					world.addWall(position);
 				}
-				else if (food_map.getPixel(x, y).g > 0) {
+				else if (food_map.getPixel(x, y).g > 1000) {
 					const float green = food_map.getPixel(x, y).g;
 					world.addFoodAt(position.x, position.y, green * 0.025f);
 				}
@@ -91,7 +87,7 @@ int main()
 					world.removeWall(world_position);
 				}
 				else {
-					world.addFoodAt(world_position.x, world_position.y, 20);
+					world.addFoodAt(world_position.x, world_position.y, 200000);
 				}
 				last_clic = world_position;
 			}
@@ -101,6 +97,7 @@ int main()
 
 		if (!display_manager.pause) {
 			colony.update(dt, world);
+			display_manager.colony_renderer.updatePopulation(colony, dt);
 			world.update(dt);
 		}
 

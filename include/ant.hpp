@@ -35,7 +35,7 @@ struct Ant
 	float markers_count;
 	float liberty_coef;
 	float autonomy;
-	float max_autonomy = 400.0f;
+	float max_autonomy = 40000.0f;
 
 	Ant(float x, float y, float angle)
 		: position(x, y)
@@ -69,8 +69,8 @@ struct Ant
 			}
 			else {
 				cell.degrade();
+				direction += RNGf::getFullRange(direction_noise_range);
 			}
-			//direction += RNGf::getFullRange(direction_noise_range);
 			direction_update.reset();
 		}
 		// Add marker
@@ -157,7 +157,7 @@ struct Ant
 	{
 		// Init
 		const Mode marker_phase = getMarkersSamplingType();
-		const float sample_angle_range = PI * 0.35f;
+		const float sample_angle_range = PI * 0.5f;
 		const float current_angle = direction.getCurrentAngle();
 		float max_intensity = 0.0f;
 		// To objective stuff
@@ -168,7 +168,7 @@ struct Ant
 		float max_repellent = 0.0f;
 		WorldCell* repellent_cell = nullptr;
 		// Sample the world
-		const uint32_t sample_count = 28;
+		const uint32_t sample_count = 40;
 		for (uint32_t i(sample_count); i--;) {
 			// Get random point in range
 			const float sample_angle = current_angle + RNGf::getRange(sample_angle_range);
