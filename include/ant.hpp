@@ -37,8 +37,6 @@ struct Ant
 	float autonomy;
 	float max_autonomy = 400.0f;
 
-	Ant() = default;
-
 	Ant(float x, float y, float angle)
 		: position(x, y)
 		, direction(angle)
@@ -123,7 +121,8 @@ struct Ant
 				phase = Mode::ToHomeNoFood;
 				marker_add.target = repellent_period;
 				marker_add.value = RNGf::getUnder(marker_add.target);
-				world.addMarkerRepellent(position, getMarkerIntensity(0.1f));
+				// Add a repellent for 300s
+				world.addMarkerRepellent(position, 300.0f);
 			}
 		}
 	}
@@ -157,10 +156,8 @@ struct Ant
 	void findMarker(World& world, float dt)
 	{
 		// Init
-		/*constexpr float angle_range_to_home = PI * 0.7f;
-		constexpr float angle_range_to_food = PI * 0.25f;*/
 		const Mode marker_phase = getMarkersSamplingType();
-		const float sample_angle_range = PI * 0.3f;
+		const float sample_angle_range = PI * 0.35f;
 		const float current_angle = direction.getCurrentAngle();
 		float max_intensity = 0.0f;
 		// To objective stuff
@@ -178,9 +175,9 @@ struct Ant
 			const float distance = RNGf::getUnder(marker_detection_max_dist);
 			const sf::Vector2f to_marker(cos(sample_angle), sin(sample_angle));
 			auto* cell = world.map.getSafe(position + distance * to_marker);
-			const HitPoint hit_result = world.map.getFirstHit(position, to_marker, marker_detection_max_dist);
+			const HitPoint hit_result = world.map.getFirstHit(position, to_marker, distance);
 			// Check cell
-			if (!cell || hit_result.isDistanceUnder(distance)) {
+			if (!cell || hit_result.cell) {
 				continue;
 			}
 			// Check for food or colony
@@ -201,7 +198,7 @@ struct Ant
 				max_direction = to_marker;
 				max_cell = cell;
 			}
-			// Randomly choose own path
+			// Eventually choose a different path
 			if (RNGf::proba(liberty_coef)) {
 				break;
 			}
@@ -238,7 +235,7 @@ struct Ant
 		}
 		else if (phase == Mode::ToHomeNoFood) {
 			const float intensity = getMarkerIntensity(0.1f);
-			world.addMarkerRepellent(position, 0.01f * intensity);
+			world.addMarkerRepellent(position, intensity);
 		}
 	}
 

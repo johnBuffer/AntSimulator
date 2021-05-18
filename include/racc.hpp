@@ -10,22 +10,36 @@ struct RAccBase
     T pop_value;
 
     RAccBase(uint32_t max_size=8)
-        : values(max_size)
+        : max_values_count(max_size)
+        , values(max_size)
         , current_index(0)
+        , pop_value(0.0f)
     {
     }
 
     bool addValueBase(T val)
     {
+        const bool pop = current_index >= max_values_count;
         const uint32_t i = current_index % max_values_count;
         pop_value = values[i];
         values[i] = val;
         ++current_index;
+        return pop;
     }
 
-    virtual bool addValue() = 0;
+    uint32_t getCount() const
+    {
+        return std::min(current_index, max_values_count);
+    }
+
     virtual T get() const = 0;
+
+    operator T() const
+    {
+        return get();
+    }
 };
+
 
 template<typename T>
 struct RMean : public RAccBase<T>
@@ -38,6 +52,14 @@ struct RMean : public RAccBase<T>
     {
     }
 
+    void addValue(T v)
+    {
+        sum += v - float(RAccBase<T>::addValueBase(v)) * RAccBase<T>::pop_value;
+    }
 
+    T get() const override
+    {
+        return sum / float(RAccBase<T>::getCount());
+    }
 };
 

@@ -6,6 +6,7 @@
 #include "config.hpp"
 #include "display_manager.hpp"
 #include "distance_field_builder.hpp"
+#include "racc.hpp"
 
 
 void loadUserConf()
@@ -72,7 +73,7 @@ int main()
 	world.renderer.draw_markers = false;
 
 	sf::Clock clock;
-	float last_frame_time = 1.0f;
+	RMean<float> fps(100);
 
 	while (window.isOpen())
 	{
@@ -106,12 +107,12 @@ int main()
 		window.clear(sf::Color(94, 87, 87));
 
 		display_manager.draw();
-		display_manager.text.setString("FPS " + toStr(1.0f / last_frame_time));
+		display_manager.text.setString("FPS " + toStr(int32_t(fps.get())));
 		window.draw(display_manager.text);
 
 		window.display();
 
-		last_frame_time = clock.restart().asSeconds();
+		fps.addValue(1.0f / clock.restart().asSeconds());
 	}
 
 	// Free textures

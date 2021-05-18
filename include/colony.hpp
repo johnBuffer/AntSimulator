@@ -28,7 +28,7 @@ struct Colony
 		, population_update(3.0f)
 	{
 		base.food = 0.0f;
-		uint32_t ants_count = 8;
+		uint32_t ants_count = 128;
 		for (uint32_t i(ants_count); i--;) {
 			ants.emplace_back(x, y, getRandRange(2.0f * PI));
 		}
