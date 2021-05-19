@@ -22,7 +22,7 @@ struct Ant
 	float direction_update_period = 0.18f;
 	float marker_period = 0.25f;
 	float direction_noise_range = PI * 0.07f;
-	float repellent_period = 32.0f;
+	float repellent_period = 16.0f;
 
 	Mode phase;
 	sf::Vector2f position;
@@ -240,7 +240,7 @@ struct Ant
 			world.addMarker(position, phase == Mode::ToFood ? Mode::ToHome : Mode::ToFood, intensity);
 		}
 		else if (phase == Mode::ToHomeNoFood) {
-			const float intensity = getMarkerIntensity(0.1f);
+			const float intensity = getMarkerIntensity(0.3f);
 			world.addMarkerRepellent(position, intensity);
 		}
 	}
