@@ -32,7 +32,7 @@ struct Colony
 		, pop_diff(60)
 	{
 		base.food = 0.0f;
-		uint32_t ants_count = 8;
+		uint32_t ants_count = 128;
 		for (uint32_t i(ants_count); i--;) {
 			ants.emplace_back(x, y, getRandRange(2.0f * PI));
 		}

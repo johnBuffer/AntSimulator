@@ -31,7 +31,7 @@ struct WorldCell
 		, repellent(0.0f)
 		, density(0.0f)
 		, wall_dist(0.0f)
-		, discovered(0.0f)
+		, discovered(1.0f)
 	{}
 
 	void update(float dt)

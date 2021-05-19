@@ -19,10 +19,10 @@ struct Ant
 	float length = 4.7f;
 	float move_speed = 40.0f;
 	float marker_detection_max_dist = 40.0f;
-	float direction_update_period = 0.18f;
+	float direction_update_period = 0.25f;
 	float marker_period = 0.25f;
 	float direction_noise_range = PI * 0.07f;
-	float repellent_period = 16.0f;
+	float repellent_period = 8.0f;
 
 	Mode phase;
 	sf::Vector2f position;
@@ -35,7 +35,7 @@ struct Ant
 	float markers_count;
 	float liberty_coef;
 	float autonomy;
-	float max_autonomy = 400.0f;
+	float max_autonomy = 60000.0f;
 
 	Ant(float x, float y, float angle)
 		: position(x, y)
@@ -157,7 +157,7 @@ struct Ant
 	{
 		// Init
 		const Mode marker_phase = getMarkersSamplingType();
-		const float sample_angle_range = PI * 0.6f;
+		const float sample_angle_range = PI * 0.35f;
 		const float current_angle = direction.getCurrentAngle();
 		float max_intensity = 0.0f;
 		// To objective stuff
@@ -181,37 +181,35 @@ struct Ant
 				if (hit_result.cell) {
 					hit_result.cell->discovered = 1.0f;
 				}
-				//continue;
+				continue;
 			}
-			else {
-				cell->discovered += 0.1f;
-				// Check for food or colony
-				if (cell->isPermanent(marker_phase)) {
-					max_direction = to_marker;
-					found_permanent = true;
-					break;
-				}
-				// Flee if repellent
-				if (cell->repellent > max_repellent) {
-					max_repellent = cell->repellent;
-					repellent_cell = cell;
-				}
-				// Check for the most intense marker
-				const float marker_intensity = cell->getIntensity(marker_phase) * std::pow(cell->wall_dist, 2.0f);
-				if (marker_intensity > max_intensity) {
-					max_intensity = marker_intensity;
-					max_direction = to_marker;
-					max_cell = cell;
-				}
-				// Eventually choose a different path
-				if (RNGf::proba(liberty_coef)) {
-					break;
-				}
+			cell->discovered += 0.1f;
+			// Check for food or colony
+			if (cell->isPermanent(marker_phase)) {
+				max_direction = to_marker;
+				found_permanent = true;
+				break;
+			}
+			// Flee if repellent
+			if (cell->repellent > max_repellent) {
+				max_repellent = cell->repellent;
+				repellent_cell = cell;
+			}
+			// Check for the most intense marker
+			const float marker_intensity = cell->getIntensity(marker_phase) * std::pow(cell->wall_dist, 2.0f);
+			if (marker_intensity > max_intensity) {
+				max_intensity = marker_intensity;
+				max_direction = to_marker;
+				max_cell = cell;
+			}
+			// Eventually choose a different path
+			if (RNGf::proba(liberty_coef)) {
+				break;
 			}
 		}
 		// Check for repellent
 		if (phase == Mode::ToFood && max_repellent && !found_permanent) {
-			const float repellent_prob_factor = 0.1f;
+			const float repellent_prob_factor = 0.3f;
 			if (RNGf::proba(repellent_prob_factor * (1.0f - max_intensity / Conf::MARKER_INTENSITY))) {
 				//phase = Mode::Flee;
 				direction.addNow(RNGf::getUnder(2.0f * PI));
@@ -240,7 +238,7 @@ struct Ant
 			world.addMarker(position, phase == Mode::ToFood ? Mode::ToHome : Mode::ToFood, intensity);
 		}
 		else if (phase == Mode::ToHomeNoFood) {
-			const float intensity = getMarkerIntensity(0.3f);
+			const float intensity = getMarkerIntensity(0.02f);
 			world.addMarkerRepellent(position, intensity);
 		}
 	}

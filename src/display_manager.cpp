@@ -127,7 +127,7 @@ void DisplayManager::processEvents()
 			break;
 		case sf::Event::MouseWheelMoved:
 			// this is an amazing zoom
-			zoom(1 + event.mouseWheel.delta * 0.2f);
+			zoom(1 + event.mouseWheel.delta * 0.05f);
 			break;
 		case sf::Event::MouseButtonPressed:
 			if (event.mouseButton.button == sf::Mouse::Left)

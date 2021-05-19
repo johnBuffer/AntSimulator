@@ -66,9 +66,9 @@ uint32_t DefaultConf<T>::ANTS_COUNT = 3000;
 template<typename T>
 float DefaultConf<T>::COLONY_SIZE = 20.0f;
 template<typename T>
-double DefaultConf<T>::MARKER_INTENSITY = 100000.0;
+double DefaultConf<T>::MARKER_INTENSITY = 1000.0;
 template<typename T>
-sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(100.0f, 100.0f);
+sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(500.0f, Conf::WIN_HEIGHT * 0.5f);
 //sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(110.0f, 80.0f);
 //sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(1100.0f, 514.0f);
 

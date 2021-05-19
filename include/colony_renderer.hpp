@@ -27,7 +27,8 @@ struct ColonyRenderer
 		font.loadFromFile("res/font.ttf");
 		text.setFont(font);
 
-		food_acc.color = sf::Color(0, 255, 0, 150);
+		food_acc.color = Conf::FOOD_COLOR;
+		//food_acc.color.a = 200;
 
 		for (uint64_t i(Conf::ANTS_COUNT-1); i--;) {
 			const uint64_t index = 4 * i;
@@ -130,7 +131,7 @@ struct ColonyRenderer
 		target.draw(text);
 
 		text.setCharacterSize(14);
-		text.setFillColor(sf::Color::Green);
+		text.setFillColor(Conf::FOOD_COLOR);
 		text.setPosition(population.x, population.y - 1.8f * margin);
 		text.setString("+ " + toStr(int(10.0f * colony.base.food_acc_mean.get())) + " Food/s");
 		target.draw(text);
