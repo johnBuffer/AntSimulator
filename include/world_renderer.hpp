@@ -96,7 +96,9 @@ struct WorldRenderer : public AsyncRenderer
 					va[4 * i + 3].texCoords = sf::Vector2f(100.0f + offset, 100.0f - offset);
 				}
 				else if (cell.wall) {
-					color = Conf::WALL_COLOR;
+					const sf::Color base = Conf::WALL_COLOR;
+					const float ratio = std::max(0.5f, 1.0f - cell.wall_dist);
+					color = sf::Color(base.r * ratio, base.g * ratio, base.b * ratio);
 					const float offset = 4.0f;
 					va[4 * i + 0].texCoords = sf::Vector2f(200.0f + offset, offset);
 					va[4 * i + 1].texCoords = sf::Vector2f(300.0f - offset, offset);

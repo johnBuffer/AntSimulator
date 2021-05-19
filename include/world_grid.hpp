@@ -9,7 +9,7 @@
 struct WorldCell
 {
 	// Stores the intensity of ToHome and ToFood markers
-	float intensity[2];
+	double intensity[2];
 	// Is the marker permanent ?
 	bool permanent[2];
 	// Food quantity in the cell
@@ -38,8 +38,8 @@ struct WorldCell
 		intensity[0] -= (!permanent[0]) * dt;
 		intensity[1] -= (!permanent[1]) * dt;
 		// Avoid negative values
-		intensity[0] = std::max(0.1f, intensity[0]);
-		intensity[1] = std::max(0.1f, intensity[1]);
+		intensity[0] = std::max(0.1, intensity[0]);
+		intensity[1] = std::max(0.1, intensity[1]);
 		// Remove food marker if no food
 		intensity[1] = intensity[1] * to<float>(!bool(!food && permanent[1]));
 		permanent[1] &= to<bool>(food);
@@ -57,7 +57,7 @@ struct WorldCell
 		return last;
 	}
 
-	float getIntensity(Mode mode) const
+	double getIntensity(Mode mode) const
 	{
 		return intensity[to<uint32_t>(mode)];
 	}
@@ -110,7 +110,7 @@ struct WorldGrid : public Grid<WorldCell>
 	{
 	}
 
-	void addMarker(sf::Vector2f pos, Mode type, float intensity, bool permanent = false)
+	void addMarker(sf::Vector2f pos, Mode type, double intensity, bool permanent = false)
 	{
 		WorldCell& cell = get(pos);
 		const uint32_t mode_index = to<uint32_t>(type);

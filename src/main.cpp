@@ -30,7 +30,7 @@ int main()
 
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 4;
-	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", sf::Style::Default, settings);
+	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", sf::Style::Fullscreen, settings);
 	window.setFramerateLimit(60);
 
 	World world(Conf::WORLD_WIDTH, Conf::WORLD_HEIGHT);
@@ -53,7 +53,7 @@ int main()
 				if (food_map.getPixel(x, y).r > 100) {
 					world.addWall(position);
 				}
-				else if (food_map.getPixel(x, y).g > 100) {
+				else if (food_map.getPixel(x, y).g > 1000) {
 					const float green = food_map.getPixel(x, y).g;
 					world.addFoodAt(position.x, position.y, green * 0.025f);
 				}
@@ -87,7 +87,7 @@ int main()
 					world.removeWall(world_position);
 				}
 				else {
-					world.addFoodAt(world_position.x, world_position.y, 200000);
+					world.addFoodAt(world_position.x, world_position.y, 10);
 				}
 				last_clic = world_position;
 			}

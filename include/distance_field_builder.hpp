@@ -10,27 +10,25 @@ struct DistanceFieldBuilder
 			for (int32_t y(0); y < grid.height; ++y) {
 				WorldCell& cell = grid.get(sf::Vector2i(x, y));
 				if (cell.wall) {
-					cell.wall_dist = 0.0f;
+					cell.wall_dist = getMinDist(x, y, grid, false, 20);
 				}
 				else {
-					cell.wall_dist = getMinDist(x, y, grid);
+					cell.wall_dist = getMinDist(x, y, grid, true, 5);
 				}
 			}
 		}
 	}
 
-	static float getMinDist(int32_t x, int32_t y, WorldGrid& grid)
+	static float getMinDist(int32_t x, int32_t y, WorldGrid& grid, bool dist_to_wall, int32_t max_iteration)
 	{
 		const sf::Vector2f cell_pos(x, y);
-		const int32_t max_iteration = 4;
 		float min_dist = max_iteration;
 		for (int32_t dx(-max_iteration); dx <= max_iteration; ++dx) {
 			for (int32_t dy(-max_iteration); dy <= max_iteration; ++dy) {
 				const WorldCell* cell = grid.getSafe(sf::Vector2i(x + dx, y + dy));
 				if (cell) {
-					if (cell->wall) {
+					if ((cell->wall && dist_to_wall) || (!cell->wall && !dist_to_wall)) {
 						const float dist = getLength(sf::Vector2f(dx, dy));
-						//min_dist = (min_dist == -1.0f) ? dist : std::min(dist, min_dist);
 						if (dist < min_dist) {
 							min_dist = dist;
 						}

@@ -14,21 +14,20 @@ struct ColonyRenderer
 	sf::VertexArray ants_food_va;
 
 	Graphic population;
+	Graphic food_acc;
 	Cooldown population_update;
 
 	ColonyRenderer()
 		: ants_va(sf::Quads, 4 * Conf::ANTS_COUNT)
 		, ants_food_va(sf::Quads, 4 * Conf::ANTS_COUNT)
 		, population(800, sf::Vector2f(800.0f, 100.0f), sf::Vector2f())
+		, food_acc(800, sf::Vector2f(800.0f, 100.0f), sf::Vector2f())
 		, population_update(3.0f)
 	{
 		font.loadFromFile("res/font.ttf");
 		text.setFont(font);
-		text.setFillColor(sf::Color::White);
-		text.setCharacterSize(20);
 
-		text.setString("Population: ");
-		text.setOrigin(0.0f, text.getGlobalBounds().height * 2.0f);
+		food_acc.color = sf::Color(0, 255, 0, 150);
 
 		for (uint64_t i(Conf::ANTS_COUNT-1); i--;) {
 			const uint64_t index = 4 * i;
@@ -51,6 +50,12 @@ struct ColonyRenderer
 			ants_food_va[index + 2].texCoords = sf::Vector2f(200.0f, 100.0f);
 			ants_food_va[index + 3].texCoords = sf::Vector2f(100.0f, 100.0f);
 		}
+
+		const float GUI_MARGIN = 20.0f;
+		population.x = GUI_MARGIN;
+		population.y = Conf::WIN_HEIGHT - population.height - GUI_MARGIN;
+		food_acc.x = GUI_MARGIN;
+		food_acc.y = Conf::WIN_HEIGHT - population.height - GUI_MARGIN;
 	}
 
 	void renderAnts(const Colony& colony, sf::RenderTarget& target, sf::RenderStates& states)
@@ -73,19 +78,18 @@ struct ColonyRenderer
 		target.draw(ants_food_va, rs);
 		rs.texture = &(*Conf::ANT_TEXTURE);
 		target.draw(ants_va, rs);
-
-		const float GUI_MARGIN = 20.0f;
-		population.x = GUI_MARGIN;
-		population.y = Conf::WIN_HEIGHT - population.height - GUI_MARGIN;
 	}
 
 	void updatePopulation(const Colony& colony, float dt)
 	{
 		population.setLastValue(to<float>(colony.ants.size()));
+		food_acc.setLastValue(colony.base.food_acc_mean.get());
+
 		population_update.update(dt);
 		if (population_update.ready()) {
 			population_update.reset();
 			population.next();
+			food_acc.next();
 		}
 	}
 
@@ -105,16 +109,33 @@ struct ColonyRenderer
 		
 		const float margin = 10.0f;
 		sf::RectangleShape population_background(sf::Vector2f(population.width + 2.0f * margin,
-															  population.height + 4.0f * margin));
-		population_background.setFillColor(sf::Color(50, 50, 50, 150));
-		population_background.setPosition(text.getPosition() - sf::Vector2f(margin, 3.0f * margin));
+															  population.height + 5.0f * margin));
+		population_background.setFillColor(sf::Color(50, 50, 50, 200));
+		population_background.setPosition(sf::Vector2f(population.x, population.y) - sf::Vector2f(margin, 4.0f * margin));
 		target.draw(population_background);
 
 		const uint32_t ants_count = to<int32_t>(colony.ants.size());
-		text.setPosition(population.x, population.y);
+		text.setCharacterSize(20);
+		text.setFillColor(sf::Color::White);
+		text.setPosition(population.x, population.y - 4.0f * margin);
 		text.setString("Population " + toStr(ants_count));
 		target.draw(text);
 
+		text.setCharacterSize(14);
+		const int32_t pop_diff = colony.pop_diff.get();
+		text.setFillColor(pop_diff >= 0 ? sf::Color::Green : sf::Color::Red);
+		text.setPosition(population.x + 160.0f, population.y - 3.5f * margin);
+		const std::string sign = (pop_diff >= 0 ? "+" : "");
+		text.setString("(" + sign + toStr(pop_diff) + " Pop var 60s)");
+		target.draw(text);
+
+		text.setCharacterSize(14);
+		text.setFillColor(sf::Color::Green);
+		text.setPosition(population.x, population.y - 1.8f * margin);
+		text.setString("+ " + toStr(int(10.0f * colony.base.food_acc_mean.get())) + " Food/s");
+		target.draw(text);
+
 		population.render(target);
+		food_acc.render(target);
 	}
 };

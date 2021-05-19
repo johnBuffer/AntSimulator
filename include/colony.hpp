@@ -18,7 +18,8 @@ struct Colony
 	Cooldown ants_creation_cooldown;
 	float food_acc;
 	RMean<float> food_acc_mean;
-	Cooldown food_acc_update;
+	Cooldown pop_diff_update;
+	RDiff<int32_t> pop_diff;
 
 
 	Colony(float x, float y, uint32_t n)
@@ -27,10 +28,11 @@ struct Colony
 		, ants_creation_cooldown(0.125f)
 		, food_acc(0.0f)
 		, food_acc_mean(100)
-		, food_acc_update(0.1f)
+		, pop_diff_update(1.0f)
+		, pop_diff(60)
 	{
 		base.food = 0.0f;
-		uint32_t ants_count = 8;
+		uint32_t ants_count = 3000;
 		for (uint32_t i(ants_count); i--;) {
 			ants.emplace_back(x, y, getRandRange(2.0f * PI));
 		}
@@ -38,6 +40,12 @@ struct Colony
 
 	void update(float dt, World& world)
 	{
+		pop_diff_update.update(dt);
+		if (pop_diff_update.ready()) {
+			pop_diff_update.reset();
+			pop_diff.addValue(ants.size());
+		}
+
 		const float ant_cost = 2.0f;
 		ants_creation_cooldown.update(dt);
 		if (ants_creation_cooldown.ready() && ants.size() < max_ants_count && base.useFood(ant_cost)) {
@@ -54,11 +62,6 @@ struct Colony
 		auto it = std::remove_if(ants.begin(), ants.end(), [](const Ant& a) { return a.autonomy > a.max_autonomy; });
 		ants.erase(it, ants.end());
 
-		food_acc_update.update(dt);
-		if (food_acc_update.ready()) {
-			food_acc_update.reset();
-			food_acc_mean.addValue(food_acc);
-			food_acc = 0.0f;
-		}
+		base.updateFoodAcc(dt);
 	}
 };

@@ -1,3 +1,4 @@
+#pragma once
 #include <vector>
 
 
@@ -11,7 +12,7 @@ struct RAccBase
 
     RAccBase(uint32_t max_size=8)
         : max_values_count(max_size)
-        , values(max_size)
+        , values(max_size, 0.0f)
         , current_index(0)
         , pop_value(0.0f)
     {
@@ -20,7 +21,7 @@ struct RAccBase
     bool addValueBase(T val)
     {
         const bool pop = current_index >= max_values_count;
-        const uint32_t i = current_index % max_values_count;
+        const uint32_t i = getIndex();
         pop_value = values[i];
         values[i] = val;
         ++current_index;
@@ -29,7 +30,7 @@ struct RAccBase
 
     uint32_t getCount() const
     {
-        return std::min(current_index, max_values_count);
+        return std::min(current_index + 1, max_values_count);
     }
 
     virtual T get() const = 0;
@@ -37,6 +38,12 @@ struct RAccBase
     operator T() const
     {
         return get();
+    }
+
+protected:
+    uint32_t getIndex(int32_t offset = 0) const
+    {
+        return (current_index + offset) % max_values_count;
     }
 };
 
@@ -63,3 +70,22 @@ struct RMean : public RAccBase<T>
     }
 };
 
+
+template<typename T>
+struct RDiff : public RAccBase<T>
+{
+    RDiff(uint32_t max_size = 8)
+        : RAccBase<T>(max_size)
+    {
+    }
+
+    void addValue(T v)
+    {
+        RAccBase<T>::addValueBase(v);
+    }
+
+    T get() const override
+    {
+        return values[getIndex(-1)] - values[getIndex()];
+    }
+};
