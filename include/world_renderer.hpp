@@ -64,30 +64,45 @@ struct WorldRenderer : public AsyncRenderer
 						va[4 * i + 2].texCoords = sf::Vector2f(300.0f - offset, 100.0f - offset);
 						va[4 * i + 3].texCoords = sf::Vector2f(200.0f + offset, 100.0f - offset);
 					}
-					else if (draw_markers) {
-						if (cell.repellent) {
-							color = sf::Color::Blue;
+					else {
+						if ((cell.intensity[0] < 1.0 && cell.intensity[1] < 1.0) || !draw_markers) {
+							const float ratio = std::min(1.0f, cell.discovered);
+							color = sf::Color(50 * ratio, 50 * ratio, 50 * ratio);
+							const float offset = 32.0f;
+							va[4 * i + 0].texCoords = sf::Vector2f(200.0f + offset, offset);
+							va[4 * i + 1].texCoords = sf::Vector2f(300.0f - offset, offset);
+							va[4 * i + 2].texCoords = sf::Vector2f(300.0f - offset, 100.0f - offset);
+							va[4 * i + 3].texCoords = sf::Vector2f(200.0f + offset, 100.0f - offset);
 						}
-						else {
-							const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * cell.intensity[0];
-							const sf::Vector3f intensity_2_color = intensity_factor * to_food_color * cell.intensity[1];
-							const sf::Vector3f mixed_color(
-								std::min(255.0f, intensity_1_color.x + intensity_2_color.x),
-								std::min(255.0f, intensity_1_color.y + intensity_2_color.y),
-								std::min(255.0f, intensity_1_color.z + intensity_2_color.z)
-							);
-							color = sf::Color(to<uint8_t>(mixed_color.x), to<uint8_t>(mixed_color.y), to<uint8_t>(mixed_color.z));
+						else if (draw_markers) {
+							const float offset = 32.0f;
+							if (cell.repellent) {
+								color = sf::Color::Blue;
+								va[4 * i + 0].texCoords = sf::Vector2f(offset, offset);
+								va[4 * i + 1].texCoords = sf::Vector2f(100.0f - offset, offset);
+								va[4 * i + 2].texCoords = sf::Vector2f(100.0f - offset, 100.0f - offset);
+								va[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
+							}
+							else {
+								const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * float(cell.intensity[0]);
+								const sf::Vector3f intensity_2_color = intensity_factor * to_food_color * float(cell.intensity[1]);
+								const sf::Vector3f mixed_color(
+									std::min(255.0f, intensity_1_color.x + intensity_2_color.x),
+									std::min(255.0f, intensity_1_color.y + intensity_2_color.y),
+									std::min(255.0f, intensity_1_color.z + intensity_2_color.z)
+								);
+								color = sf::Color(to<uint8_t>(mixed_color.x), to<uint8_t>(mixed_color.y), to<uint8_t>(mixed_color.z));
+								va[4 * i + 0].texCoords = sf::Vector2f(offset, offset);
+								va[4 * i + 1].texCoords = sf::Vector2f(100.0f - offset, offset);
+								va[4 * i + 2].texCoords = sf::Vector2f(100.0f - offset, 100.0f - offset);
+								va[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
+							}
 						}
-						const float offset = 32.0f;
-						va[4 * i + 0].texCoords = sf::Vector2f(offset, offset);
-						va[4 * i + 1].texCoords = sf::Vector2f(100.0f - offset, offset);
-						va[4 * i + 2].texCoords = sf::Vector2f(100.0f - offset, 100.0f - offset);
-						va[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
 					}
 				}
 				else if (cell.food) {
 					const float max_food = 10.0f;
-					const float ratio = cell.food / max_food;
+					const float ratio = cell.food / max_food * (cell.discovered > 0.0f ? 1.0f : 0.0f);
 					color = sf::Color(0, ratio * 255, 0);
 					const float offset = 4.0f;
 					va[4 * i + 0].texCoords = sf::Vector2f(100.0f + offset, offset);
@@ -97,7 +112,7 @@ struct WorldRenderer : public AsyncRenderer
 				}
 				else if (cell.wall) {
 					const sf::Color base = Conf::WALL_COLOR;
-					const float ratio = std::max(0.5f, 1.0f - cell.wall_dist);
+					const float ratio = std::min(1.0f, cell.discovered);
 					color = sf::Color(base.r * ratio, base.g * ratio, base.b * ratio);
 					const float offset = 4.0f;
 					va[4 * i + 0].texCoords = sf::Vector2f(200.0f + offset, offset);

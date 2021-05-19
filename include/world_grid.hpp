@@ -21,6 +21,7 @@ struct WorldCell
 	float density;
 	// Dist to wall
 	float wall_dist;
+	float discovered;
 
 	WorldCell()
 		: intensity{ 0.0f, 0.0f }
@@ -30,6 +31,7 @@ struct WorldCell
 		, repellent(0.0f)
 		, density(0.0f)
 		, wall_dist(0.0f)
+		, discovered(0.0f)
 	{}
 
 	void update(float dt)
@@ -48,6 +50,7 @@ struct WorldCell
 		repellent = std::max(0.0f, repellent);
 		// Update density
 		density *= 0.99f;
+		discovered += dt * float(bool(discovered));
 	}
 
 	bool pick()
@@ -81,7 +84,7 @@ struct WorldCell
 
 struct HitPoint
 {
-	const WorldCell* cell;
+	WorldCell* cell;
 	sf::Vector2f normal;
 	float distance;
 
@@ -90,7 +93,7 @@ struct HitPoint
 		, distance(-1.0f)
 	{}
 
-	HitPoint(const WorldCell& c, sf::Vector2f n, float dist)
+	HitPoint(WorldCell& c, sf::Vector2f n, float dist)
 		: cell(&c)
 		, normal(n)
 		, distance(dist)
@@ -151,7 +154,7 @@ struct WorldGrid : public Grid<WorldCell>
 		return get(pos).pick();
 	}
 
-	HitPoint getFirstHit(sf::Vector2f p, sf::Vector2f d, float max_dist) const
+	HitPoint getFirstHit(sf::Vector2f p, sf::Vector2f d, float max_dist)
 	{
 		HitPoint intersection;
 		sf::Vector2i cell_p = getCellCoords(p);
@@ -165,7 +168,7 @@ struct WorldGrid : public Grid<WorldCell>
 		while (dist < max_dist) {
 			const uint32_t b = t_max_x < t_max_y;
 			// Advance in grid
-			dist += b * t_max_x + (!b) * t_max_y;
+			dist = (b * t_max_x + (!b) * t_max_y);
 			t_max_x += t_dx * b;
 			t_max_y += t_dy * (!b);
 			cell_p.x += step.x * b;
@@ -174,7 +177,7 @@ struct WorldGrid : public Grid<WorldCell>
 				return intersection;
 			}
 			else {
-				const WorldCell& cell = getCst(cell_p);
+				WorldCell& cell = get(cell_p);
 				if (cell.wall) {
 					intersection.cell = &cell;
 					intersection.normal = sf::Vector2f(to<float>(b), to<float>(!b));

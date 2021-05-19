@@ -53,7 +53,7 @@ int main()
 				if (food_map.getPixel(x, y).r > 100) {
 					world.addWall(position);
 				}
-				else if (food_map.getPixel(x, y).g > 1000) {
+				else if (food_map.getPixel(x, y).g > 100) {
 					const float green = food_map.getPixel(x, y).g;
 					world.addFoodAt(position.x, position.y, green * 0.025f);
 				}
@@ -102,11 +102,7 @@ int main()
 		}
 
 		window.clear(sf::Color(94, 87, 87));
-
 		display_manager.draw();
-		display_manager.text.setString("FPS " + toStr(int32_t(fps.get())));
-		window.draw(display_manager.text);
-
 		window.display();
 
 		fps.addValue(1.0f / clock.restart().asSeconds());

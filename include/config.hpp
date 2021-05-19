@@ -14,7 +14,7 @@ struct DefaultConf
 	const static sf::Color COLONY_COLOR;
 	const static sf::Color WALL_COLOR;
 	static float COLONY_SIZE;
-	static float MARKER_INTENSITY;
+	static double MARKER_INTENSITY;
 	static sf::Vector2f COLONY_POSITION;
 	static uint32_t WIN_WIDTH;
 	static uint32_t WIN_HEIGHT;
@@ -52,7 +52,7 @@ const sf::Color DefaultConf<T>::TO_HOME_COLOR = sf::Color(255, 0, 0);
 template<typename T>
 const sf::Color DefaultConf<T>::COLONY_COLOR = DefaultConf<T>::ANT_COLOR;
 template<typename T>
-const sf::Color DefaultConf<T>::WALL_COLOR = sf::Color(94, 87, 87);
+const sf::Color DefaultConf<T>::WALL_COLOR = sf::Color(114, 107, 107);
 template<typename T>
 uint32_t DefaultConf<T>::WIN_WIDTH = 1920;
 template<typename T>
@@ -66,7 +66,7 @@ uint32_t DefaultConf<T>::ANTS_COUNT = 3000;
 template<typename T>
 float DefaultConf<T>::COLONY_SIZE = 20.0f;
 template<typename T>
-float DefaultConf<T>::MARKER_INTENSITY = 1000000.0f;
+double DefaultConf<T>::MARKER_INTENSITY = 100000.0;
 template<typename T>
 sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(100.0f, 100.0f);
 //sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(110.0f, 80.0f);
