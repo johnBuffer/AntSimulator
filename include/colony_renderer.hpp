@@ -21,7 +21,7 @@ struct ColonyRenderer
 		: ants_va(sf::Quads, 4 * Conf::ANTS_COUNT)
 		, ants_food_va(sf::Quads, 4 * Conf::ANTS_COUNT)
 		, population(800, sf::Vector2f(800.0f, 100.0f), sf::Vector2f())
-		, food_acc(800, sf::Vector2f(800.0f, 100.0f), sf::Vector2f())
+		, food_acc(800, sf::Vector2f(800.0f, 50.0f), sf::Vector2f())
 		, population_update(3.0f)
 	{
 		font.loadFromFile("res/font.ttf");
@@ -56,7 +56,7 @@ struct ColonyRenderer
 		population.x = GUI_MARGIN;
 		population.y = Conf::WIN_HEIGHT - population.height - GUI_MARGIN;
 		food_acc.x = GUI_MARGIN;
-		food_acc.y = Conf::WIN_HEIGHT - population.height - GUI_MARGIN;
+		food_acc.y = Conf::WIN_HEIGHT - population.height - GUI_MARGIN + 50.0f;
 	}
 
 	void renderAnts(const Colony& colony, sf::RenderTarget& target, sf::RenderStates& states)
@@ -127,7 +127,7 @@ struct ColonyRenderer
 		text.setFillColor(pop_diff >= 0 ? sf::Color::Green : sf::Color::Red);
 		text.setPosition(population.x + 160.0f, population.y - 3.5f * margin);
 		const std::string sign = (pop_diff >= 0 ? "+" : "");
-		text.setString("(" + sign + toStr(pop_diff) + " Pop var 60s)");
+		text.setString("(" + sign + toStr(pop_diff) + " Ants over last 60s)");
 		target.draw(text);
 
 		text.setCharacterSize(14);

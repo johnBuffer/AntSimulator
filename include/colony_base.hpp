@@ -27,7 +27,7 @@ struct ColonyBase
 		, radius(r)
 		, food(0.0f)
 		, food_acc(0.0f)
-		, food_acc_mean(20)
+		, food_acc_mean(200)
 		, food_acc_update(0.1f)
 	{}
 
