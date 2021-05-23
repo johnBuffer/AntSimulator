@@ -26,7 +26,7 @@ struct DefaultConf
 	static void loadTextures()
 	{
 		DefaultConf::ANT_TEXTURE = std::make_shared<sf::Texture>();
-		DefaultConf::ANT_TEXTURE->loadFromFile("res/ant_2.png");
+		DefaultConf::ANT_TEXTURE->loadFromFile("res/ant.png");
 		DefaultConf::ANT_TEXTURE->setSmooth(true);
 		DefaultConf::MARKER_TEXTURE = std::make_shared<sf::Texture>();
 		DefaultConf::MARKER_TEXTURE->loadFromFile("res/marker.png");

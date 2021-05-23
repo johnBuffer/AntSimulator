@@ -26,9 +26,9 @@ struct Colony
 			ants_va[index + 3].color = Conf::ANT_COLOR;
 
 			ants_va[index + 0].texCoords = sf::Vector2f(0.0f, 0.0f);
-			ants_va[index + 1].texCoords = sf::Vector2f(73.0f, 0.0f);
-			ants_va[index + 2].texCoords = sf::Vector2f(73.0f, 107.0f);
-			ants_va[index + 3].texCoords = sf::Vector2f(0.0f, 107.0f);
+			ants_va[index + 1].texCoords = sf::Vector2f(74.0f, 0.0f);
+			ants_va[index + 2].texCoords = sf::Vector2f(74.0f, 108.0f);
+			ants_va[index + 3].texCoords = sf::Vector2f(0.0f, 108.0f);
 		}
 	}
 
