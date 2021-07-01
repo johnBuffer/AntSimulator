@@ -12,15 +12,9 @@
 
 struct Ant
 {
-	Ant() = default;
-
 	Ant(float x, float y, float angle)
 		: position(x, y)
 		, direction(angle)
-		, last_direction_update(RNGf::getUnder(1.0f) * direction_update_period)
-		, last_marker(RNGf::getUnder(1.0f) * marker_period)
-		, phase(Mode::ToFood)
-		, liberty_coef(RNGf::getRange(0.0001f, 0.001f))
 		, hits(0)
 		, markers_count(0.0f)
 	{
@@ -35,7 +29,7 @@ struct Ant
 
 		last_direction_update += dt;
 		if (last_direction_update > direction_update_period) {
-			findMarker(world, dt);
+			findMarker(world);
 			direction += RNGf::getFullRange(direction_noise_range);
 			last_direction_update = 0.0f;
 		}
@@ -51,7 +45,6 @@ struct Ant
 	void updatePosition(World& world, float dt)
 	{
 		sf::Vector2f v = direction.getVec();
-		const sf::Vector2f next_position = position + (dt * move_speed) * v;
 		const HitPoint intersection = world.markers.getFirstHit(position, v, dt * move_speed);
 		if (intersection.cell) {
 			++hits;
@@ -95,7 +88,7 @@ struct Ant
 		}
 	}
 
-	void findMarker(World& world, float dt)
+	void findMarker(World& world)
 	{
 		// Init
 		const float sample_angle_range = PI * 0.8f;
@@ -182,13 +175,13 @@ struct Ant
 	const float direction_noise_range = PI * 0.1f;
 	const float colony_size = 20.0f;
 
-	Mode phase;
+	Mode phase{Mode::ToFood};
 	sf::Vector2f position;
 	Direction direction;
 	uint32_t hits;
 
-	float last_direction_update;
+	float last_direction_update = RNGf::getUnder(1.0f) * direction_update_period;
 	float markers_count;
-	float last_marker;
-	float liberty_coef;
+	float last_marker = RNGf::getUnder(1.0f) * marker_period;
+	float liberty_coef = RNGf::getRange(0.0001f, 0.001f);
 };

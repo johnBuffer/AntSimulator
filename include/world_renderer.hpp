@@ -42,7 +42,6 @@ struct WorldRenderer : public AsyncRenderer
 		const sf::Vector3f to_food_color(Conf::TO_FOOD_COLOR.r / 255.0f, Conf::TO_FOOD_COLOR.g / 255.0f, Conf::TO_FOOD_COLOR.b / 255.0f);
 
 		uint64_t i = 0;
-		const float cell_size = to<float>(grid.cell_size);
 		for (int32_t x(0); x < grid.width; x++) {
 			for (int32_t y(0); y < grid.height; y++) {
 				const auto& cell = grid.getCst(sf::Vector2i(x, y));

@@ -2,23 +2,10 @@
 
 
 DisplayManager::DisplayManager(sf::RenderTarget& target, sf::RenderWindow& window, World& world, Colony& colony)
-	: m_window(window)
-	, m_target(target)
-	, m_zoom(1.0f)
-	, m_offsetX(0.0f)
-	, m_offsetY(0.0f)
-	, speed_mode(false)
-	, m_va(sf::Quads, 0)
-	, update(true)
-	, debug_mode(false)
+	: m_target(target)
+	, m_window(window)
 	, m_world(world)
 	, m_colony(colony)
-	, clic(false)
-	, m_mouse_button_pressed(false)
-	, pause(false)
-	, wall_mode(false)
-	, render_ants(true)
-	, remove_wall(false)
 {
 	m_windowOffsetX = m_window.getSize().x * 0.5f;
     m_windowOffsetY = m_window.getSize().y * 0.5f;
@@ -97,31 +84,31 @@ void DisplayManager::processEvents()
 			break;
 		case sf::Event::KeyPressed:
 			if (event.key.code == sf::Keyboard::Escape) m_window.close();
-			else if ((event.key.code == sf::Keyboard::Subtract)) zoom(0.8f);
-			else if ((event.key.code == sf::Keyboard::Add)) zoom(1.2f);
-			else if ((event.key.code == sf::Keyboard::Space)) update = !update;
-			else if ((event.key.code == sf::Keyboard::P)) pause = !pause;
-			else if ((event.key.code == sf::Keyboard::E)) {
+			else if (event.key.code == sf::Keyboard::Subtract) zoom(0.8f);
+			else if (event.key.code == sf::Keyboard::Add) zoom(1.2f);
+			else if (event.key.code == sf::Keyboard::Space) update = !update;
+			else if (event.key.code == sf::Keyboard::P) pause = !pause;
+			else if (event.key.code == sf::Keyboard::E) {
 				remove_wall = !remove_wall;
 				if (remove_wall) {
 					wall_mode = false;
 				}
 			}
-			else if ((event.key.code == sf::Keyboard::A)) render_ants = !render_ants;
-			else if ((event.key.code == sf::Keyboard::M)) m_world.renderer.draw_markers = !m_world.renderer.draw_markers;
-			else if ((event.key.code == sf::Keyboard::W)) {
+			else if (event.key.code== sf::Keyboard::A) render_ants = !render_ants;
+			else if (event.key.code == sf::Keyboard::M) m_world.renderer.draw_markers = !m_world.renderer.draw_markers;
+			else if (event.key.code == sf::Keyboard::W) {
 				wall_mode = !wall_mode;
 				if (wall_mode) {
 					remove_wall = false;
 				}
 			}
-			else if ((event.key.code == sf::Keyboard::R))
+			else if (event.key.code == sf::Keyboard::R)
 			{
 				m_offsetX = m_windowOffsetX;
 				m_offsetY = m_windowOffsetY;
 				m_zoom = 1.0f;
 			}
-			else if ((event.key.code == sf::Keyboard::S))
+			else if (event.key.code == sf::Keyboard::S)
 			{
 				speed_mode = !speed_mode;
 				m_window.setFramerateLimit(speed_mode ? 0 : 60);

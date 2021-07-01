@@ -11,7 +11,6 @@ struct Colony
 {
 	Colony(float x, float y, uint32_t n)
 		: position(x, y)
-		, last_direction_update(0.0f)
 		, ants_va(sf::Quads, 4 * n)
 	{
 		for (uint32_t i(n); i--;) {
@@ -64,7 +63,7 @@ struct Colony
 	mutable sf::VertexArray ants_va;
 	const float size = 20.0f;
 
-	float last_direction_update;
+	float last_direction_update = 0.0f;
 	const float direction_update_period = 0.25f;
 
 };

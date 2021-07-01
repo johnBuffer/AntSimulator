@@ -20,8 +20,8 @@ struct World
 	WorldRenderer renderer;
 
 	World(uint32_t width, uint32_t height)
-		: markers(width, height, 4)
-		, size(to<float>(width), to<float>(height))
+		: size(to<float>(width), to<float>(height))
+		, markers(width, height, 4)
 		, renderer(markers, va_markers)
 	{
 		for (int32_t x(0); x < markers.width; x++) {

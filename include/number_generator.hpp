@@ -112,7 +112,7 @@ public:
 	{}
 
 	// random_device is not copyable
-	IntegerNumberGenerator(const IntegerNumberGenerator<T>& right)
+	IntegerNumberGenerator(const IntegerNumberGenerator<T>&)
 		: NumberGenerator()
 	{}
 

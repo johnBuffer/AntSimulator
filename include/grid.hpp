@@ -12,9 +12,9 @@ struct Grid
 	const int32_t width, height, cell_size;
 
 	Grid(int32_t width_, int32_t height_, uint32_t cell_size_)
-		: cell_size(cell_size_)
-		, width(width_ / cell_size_)
+		: width(width_ / cell_size_)
 		, height(height_ / cell_size_)
+		, cell_size(cell_size_)
 	{
 		cells.resize(width * height);
 	}
