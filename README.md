@@ -23,6 +23,21 @@ Detailed explanation [here](https://preshing.com/20170511/how-to-build-a-cmake-b
 
 `./install.sh`
 
+##### On Ubuntu from Docker
+ - Install Docker (see [this](https://docs.docker.com/engine/install/))
+ - Execute `install_from_docker.sh` script
+```sh
+docker build -t myimages/ant-simulator:latest .
+docker create -it --name dummy myimages/ant-simulator:latest bash
+docker cp dummy:/AntSimulator/build/AntSimulator .
+rm -rf build/
+mkdir build/
+mv AntSimulator build/
+cp -r res/ build/
+docker rm -f dummy
+```
+Executable files will be located in the build folder.
+
 ### On Windows with CMake GUI and Visual Studio
  - Install the right SFML version or compile it (see [this](https://www.sfml-dev.org/tutorials/2.5/start-vc.php))
  - Run CMake
