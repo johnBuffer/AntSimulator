@@ -39,9 +39,9 @@ docker rm -f dummy
 Executable files will be located in the build folder.
 
 ### On Windows with CMake GUI and Visual Studio
- - Install the right SFML version or compile it (see [this](https://www.sfml-dev.org/tutorials/2.5/start-vc.php))
+ - Install the right SFML version or compile it. To try out SFML separately see [this](https://www.sfml-dev.org/tutorials/2.5/start-vc.php) but for now you only need to download the correct version and extract the SFML directory into this project.
  - Run CMake
- - Select the repo location
+ - Select the repo location and the SFML location. The SFML location is something like `SFML-2.5.1-windows-vc15-64-bit/SFML-2.5.1/lib/cmake/SFML`.
  
 ![Cmake 1](https://github.com/johnBuffer/AntSimulator/blob/master/img/cmake_1.PNG)
  - Click on `Configure`, if you have installed the `x64` version of SFML, in the pop up window select `x64` in the `Optionnal platform for generator` drop down
