@@ -1,5 +1,5 @@
 # Get image from Docker Hub
-FROM iorfanidi/ubuntu-20.04-gcc-cmake-git:latest
+FROM ubuntu:18.04
 
 # Specify the working directory
 WORKDIR /AntSimulator
@@ -10,8 +10,9 @@ COPY . /AntSimulator
 # Update apps on the base image
 RUN apt-get update && \
     apt-get install -y \
+    # Install GCC, CMake, Git
+    gcc cmake build-essential git \
     # Install additional libraries
-    libsfml-dev \
     libfreetype6-dev \
     libjpeg-dev \
     xorg-dev \
@@ -27,9 +28,19 @@ RUN apt-get update && \
     libopenal-dev \
     libpthread-stubs0-dev \
     libudev-dev \
-    && \
-    # AntSimulator Build
-    cd ../../.. && cd AntSimulator/ && \
+    libxcursor-dev \
+    libxinerama-dev \
+    libxi-dev &&  \
+    # SFML static build
+    git clone https://github.com/SFML/SFML.git && \
+    cd SFML && \
     rm -rf build && mkdir build && cd build && \
-    cmake cmake -DCMAKE_PREFIX_PATH=/usr/local/cmake/SFML/ -DCMAKE_BUILD_TYPE=Release .. && \
+    cmake -G "Unix Makefiles" -DBUILD_SHARED_LIBS=FALSE -DCMAKE_BUILD_TYPE=Release .. && \
+    cmake --build . && \
+    make install && \
+    cd ../../.. && \
+    # AntSimulator build
+    cd AntSimulator/ && \
+    rm -rf build && mkdir build && cd build && \
+    cmake -DCMAKE_PREFIX_PATH=/usr/local/cmake/SFML/ -DSFML_STATIC_LIBRARIES=TRUE -DCMAKE_BUILD_TYPE=Release .. && \
     cmake --build .
