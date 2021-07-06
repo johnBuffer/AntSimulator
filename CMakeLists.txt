@@ -13,7 +13,7 @@ if(WIN32)
    set(WIN32_GUI WIN32)
 endif()
 
-set(SFML_LIBS sfml-graphics sfml-system sfml-window )
+set(SFML_LIBS sfml-graphics sfml-system sfml-window)
 
 file(GLOB SOURCES src/*.cpp)
 add_executable(${PROJECT_NAME} ${WIN32_GUI} ${SOURCES})

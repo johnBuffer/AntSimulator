@@ -1,7 +1,7 @@
 #!/bin/bash
 
-docker build -t myimages/ant-simulator:latest .
-docker create -it --name dummy myimages/ant-simulator:latest bash
+docker build -t ant-simulator:latest .
+docker create -it --name dummy ant-simulator:latest bash
 docker cp dummy:/AntSimulator/build/AntSimulator .
 rm -rf build/
 mkdir build/
