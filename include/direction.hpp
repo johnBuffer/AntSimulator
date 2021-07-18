@@ -6,7 +6,13 @@
 struct Direction
 {
 public:
-	Direction(float angle)
+	Direction()
+		: m_angle(0.0f)
+		, m_target_angle(0.0f)
+		, m_rotation_speed(0.0f)
+	{}
+
+	Direction(float angle, float rotation_speed = 10.0f)
 		: m_angle(angle)
 		, m_target_angle(angle)
 	{
@@ -17,12 +23,9 @@ public:
 	void update(float dt)
 	{
 		updateVec();
-
 		const sf::Vector2f dir_nrm(-m_vec.y, m_vec.x);
-
 		const float dir_delta = dot(m_target_vec, dir_nrm);
-		const float rotation_speed = 10.0f;
-		m_angle += rotation_speed * dir_delta * dt;
+		m_angle += m_rotation_speed * dir_delta * dt;
 	}
 
 	sf::Vector2f getVec() const
@@ -32,7 +35,7 @@ public:
 
 	float getCurrentAngle() const
 	{
-		return getAngle(m_target_vec);
+		return m_angle;
 	}
 
 	void operator+=(float a)

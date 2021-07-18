@@ -14,20 +14,20 @@
 struct World
 {
 	sf::Vector2f size;
-	WorldGrid markers;
-	DoubleObject<sf::VertexArray> va_markers;
+	WorldGrid map;
+	DoubleObject<sf::VertexArray> va_map;
 	DoubleObject<sf::VertexArray> va_walls;
 	WorldRenderer renderer;
 
 	World(uint32_t width, uint32_t height)
-		: size(to<float>(width), to<float>(height))
-		, markers(width, height, 4)
-		, renderer(markers, va_markers)
+		: map(width, height, 4)
+		, size(to<float>(width), to<float>(height))
+		, renderer(map, va_map)
 	{
-		for (int32_t x(0); x < markers.width; x++) {
-			for (int32_t y(0); y < markers.height; y++) {
-				if (x == 0 || x == markers.width - 1 || y == 0 || y == markers.height - 1) {
-					markers.get(sf::Vector2i(x, y)).wall = 1;
+		for (int32_t x(0); x < map.width; x++) {
+			for (int32_t y(0); y < map.height; y++) {
+				if (x == 0 || x == map.width - 1 || y == 0 || y == map.height - 1) {
+					map.get(sf::Vector2i(x, y)).wall = 1;
 				}
 			}
 		}
@@ -35,33 +35,38 @@ struct World
 
 	void update(float dt)
 	{
-		markers.update(dt);
+		map.update(dt);
 	}
 
-	void addMarker(sf::Vector2f pos, Mode type, float intensity, bool permanent = false)
+	void addMarker(sf::Vector2f pos, Mode type, double intensity, bool permanent = false)
 	{
-		markers.addMarker(pos, type, intensity, permanent);
+		map.addMarker(pos, type, intensity, permanent);
+	}
+
+	void addMarkerRepellent(sf::Vector2f pos, float amount)
+	{
+		map.get(pos).repellent += amount;
 	}
 
 	void addWall(const sf::Vector2f& position)
 	{
-		if (markers.checkCoords(position)) {
-			markers.get(position).wall = 1;
+		if (map.checkCoords(position)) {
+			map.get(position).wall = 1;
 		}
 	}
 
 	void removeWall(const sf::Vector2f& position)
 	{
-		if (markers.checkCoords(position)) {
-			markers.get(position).wall = 0;
+		if (map.checkCoords(position)) {
+			map.get(position).wall = 0;
 		}
 	}
 
-	void renderMarkers(sf::RenderTarget& target, sf::RenderStates states)
+	void renderMap(sf::RenderTarget& target, sf::RenderStates states)
 	{
 		states.texture = &(*Conf::MARKER_TEXTURE);
 		renderer.mutex.lock();
-		target.draw(va_markers.getCurrent(), states);
+		target.draw(va_map.getCurrent(), states);
 		renderer.mutex.unlock();
 	}
 

@@ -5,7 +5,8 @@
 #include "colony.hpp"
 #include "config.hpp"
 #include "display_manager.hpp"
-
+#include "distance_field_builder.hpp"
+#include "racc.hpp"
 
 
 void loadUserConf()
@@ -36,10 +37,11 @@ int main()
 	Colony colony(Conf::COLONY_POSITION.x, Conf::COLONY_POSITION.y, Conf::ANTS_COUNT);
 	for (uint32_t i(0); i < 64; ++i) {
 		float angle = float(i) / 64.0f * (2.0f * PI);
-		world.addMarker(colony.position + 16.0f * sf::Vector2f(cos(angle), sin(angle)), Mode::ToHome, 10.0f, true);
+		world.addMarker(colony.base.position + 16.0f * sf::Vector2f(cos(angle), sin(angle)), Mode::ToHome, 10.0f, true);
 	}
 	
 	DisplayManager display_manager(window, window, world, colony);
+	display_manager.setZoom(1.02f);
 
 	sf::Vector2f last_clic;
 
@@ -47,15 +49,27 @@ int main()
 	if (food_map.loadFromFile("map.bmp")) {
 		for (uint32_t x(0); x < food_map.getSize().x; ++x) {
 			for (uint32_t y(0); y < food_map.getSize().y; ++y) {
-				const sf::Vector2f position = float(world.markers.cell_size) * sf::Vector2f(to<float>(x), to<float>(y));
-				if (food_map.getPixel(x, y).g > 100) {
-					world.addFoodAt(position.x, position.y, 5);
-				} else if (food_map.getPixel(x, y).r > 100) {
+				const sf::Vector2f position = float(world.map.cell_size) * sf::Vector2f(to<float>(x), to<float>(y));
+				if (food_map.getPixel(x, y).r > 100) {
 					world.addWall(position);
+				}
+				else if (food_map.getPixel(x, y).g > 100) {
+					const float green = food_map.getPixel(x, y).g;
+					world.addFoodAt(position.x, position.y, to<int32_t>(green * 0.025f));
 				}
 			}
 		}
 	}
+
+	DistanceFieldBuilder::computeDistance(world.map);
+
+	display_manager.pause = true;
+	display_manager.render_ants = true;
+	world.renderer.draw_density = false;
+	world.renderer.draw_markers = false;
+
+	sf::Clock clock;
+	RMean<float> fps(100);
 
 	while (window.isOpen())
 	{
@@ -73,7 +87,7 @@ int main()
 					world.removeWall(world_position);
 				}
 				else {
-					world.addFoodAt(world_position.x, world_position.y, 20);
+					world.addFoodAt(world_position.x, world_position.y, 10);
 				}
 				last_clic = world_position;
 			}
@@ -83,14 +97,15 @@ int main()
 
 		if (!display_manager.pause) {
 			colony.update(dt, world);
+			display_manager.colony_renderer.updatePopulation(colony, dt);
 			world.update(dt);
 		}
 
 		window.clear(sf::Color(94, 87, 87));
-		
 		display_manager.draw();
-
 		window.display();
+
+		fps.addValue(1.0f / clock.restart().asSeconds());
 	}
 
 	// Free textures

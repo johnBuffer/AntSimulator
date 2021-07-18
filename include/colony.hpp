@@ -5,65 +5,63 @@
 #include "ant.hpp"
 #include "utils.hpp"
 #include "world.hpp"
+#include "colony_base.hpp"
+#include "graph.hpp"
+#include "racc.hpp"
 
 
 struct Colony
 {
+	ColonyBase base;
+	uint32_t max_ants_count;
+	std::vector<Ant> ants;
+	Cooldown ants_creation_cooldown;
+	float food_acc;
+	RMean<float> food_acc_mean;
+	Cooldown pop_diff_update;
+	RDiff<int64_t> pop_diff;
+
+
 	Colony(float x, float y, uint32_t n)
-		: position(x, y)
-		, ants_va(sf::Quads, 4 * n)
+		: base(sf::Vector2f(x, y), 20.0f)
+		, max_ants_count(n)
+		, ants_creation_cooldown(0.125f)
+		, food_acc(0.0f)
+		, food_acc_mean(100)
+		, pop_diff_update(1.0f)
+		, pop_diff(60)
 	{
-		for (uint32_t i(n); i--;) {
+		base.food = 0.0f;
+		uint32_t ants_count = 128;
+		for (uint32_t i(ants_count); i--;) {
 			ants.emplace_back(x, y, getRandRange(2.0f * PI));
 		}
-
-		for (uint64_t i(0); i < n; ++i) {
-			const uint64_t index = 4 * i;
-			ants_va[index + 0].color = Conf::ANT_COLOR;
-			ants_va[index + 1].color = Conf::ANT_COLOR;
-			ants_va[index + 2].color = Conf::ANT_COLOR;
-			ants_va[index + 3].color = Conf::ANT_COLOR;
-
-			ants_va[index + 0].texCoords = sf::Vector2f(0.0f, 0.0f);
-			ants_va[index + 1].texCoords = sf::Vector2f(74.0f, 0.0f);
-			ants_va[index + 2].texCoords = sf::Vector2f(74.0f, 108.0f);
-			ants_va[index + 3].texCoords = sf::Vector2f(0.0f, 108.0f);
-		}
 	}
 
-	void update(const float dt, World& world)
-	{		
+	void update(float dt, World& world)
+	{
+		pop_diff_update.update(dt);
+		if (pop_diff_update.ready()) {
+			pop_diff_update.reset();
+ 			pop_diff.addValue(ants.size());
+		}
+
+		const float ant_cost = 2.0f;
+		ants_creation_cooldown.update(dt);
+		if (ants_creation_cooldown.ready() && ants.size() < max_ants_count && base.useFood(ant_cost)) {
+			ants.emplace_back(base.position.x, base.position.y, getRandRange(2.0f * PI));
+			ants_creation_cooldown.reset();
+		}
+		
 		for (Ant& ant : ants) {
 			ant.update(dt, world);
+			ant.checkColony(base);
 		}
 
-		for (Ant& ant : ants) {
-			ant.checkColony(position);
-		}
+		// Remove dead ants
+		auto it = std::remove_if(ants.begin(), ants.end(), [](const Ant& a) { return a.autonomy > a.max_autonomy; });
+		ants.erase(it, ants.end());
+
+		base.updateFoodAcc(dt);
 	}
-
-	void render(sf::RenderTarget& target, const sf::RenderStates& states) const
-	{
-		for (const Ant& a : ants) {
-			a.render_food(target, states);
-		}
-
-		uint32_t index = 0;
-		for (const Ant& a : ants) {
-			a.render_in(ants_va, 4 * (index++));
-		}
-
-		sf::RenderStates rs = states;
-		rs.texture = &(*Conf::ANT_TEXTURE);
-		target.draw(ants_va, rs);
-	}
-
-	const sf::Vector2f position;
-	std::vector<Ant> ants;
-	mutable sf::VertexArray ants_va;
-	const float size = 20.0f;
-
-	float last_direction_update = 0.0f;
-	const float direction_update_period = 0.25f;
-
 };

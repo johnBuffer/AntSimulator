@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include "world.hpp"
 #include "colony.hpp"
+#include "colony_renderer.hpp"
 
 
 class DisplayManager
@@ -38,11 +39,15 @@ public:
 	bool pause = false;
 	bool update = true;
 	float render_time;
+
 	bool speed_mode = false;
 	bool debug_mode = false;
 	bool wall_mode = false;
 	bool render_ants = true;
 	bool remove_wall = false;
+	ColonyRenderer colony_renderer;
+	sf::Font font;
+	sf::Text text;
 
 	sf::Vector2f getClicPosition() const
 	{

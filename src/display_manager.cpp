@@ -1,4 +1,5 @@
 #include "display_manager.hpp"
+#include "colony_renderer.hpp"
 
 
 DisplayManager::DisplayManager(sf::RenderTarget& target, sf::RenderWindow& window, World& world, Colony& colony)
@@ -12,6 +13,12 @@ DisplayManager::DisplayManager(sf::RenderTarget& target, sf::RenderWindow& windo
 
 	m_offsetX = m_windowOffsetX;
 	m_offsetY = m_windowOffsetY;
+
+	font.loadFromFile("res/font.ttf");
+	text.setFont(font);
+	text.setCharacterSize(32);
+	text.setFillColor(sf::Color::White);
+	text.setPosition(4.0f, 0.0f);
 }
 
 sf::Vector2f DisplayManager::worldCoordToDisplayCoord(const sf::Vector2f& worldCoord)
@@ -27,12 +34,8 @@ sf::Vector2f DisplayManager::worldCoordToDisplayCoord(const sf::Vector2f& worldC
 
 sf::Vector2f DisplayManager::displayCoordToWorldCoord(const sf::Vector2f& viewCoord)
 {
-    float viewCoordX = viewCoord.x;
-    float viewCoordY = viewCoord.y;
-
-    float worldCoordX = (viewCoordX-m_windowOffsetX)/m_zoom+m_offsetX;
-    float worldCoordY = (viewCoordY-m_windowOffsetY)/m_zoom+m_offsetY;
-
+    const float worldCoordX = (viewCoord.x-m_windowOffsetX)/m_zoom+m_offsetX;
+    const float worldCoordY = (viewCoord.y-m_windowOffsetY)/m_zoom+m_offsetY;
     return sf::Vector2f(worldCoordX, worldCoordY);
 }
 
@@ -52,19 +55,13 @@ void DisplayManager::draw()
 	sf::RenderStates rs = rs_ground;
 
 	// Render markers
-	m_world.renderMarkers(m_target, rs_ground);
+	m_world.renderMap(m_target, rs_ground);
 
 	// Render ants
 	if (render_ants) {
-		m_colony.render(m_target, rs);
+		colony_renderer.renderAnts(m_colony, m_target, rs);
 	}
-
-	const float size = m_colony.size;
-	sf::CircleShape circle(size);
-	circle.setOrigin(size, size);
-	circle.setPosition(m_colony.position);
-	circle.setFillColor(Conf::COLONY_COLOR);
-	m_target.draw(circle, rs_ground);
+	colony_renderer.render(m_colony, m_target, rs_ground);
 
 	render_time = clock.getElapsedTime().asMicroseconds() * 0.001f;
 }
@@ -87,6 +84,7 @@ void DisplayManager::processEvents()
 			else if (event.key.code == sf::Keyboard::Subtract) zoom(0.8f);
 			else if (event.key.code == sf::Keyboard::Add) zoom(1.2f);
 			else if (event.key.code == sf::Keyboard::Space) update = !update;
+			else if (event.key.code == sf::Keyboard::D) m_world.renderer.draw_density = !m_world.renderer.draw_density;
 			else if (event.key.code == sf::Keyboard::P) pause = !pause;
 			else if (event.key.code == sf::Keyboard::E) {
 				remove_wall = !remove_wall;
@@ -94,7 +92,7 @@ void DisplayManager::processEvents()
 					wall_mode = false;
 				}
 			}
-			else if (event.key.code== sf::Keyboard::A) render_ants = !render_ants;
+			else if (event.key.code == sf::Keyboard::A) render_ants = !render_ants;
 			else if (event.key.code == sf::Keyboard::M) m_world.renderer.draw_markers = !m_world.renderer.draw_markers;
 			else if (event.key.code == sf::Keyboard::W) {
 				wall_mode = !wall_mode;
@@ -116,7 +114,7 @@ void DisplayManager::processEvents()
 			break;
 		case sf::Event::MouseWheelMoved:
 			// this is an amazing zoom
-			zoom(1 + event.mouseWheel.delta * 0.2f);
+			zoom(1 + event.mouseWheel.delta * 0.05f);
 			break;
 		case sf::Event::MouseButtonPressed:
 			if (event.mouseButton.button == sf::Mouse::Left)

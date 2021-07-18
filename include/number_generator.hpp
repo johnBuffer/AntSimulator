@@ -9,7 +9,7 @@ protected:
 	std::mt19937 gen;
 
 	NumberGenerator()
-		: gen(rd())
+		: gen(0)
 	{}
 };
 
