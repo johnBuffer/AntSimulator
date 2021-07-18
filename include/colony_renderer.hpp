@@ -16,13 +16,15 @@ struct ColonyRenderer
 	Graphic population;
 	Graphic food_acc;
 	Cooldown population_update;
+	Colony& colony;
 
-	ColonyRenderer()
+	ColonyRenderer(Colony& colony)
 		: ants_va(sf::Quads, 4 * Conf::ANTS_COUNT)
 		, ants_food_va(sf::Quads, 4 * Conf::ANTS_COUNT)
 		, population(800, sf::Vector2f(800.0f, 100.0f), sf::Vector2f())
 		, food_acc(800, sf::Vector2f(800.0f, 50.0f), sf::Vector2f())
 		, population_update(3.0f)
+		, colony(colony)
 	{
 		font.loadFromFile("res/font.ttf");
 		text.setFont(font);
@@ -33,10 +35,10 @@ struct ColonyRenderer
 		for (uint64_t i(Conf::ANTS_COUNT-1); i--;) {
 			const uint64_t index = 4 * i;
 			// Ant
-			ants_va[index + 0].color = Conf::ANT_COLOR;
-			ants_va[index + 1].color = Conf::ANT_COLOR;
-			ants_va[index + 2].color = Conf::ANT_COLOR;
-			ants_va[index + 3].color = Conf::ANT_COLOR;
+			ants_va[index + 0].color = colony.ants_color;
+			ants_va[index + 1].color = colony.ants_color;
+			ants_va[index + 2].color = colony.ants_color;
+			ants_va[index + 3].color = colony.ants_color;
 			ants_va[index + 0].texCoords = sf::Vector2f(0.0f, 0.0f);
 			ants_va[index + 1].texCoords = sf::Vector2f(73.0f, 0.0f);
 			ants_va[index + 2].texCoords = sf::Vector2f(73.0f, 107.0f);
@@ -59,7 +61,7 @@ struct ColonyRenderer
 		food_acc.y = Conf::WIN_HEIGHT - population.height - GUI_MARGIN + 50.0f;
 	}
 
-	void renderAnts(const Colony& colony, sf::RenderTarget& target, sf::RenderStates& states)
+	void renderAnts(sf::RenderTarget& target, const sf::RenderStates& states)
 	{
 		uint32_t index = 0;
 		for (const Ant& a : colony.ants) {
@@ -69,7 +71,7 @@ struct ColonyRenderer
 		}
 
 		constexpr float no_draw_position = -10000.0f;
-		const Ant placeholder(no_draw_position, no_draw_position, 0.0f);
+		const Ant placeholder(no_draw_position, no_draw_position, 0.0f, 0);
 		for (uint32_t i(index); i < colony.max_ants_count; ++i) {
 			placeholder.render_in(ants_va, 4 * i);
 		}
@@ -81,7 +83,7 @@ struct ColonyRenderer
 		target.draw(ants_va, rs);
 	}
 
-	void updatePopulation(const Colony& colony, float dt)
+	void updatePopulation(float dt)
 	{
 		population.setLastValue(to<float>(colony.ants.size()));
 		food_acc.setLastValue(colony.base.food_acc_mean.get());
@@ -94,7 +96,7 @@ struct ColonyRenderer
 		}
 	}
 
-	void render(const Colony& colony, sf::RenderTarget& target, sf::RenderStates& states)
+	void render(sf::RenderTarget& target, const sf::RenderStates& states)
 	{
 		const float size = colony.base.radius;
 		sf::CircleShape circle(size);

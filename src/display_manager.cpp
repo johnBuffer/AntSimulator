@@ -2,11 +2,10 @@
 #include "colony_renderer.hpp"
 
 
-DisplayManager::DisplayManager(sf::RenderTarget& target, sf::RenderWindow& window, World& world, Colony& colony)
+DisplayManager::DisplayManager(sf::RenderTarget& target, sf::RenderWindow& window, World& world)
 	: m_target(target)
 	, m_window(window)
 	, m_world(world)
-	, m_colony(colony)
 {
 	m_windowOffsetX = m_window.getSize().x * 0.5f;
     m_windowOffsetY = m_window.getSize().y * 0.5f;
@@ -39,7 +38,7 @@ sf::Vector2f DisplayManager::displayCoordToWorldCoord(const sf::Vector2f& viewCo
     return sf::Vector2f(worldCoordX, worldCoordY);
 }
 
-void DisplayManager::draw()
+void DisplayManager::draw(std::vector<ColonyRenderer>& renderers)
 {
 	sf::Clock clock;
     // draw the world's ground as a big black square
@@ -52,18 +51,24 @@ void DisplayManager::draw()
 	rs_ground.transform.translate(-m_offsetX, -m_offsetY);
     m_target.draw(ground, rs_ground);
 
-	sf::RenderStates rs = rs_ground;
+	for (ColonyRenderer& renderer : renderers) {
+		renderColony(renderer, rs_ground);
+	}
 
 	// Render markers
 	m_world.renderMap(m_target, rs_ground);
 
+	render_time = clock.getElapsedTime().asMicroseconds() * 0.001f;
+}
+
+
+void DisplayManager::renderColony(ColonyRenderer& renderer, const sf::RenderStates& rs)
+{
 	// Render ants
 	if (render_ants) {
-		colony_renderer.renderAnts(m_colony, m_target, rs);
+		renderer.renderAnts(m_target, rs);
 	}
-	colony_renderer.render(m_colony, m_target, rs_ground);
-
-	render_time = clock.getElapsedTime().asMicroseconds() * 0.001f;
+	renderer.render(m_target, rs);
 }
 
 

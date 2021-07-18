@@ -37,7 +37,9 @@ struct Ant
 	float autonomy;
 	float max_autonomy = 60000.0f;
 
-	Ant(float x, float y, float angle)
+	uint8_t col_id;
+
+	Ant(float x, float y, float angle, uint8_t colony_id)
 		: position(x, y)
 		, direction(angle)
 		, direction_update(direction_update_period, RNGf::getUnder(1.0f) * direction_update_period)
@@ -48,6 +50,7 @@ struct Ant
 		, hits(0)
 		, markers_count(0.0f)
 		, autonomy(0.0f)
+		, col_id(colony_id)
 	{
 	}
 

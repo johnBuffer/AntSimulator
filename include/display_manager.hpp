@@ -9,7 +9,7 @@
 class DisplayManager
 {
 public:
-    DisplayManager(sf::RenderTarget& target, sf::RenderWindow& window, World& world, Colony& colony);
+    DisplayManager(sf::RenderTarget& target, sf::RenderWindow& window, World& world);
 
     //offset mutators
     void setOffset(float x, float y) {m_offsetX=x; m_offsetY=y;};
@@ -25,7 +25,8 @@ public:
     void zoom(float zoomFactor) {m_zoom *= zoomFactor;};
 
     // draw the current world
-    void draw();
+    void draw(std::vector<ColonyRenderer>& renderers);
+	void renderColony(ColonyRenderer& renderer, const sf::RenderStates& rs_ground);
 
 	void processEvents();
 
@@ -45,7 +46,6 @@ public:
 	bool wall_mode = false;
 	bool render_ants = true;
 	bool remove_wall = false;
-	ColonyRenderer colony_renderer;
 	sf::Font font;
 	sf::Text text;
 
@@ -60,7 +60,6 @@ private:
 	sf::VertexArray m_va{sf::Quads, 0};
 
 	World& m_world;
-	Colony& m_colony;
 
 	bool m_mouse_button_pressed = false;
 	sf::Vector2i m_drag_clic_position, m_clic_position;

@@ -20,9 +20,11 @@ struct Colony
 	RMean<float> food_acc_mean;
 	Cooldown pop_diff_update;
 	RDiff<int64_t> pop_diff;
+	uint8_t id;
+	sf::Color ants_color = sf::Color::White;
 
 
-	Colony(float x, float y, uint32_t n)
+	Colony(float x, float y, uint32_t n, uint8_t col_id)
 		: base(sf::Vector2f(x, y), 20.0f)
 		, max_ants_count(n)
 		, ants_creation_cooldown(0.125f)
@@ -30,12 +32,18 @@ struct Colony
 		, food_acc_mean(100)
 		, pop_diff_update(1.0f)
 		, pop_diff(60)
+		, id(col_id)
 	{
 		base.food = 0.0f;
 		uint32_t ants_count = 128;
 		for (uint32_t i(ants_count); i--;) {
-			ants.emplace_back(x, y, getRandRange(2.0f * PI));
+			createAnt(base.position, getRandRange(2.0f * PI));
 		}
+	}
+
+	void createAnt(sf::Vector2f pos, float angle)
+	{
+		ants.emplace_back(pos.x, pos.y, angle, id);
 	}
 
 	void update(float dt, World& world)
@@ -49,7 +57,7 @@ struct Colony
 		const float ant_cost = 2.0f;
 		ants_creation_cooldown.update(dt);
 		if (ants_creation_cooldown.ready() && ants.size() < max_ants_count && base.useFood(ant_cost)) {
-			ants.emplace_back(base.position.x, base.position.y, getRandRange(2.0f * PI));
+			createAnt(base.position, getRandRange(2.0f * PI));
 			ants_creation_cooldown.reset();
 		}
 		
