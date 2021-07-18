@@ -123,7 +123,7 @@ struct ColonyRenderer
 		target.draw(text);
 
 		text.setCharacterSize(14);
-		const int32_t pop_diff = colony.pop_diff.get();
+		const int64_t pop_diff = colony.pop_diff.get();
 		text.setFillColor(pop_diff >= 0 ? sf::Color::Green : sf::Color::Red);
 		text.setPosition(population.x + 160.0f, population.y - 3.5f * margin);
 		const std::string sign = (pop_diff >= 0 ? "+" : "");

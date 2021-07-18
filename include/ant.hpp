@@ -196,7 +196,7 @@ struct Ant
 				repellent_cell = cell;
 			}
 			// Check for the most intense marker
-			const float marker_intensity = cell->getIntensity(marker_phase) * std::pow(cell->wall_dist, 2.0f);
+			const float marker_intensity = to<float>(cell->getIntensity(marker_phase) * std::pow(cell->wall_dist, 2.0));
 			if (marker_intensity > max_intensity) {
 				max_intensity = marker_intensity;
 				max_direction = to_marker;
@@ -210,7 +210,7 @@ struct Ant
 		// Check for repellent
 		if (phase == Mode::ToFood && max_repellent && !found_permanent) {
 			const float repellent_prob_factor = 0.3f;
-			if (RNGf::proba(repellent_prob_factor * (1.0f - max_intensity / Conf::MARKER_INTENSITY))) {
+			if (RNGf::proba(repellent_prob_factor * (1.0f - max_intensity / to<float>(Conf::MARKER_INTENSITY)))) {
 				//phase = Mode::Flee;
 				direction.addNow(RNGf::getUnder(2.0f * PI));
 				search_markers.reset();
@@ -238,7 +238,7 @@ struct Ant
 			world.addMarker(position, phase == Mode::ToFood ? Mode::ToHome : Mode::ToFood, intensity);
 		}
 		else if (phase == Mode::ToHomeNoFood) {
-			const float intensity = getMarkerIntensity(0.02f);
+			const float intensity = to<float>(getMarkerIntensity(0.02f));
 			world.addMarkerRepellent(position, intensity);
 		}
 	}

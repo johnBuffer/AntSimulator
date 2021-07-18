@@ -19,7 +19,7 @@ struct Colony
 	float food_acc;
 	RMean<float> food_acc_mean;
 	Cooldown pop_diff_update;
-	RDiff<int32_t> pop_diff;
+	RDiff<int64_t> pop_diff;
 
 
 	Colony(float x, float y, uint32_t n)
@@ -43,7 +43,7 @@ struct Colony
 		pop_diff_update.update(dt);
 		if (pop_diff_update.ready()) {
 			pop_diff_update.reset();
-			pop_diff.addValue(ants.size());
+ 			pop_diff.addValue(ants.size());
 		}
 
 		const float ant_cost = 2.0f;

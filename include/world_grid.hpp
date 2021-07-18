@@ -56,7 +56,7 @@ struct WorldCell
 	bool pick()
 	{
 		const bool last = (food <= 1.0f);
-		food = (food - bool(food)) * float(!last);
+		food = (food - bool(food)) * (!last);
 		return last;
 	}
 

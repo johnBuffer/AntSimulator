@@ -3,6 +3,7 @@
 #include "grid.hpp"
 #include "config.hpp"
 #include "world_grid.hpp"
+#include "utils.hpp"
 
 
 struct WorldRenderer : public AsyncRenderer
@@ -42,7 +43,7 @@ struct WorldRenderer : public AsyncRenderer
 		sf::VertexArray& va = vertex_array.getLast();
 		const sf::Vector3f to_home_color(Conf::TO_HOME_COLOR.r / 255.0f, Conf::TO_HOME_COLOR.g / 255.0f, Conf::TO_HOME_COLOR.b / 255.0f);
 		const sf::Vector3f to_food_color(Conf::TO_FOOD_COLOR.r / 255.0f, Conf::TO_FOOD_COLOR.g / 255.0f, Conf::TO_FOOD_COLOR.b / 255.0f);
-		const float intensity_factor = 2.0f * 255.0f / Conf::MARKER_INTENSITY;
+		const float intensity_factor = 2.0f * 255.0f / to<float>(Conf::MARKER_INTENSITY);
 
 		uint64_t i = 0;
 		const float cell_size = to<float>(grid.cell_size);
@@ -52,12 +53,7 @@ struct WorldRenderer : public AsyncRenderer
 				sf::Color color = sf::Color::Black;
 				if (!cell.food && !cell.wall) {
 					if (draw_density) {
-						const float density_color = cell.wall_dist;
-						color = sf::Color(
-							std::min(255.0f, 255.0f * density_color),
-							std::min(255.0f, 73.0f * density_color),
-							std::min(255.0f, 68.0f * density_color)
-						);
+						color = vec3ToColor(sf::Vector3f(255.0f, 73.0f, 68.0f) * cell.wall_dist);
 						const float offset = 4.0f;
 						va[4 * i + 0].texCoords = sf::Vector2f(200.0f + offset, offset);
 						va[4 * i + 1].texCoords = sf::Vector2f(300.0f - offset, offset);
@@ -103,7 +99,7 @@ struct WorldRenderer : public AsyncRenderer
 				else if (cell.food) {
 					const float max_food = 10.0f;
 					const float ratio = cell.food / max_food * (cell.discovered > 0.0f ? 1.0f : 0.0f);
-					color = sf::Color(0, ratio * 255, 0);
+					color = sf::Color(0, to<uint8_t>(ratio * 255), 0);
 					const float offset = 4.0f;
 					va[4 * i + 0].texCoords = sf::Vector2f(100.0f + offset, offset);
 					va[4 * i + 1].texCoords = sf::Vector2f(200.0f - offset, offset);
@@ -113,7 +109,7 @@ struct WorldRenderer : public AsyncRenderer
 				else if (cell.wall) {
 					const sf::Color base = Conf::WALL_COLOR;
 					const float ratio = std::min(1.0f, cell.discovered);
-					color = sf::Color(base.r * ratio, base.g * ratio, base.b * ratio);
+					color = vec3ToColor(sf::Vector3f(base.r * ratio, base.g * ratio, base.b * ratio));
 					const float offset = 4.0f;
 					va[4 * i + 0].texCoords = sf::Vector2f(200.0f + offset, offset);
 					va[4 * i + 1].texCoords = sf::Vector2f(300.0f - offset, offset);

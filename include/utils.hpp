@@ -46,6 +46,19 @@ std::string toStr(T v)
 	return sstr.str();
 }
 
+template<typename T>
+T clamp(T value, T min, T max)
+{
+	return std::max(min, std::min(value, max));
+}
+
+template<typename T>
+sf::Color vec3ToColor(const sf::Vector3<T>& v)
+{
+	return sf::Color(to<uint8_t>(clamp(v.x, 0.0f, 255.0f)),
+					 to<uint8_t>(clamp(v.y, 0.0f, 255.0f)),
+					 to<uint8_t>(clamp(v.z, 0.0f, 255.0f)));
+}
 
 float getAngle(const sf::Vector2f& v);
 

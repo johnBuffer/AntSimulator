@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "utils.hpp"
 
 
 template<typename T>
@@ -12,9 +13,9 @@ struct RAccBase
 
     RAccBase(uint32_t max_size=8)
         : max_values_count(max_size)
-        , values(max_size, 0.0f)
+        , values(max_size, to<T>(0.0f))
         , current_index(0)
-        , pop_value(0.0f)
+        , pop_value(to<T>(0.0f))
     {
     }
 
