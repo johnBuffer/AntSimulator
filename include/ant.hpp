@@ -65,7 +65,7 @@ struct Ant
 		direction_update.update(dt);
 		if (direction_update.ready()) {
 			if (search_markers.ready()) {
-				findMarker(world, dt);
+				findMarker(world);
 			}
 			else {
 				cell.degrade();
@@ -153,7 +153,7 @@ struct Ant
 		return Mode::ToFood;
 	}
 
-	void findMarker(World& world, float dt)
+	void findMarker(World& world)
 	{
 		// Init
 		const Mode marker_phase = getMarkersSamplingType();

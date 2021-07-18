@@ -73,9 +73,9 @@ struct World
 	void addFoodAt(float x, float y, uint32_t quantity)
 	{
 		const sf::Vector2f pos(x, y);
-		if (markers.checkCoords(pos)) {
+		if (map.checkCoords(pos)) {
 			addMarker(pos, Mode::ToFood, 1.0f, true);
-			markers.addFood(pos, quantity);
+			map.addFood(pos, quantity);
 		}
 	}
 };

@@ -15,6 +15,7 @@ public:
 	Direction(float angle, float rotation_speed = 10.0f)
 		: m_angle(angle)
 		, m_target_angle(angle)
+		, m_rotation_speed(rotation_speed)
 	{
 		updateVec();
 		m_target_vec = m_vec;
@@ -71,6 +72,7 @@ private:
 	sf::Vector2f m_target_vec;
 	float m_angle;
 	float m_target_angle;
+	float m_rotation_speed;
 
 	void updateVec()
 	{
