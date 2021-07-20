@@ -17,7 +17,6 @@ struct World
 	WorldGrid map;
 	DoubleObject<sf::VertexArray> va_map;
 	DoubleObject<sf::VertexArray> va_walls;
-	std::vector<Colony> colonies;
 	WorldRenderer renderer;
 
 	World(uint32_t width, uint32_t height)
