@@ -21,7 +21,7 @@ struct Simulation
 		, vp_handler({ to<float>(Conf::WIN_WIDTH), to<float>(Conf::WIN_HEIGHT) })
 		, ev_manager(window, true)
 	{
-
+		initEventCallbacks();
 	}
 
 	void initEventCallbacks()
@@ -38,6 +38,14 @@ struct Simulation
 
 		ev_manager.addEventCallback(sf::Event::MouseMoved, [&](sfev::CstEv) {
 			vp_handler.setMousePosition(ev_manager.getFloatMousePosition());
+		});
+
+		ev_manager.addEventCallback(sf::Event::Closed, [this](sfev::CstEv) {
+			ev_manager.getWindow().close();
+		});
+
+		ev_manager.addKeyPressedCallback(sf::Keyboard::Escape, [this](sfev::CstEv) {
+			ev_manager.getWindow().close();
 		});
 	}
 
