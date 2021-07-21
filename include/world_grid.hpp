@@ -64,10 +64,9 @@ struct WorldCell
 		for (uint8_t i(max_colonies_count); i--;) {
 			markers[i].update(dt);
 		}
-		
 		// Update density
 		density *= 0.99f;
-		discovered += dt * float(bool(discovered));
+		//discovered += dt * float(bool(discovered));
 	}
 
 	bool pick()
