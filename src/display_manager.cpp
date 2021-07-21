@@ -56,7 +56,7 @@ void DisplayManager::draw(std::vector<ColonyRenderer>& renderers)
 	}
 
 	// Render markers
-	m_world.renderMap(m_target, rs_ground);
+	//m_world.renderMap(m_target, rs_ground);
 
 	render_time = clock.getElapsedTime().asMicroseconds() * 0.001f;
 }

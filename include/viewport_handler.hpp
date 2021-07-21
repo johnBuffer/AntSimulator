@@ -62,7 +62,7 @@ struct ViewportHandler
         state.updateState();
     }
 
-    void wheelZoom(int32_t w)
+    void wheelZoom(float w)
     {
         if (w) {
             const float zoom_amount = 1.2f;

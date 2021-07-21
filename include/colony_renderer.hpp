@@ -102,7 +102,7 @@ struct ColonyRenderer
 		sf::CircleShape circle(size);
 		circle.setOrigin(size, size);
 		circle.setPosition(colony.base.position);
-		circle.setFillColor(Conf::COLONY_COLOR);
+		circle.setFillColor(colony.ants_color);
 		target.draw(circle, states);
 
 		CircularGauge food_gauge(colony.base.position, 12.0f, 17.0f, sf::Color::White);

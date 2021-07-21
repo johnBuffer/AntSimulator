@@ -31,9 +31,9 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", sf::Style::Fullscreen, settings);
 	window.setFramerateLimit(60);
 
-
 	Simulation simulation(window);
 	simulation.createColony(Conf::COLONY_POSITION.x, Conf::COLONY_POSITION.y);
+	simulation.loadMap("res/map.bmp");
 	
 	sf::Vector2f last_clic;
 
@@ -63,9 +63,10 @@ int main()
 		}*/
 
 		const float dt = 0.016f;
+		simulation.update(dt);
 
 		window.clear(sf::Color(94, 87, 87));
-		//display_manager.draw();
+		simulation.render(window);
 		window.display();
 
 		fps.addValue(1.0f / clock.restart().asSeconds());

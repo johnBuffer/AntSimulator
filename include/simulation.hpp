@@ -5,6 +5,8 @@
 #include "viewport_handler.hpp"
 #include "event_manager.hpp"
 #include "event_state.hpp"
+#include "renderer.hpp"
+#include "map_loader.hpp"
 
 
 struct Simulation
@@ -12,32 +14,37 @@ struct Simulation
 	std::vector<Colony> colonies;
 	World world;
 	// Render
-	ViewportHandler vp_handler;
+	Renderer renderer;
 	sfev::EventManager ev_manager;
 	EventSate ev_state;
 
 	Simulation(sf::Window& window)
 		: world(Conf::WORLD_WIDTH, Conf::WORLD_HEIGHT)
-		, vp_handler({ to<float>(Conf::WIN_WIDTH), to<float>(Conf::WIN_HEIGHT) })
+		, renderer()
 		, ev_manager(window, true)
 	{
 		initEventCallbacks();
+	}
+
+	void loadMap(const std::string& map_filename)
+	{
+		MapLoader::load(world, map_filename);
 	}
 
 	void initEventCallbacks()
 	{
 		ev_manager.addMousePressedCallback(sf::Mouse::Left, [&](sfev::CstEv) {
 			ev_state.clicking = true;
-			vp_handler.click(ev_manager.getFloatMousePosition());
+			renderer.vp_handler.click(ev_manager.getFloatMousePosition());
 		});
 
 		ev_manager.addMouseReleasedCallback(sf::Mouse::Left, [&](sfev::CstEv) {
 			ev_state.clicking = false;
-			vp_handler.unclick();
+			renderer.vp_handler.unclick();
 		});
 
 		ev_manager.addEventCallback(sf::Event::MouseMoved, [&](sfev::CstEv) {
-			vp_handler.setMousePosition(ev_manager.getFloatMousePosition());
+			renderer.vp_handler.setMousePosition(ev_manager.getFloatMousePosition());
 		});
 
 		ev_manager.addEventCallback(sf::Event::Closed, [this](sfev::CstEv) {
@@ -46,6 +53,19 @@ struct Simulation
 
 		ev_manager.addKeyPressedCallback(sf::Keyboard::Escape, [this](sfev::CstEv) {
 			ev_manager.getWindow().close();
+		});
+
+		ev_manager.addEventCallback(sf::Event::MouseWheelScrolled, [&](sfev::CstEv e) {
+			renderer.vp_handler.wheelZoom(e.mouseWheelScroll.delta);
+		});
+
+		ev_manager.addKeyPressedCallback(sf::Keyboard::P, [this](sfev::CstEv) {
+			ev_state.pause = !ev_state.pause;
+		});
+
+		ev_manager.addKeyPressedCallback(sf::Keyboard::S, [this](sfev::CstEv) {
+			ev_state.fullspeed = !ev_state.fullspeed;
+			ev_manager.getWindow().setFramerateLimit(60 * (!ev_state.fullspeed));
 		});
 	}
 
@@ -56,20 +76,34 @@ struct Simulation
 
 	void createColony(float colony_x, float colony_y)
 	{
+		// Create the colony object
 		colonies.emplace_back(colony_x, colony_y, Conf::ANTS_COUNT, to<uint8_t>(colonies.size()));
 		Colony& colony = colonies.back();
+		// Create ants
 		for (uint32_t i(0); i < 64; ++i) {
 			float angle = float(i) / 64.0f * (2.0f * PI);
 			world.addMarker(colony.base.position + 16.0f * sf::Vector2f(cos(angle), sin(angle)), Mode::ToHome, 10.0f, true);
 		}
+		// Register it for the renderer
+		renderer.addColony(colony);
 	}
 
 	void update(float dt)
 	{
-		for (Colony& colony : colonies) {
-			colony.update(dt, world);
+		if (!ev_state.pause) {
+			// Update world cells (markers, density, walls)
+			world.update(dt);
+			for (Colony& colony : colonies) {
+				colony.update(dt, world);
+			}
+			// Update stats
+			renderer.updateColoniesStats(dt);
 		}
-		world.update(dt);
+	}
+
+	void render(sf::RenderTarget& target)
+	{
+		renderer.render(world, target);
 	}
 };
 

@@ -16,7 +16,6 @@ struct World
 	sf::Vector2f size;
 	WorldGrid map;
 	DoubleObject<sf::VertexArray> va_map;
-	DoubleObject<sf::VertexArray> va_walls;
 	WorldRenderer renderer;
 
 	World(uint32_t width, uint32_t height)
@@ -62,7 +61,7 @@ struct World
 		}
 	}
 
-	void renderMap(sf::RenderTarget& target, sf::RenderStates states)
+	void render(sf::RenderTarget& target, sf::RenderStates states)
 	{
 		states.texture = &(*Conf::MARKER_TEXTURE);
 		renderer.mutex.lock();
