@@ -46,7 +46,7 @@ struct Ant
 		, marker_add(marker_period, RNGf::getUnder(1.0f) * marker_period)
 		, search_markers(5.0f, 5.0f)
 		, phase(Mode::ToFood)
-		, liberty_coef(RNGf::getRange(0.001f, 0.01f))
+		, liberty_coef(RNGf::getRange(0.003f, 0.03f))
 		, hits(0)
 		, markers_count(0.0f)
 		, autonomy(0.0f)
@@ -199,7 +199,7 @@ struct Ant
 				repellent_cell = cell;
 			}
 			// Check for the most intense marker
-			const float marker_intensity = to<float>(cell->getIntensity(marker_phase) * std::pow(cell->wall_dist, 2.0));
+			const float marker_intensity = to<float>(cell->getIntensity(marker_phase, col_id) * std::pow(cell->wall_dist, 2.0));
 			if (marker_intensity > max_intensity) {
 				max_intensity = marker_intensity;
 				max_direction = to_marker;
@@ -237,8 +237,8 @@ struct Ant
 	{
 		markers_count += marker_add.target;
 		if (phase == Mode::ToHome || phase == Mode::ToFood) {
-			const double intensity = getMarkerIntensity(0.01f);
-			world.addMarker(position, phase == Mode::ToFood ? Mode::ToHome : Mode::ToFood, intensity);
+			const float intensity = getMarkerIntensity(0.01f);
+			world.addMarker(position, phase == Mode::ToFood ? Mode::ToHome : Mode::ToFood, intensity, col_id);
 		}
 		else if (phase == Mode::ToHomeNoFood) {
 			const float intensity = to<float>(getMarkerIntensity(0.02f));
@@ -271,8 +271,8 @@ struct Ant
 		va[index + 3].position = position - width * nrm_vec - length * dir_vec;
 	}
 
-	double getMarkerIntensity(float coef)
+	float getMarkerIntensity(float coef)
 	{
-		return Conf::MARKER_INTENSITY * exp(-coef * markers_count);
+		return Conf::MARKER_INTENSITY * expf(-coef * markers_count);
 	}
 };

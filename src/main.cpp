@@ -32,7 +32,8 @@ int main()
 	window.setFramerateLimit(60);
 
 	Simulation simulation(window);
-	simulation.createColony(Conf::COLONY_POSITION.x, Conf::COLONY_POSITION.y);
+	simulation.createColony(100.0f, 100.0f);
+	simulation.createColony(100.0f, Conf::WIN_HEIGHT - 100.0f);
 	simulation.loadMap("res/map.bmp");
 	
 	sf::Vector2f last_clic;
@@ -43,24 +44,6 @@ int main()
 	while (window.isOpen())
 	{
 		simulation.processEvents();
-		// Add food on clic
-		/*if (display_manager.clic) {
-			const sf::Vector2i mouse_position = sf::Mouse::getPosition(window);
-			const sf::Vector2f world_position = display_manager.displayCoordToWorldCoord(sf::Vector2f(to<float>(mouse_position.x), to<float>(mouse_position.y)));
-			const float clic_min_dist = 2.0f;
-			if (getLength(world_position - last_clic) > clic_min_dist) {
-				if (display_manager.wall_mode) {
-					world.addWall(world_position);
-				}
-				else if (display_manager.remove_wall) {
-					world.removeWall(world_position);
-				}
-				else {
-					world.addFoodAt(world_position.x, world_position.y, 10);
-				}
-				last_clic = world_position;
-			}
-		}*/
 
 		const float dt = 0.016f;
 		simulation.update(dt);

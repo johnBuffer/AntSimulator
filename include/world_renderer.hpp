@@ -52,12 +52,12 @@ struct WorldRenderer : public AsyncRenderer
 				sf::Color color = sf::Color::Black;
 				if (!cell.food && !cell.wall) {
 					if (draw_density) {
-						color = vec3ToColor(sf::Vector3f(255.0f, 73.0f, 68.0f) * cell.wall_dist);
+						/*color = vec3ToColor(sf::Vector3f(255.0f, 73.0f, 68.0f) * cell.wall_dist);
 						const float offset = 4.0f;
 						va[4 * i + 0].texCoords = sf::Vector2f(200.0f + offset, offset);
 						va[4 * i + 1].texCoords = sf::Vector2f(300.0f - offset, offset);
 						va[4 * i + 2].texCoords = sf::Vector2f(300.0f - offset, 100.0f - offset);
-						va[4 * i + 3].texCoords = sf::Vector2f(200.0f + offset, 100.0f - offset);
+						va[4 * i + 3].texCoords = sf::Vector2f(200.0f + offset, 100.0f - offset);*/
 					}
 					else {
 						/*if ((cell.intensity[0] < 1.0 && cell.intensity[1] < 1.0) || !draw_markers) {
@@ -69,7 +69,7 @@ struct WorldRenderer : public AsyncRenderer
 							va[4 * i + 2].texCoords = sf::Vector2f(300.0f - offset, 100.0f - offset);
 							va[4 * i + 3].texCoords = sf::Vector2f(200.0f + offset, 100.0f - offset);
 						}
-						else */if (draw_markers) {
+						else if (draw_markers) {
 							const float offset = 32.0f;
 							if (cell.repellent) {
 								color = sf::Color::Blue;
@@ -92,7 +92,7 @@ struct WorldRenderer : public AsyncRenderer
 								va[4 * i + 2].texCoords = sf::Vector2f(100.0f - offset, 100.0f - offset);
 								va[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
 							}
-						}
+						}*/
 					}
 				}
 				else if (cell.food) {

@@ -18,7 +18,7 @@ struct MapLoader
 					}
 					else if (food_map.getPixel(x, y).g > 100) {
 						const float green = food_map.getPixel(x, y).g;
-						world.addFoodAt(position.x, position.y, to<int32_t>(green * 0.025f));
+						world.addFoodAt(position.x, position.y, 3);
 					}
 				}
 			}

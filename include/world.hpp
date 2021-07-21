@@ -37,9 +37,9 @@ struct World
 		map.update(dt);
 	}
 
-	void addMarker(sf::Vector2f pos, Mode type, double intensity, bool permanent = false)
+	void addMarker(sf::Vector2f pos, Mode type, float intensity, uint8_t colony_id, bool permanent = false)
 	{
-		map.addMarker(pos, type, intensity, permanent);
+		map.addMarker(pos, type, intensity, colony_id, permanent);
 	}
 
 	void addMarkerRepellent(sf::Vector2f pos, float amount)

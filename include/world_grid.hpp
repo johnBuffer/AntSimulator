@@ -6,10 +6,13 @@
 #include "grid.hpp"
 
 
+constexpr float min_intensity = 0.1f;
+
+
 struct WorldCell
 {
 	// Stores the intensity of ToHome and ToFood markers
-	double intensity[2];
+	float intensity[2];
 	// Is the marker permanent ?
 	bool permanent[2];
 	// Food quantity in the cell
@@ -22,6 +25,8 @@ struct WorldCell
 	// Dist to wall
 	float wall_dist;
 	float discovered;
+	// Colony ID of the marker
+	uint8_t colony_id = 0;
 
 	WorldCell()
 		: intensity{ 0.0f, 0.0f }
@@ -40,17 +45,24 @@ struct WorldCell
 		intensity[0] -= (!permanent[0]) * dt;
 		intensity[1] -= (!permanent[1]) * dt;
 		// Avoid negative values
-		intensity[0] = std::max(0.1, intensity[0]);
-		intensity[1] = std::max(0.1, intensity[1]);
+		intensity[0] = std::max(min_intensity, intensity[0]);
+		intensity[1] = std::max(min_intensity, intensity[1]);
 		// Remove food marker if no food
 		intensity[1] = intensity[1] * to<float>(!bool(!food && permanent[1]));
 		permanent[1] &= to<bool>(food);
+		// Reset colony ID if empty
+		colony_id = isEmpty() ? 0 : colony_id;
 		// Update repellents
 		repellent -= dt;
 		repellent = std::max(0.0f, repellent);
 		// Update density
 		density *= 0.99f;
 		discovered += dt * float(bool(discovered));
+	}
+
+	bool isEmpty() const
+	{
+		return (intensity[0] == min_intensity) && (intensity[1] == min_intensity);
 	}
 
 	bool pick()
@@ -60,9 +72,9 @@ struct WorldCell
 		return last;
 	}
 
-	double getIntensity(Mode mode) const
+	float getIntensity(Mode mode, uint8_t col_id) const
 	{
-		return intensity[to<uint32_t>(mode)];
+		return intensity[to<uint32_t>(mode)] * (colony_id == col_id || colony_id == 0);
 	}
 
 	bool isPermanent(Mode mode) const
@@ -113,12 +125,19 @@ struct WorldGrid : public Grid<WorldCell>
 	{
 	}
 
-	void addMarker(sf::Vector2f pos, Mode type, double intensity, bool permanent = false)
+	void addMarker(sf::Vector2f pos, Mode type, float intensity, uint8_t colony_id, bool permanent = false)
 	{
 		WorldCell& cell = get(pos);
 		const uint32_t mode_index = to<uint32_t>(type);
 		cell.permanent[mode_index] |= permanent;
-		cell.intensity[mode_index] = std::max(cell.intensity[mode_index], intensity);
+		cell.colony_id = colony_id;
+		// Overwrite intensity if different colony
+		if (colony_id == cell.colony_id) {
+			cell.intensity[mode_index] = std::max(cell.intensity[mode_index], intensity);
+		}
+		else {
+			cell.intensity[mode_index] = intensity;
+		}
 	}
 
 	void addFood(sf::Vector2f pos, uint32_t quantity)
