@@ -42,9 +42,9 @@ struct World
 		map.addMarker(pos, type, intensity, colony_id, permanent);
 	}
 
-	void addMarkerRepellent(sf::Vector2f pos, float amount)
+	void addMarkerRepellent(sf::Vector2f pos, uint8_t colony_id, float amount)
 	{
-		map.get(pos).repellent += amount;
+		map.get(pos).markers[colony_id].repellent += amount;
 	}
 
 	void addWall(const sf::Vector2f& position)

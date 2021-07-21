@@ -66,10 +66,12 @@ struct Colony
 			ant.checkColony(base);
 		}
 
-		// Remove dead ants
+		base.updateFoodAcc(dt);
+	}
+
+	void removeDeadAnts()
+	{
 		auto it = std::remove_if(ants.begin(), ants.end(), [](const Ant& a) { return a.autonomy > a.max_autonomy; });
 		ants.erase(it, ants.end());
-
-		base.updateFoodAcc(dt);
 	}
 };

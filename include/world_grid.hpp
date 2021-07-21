@@ -6,34 +6,53 @@
 #include "grid.hpp"
 
 
+constexpr uint8_t max_colonies_count = 2;
 constexpr float min_intensity = 0.1f;
 
 
-struct WorldCell
+struct ColonyCell
 {
 	// Stores the intensity of ToHome and ToFood markers
 	float intensity[2];
 	// Is the marker permanent ?
 	bool permanent[2];
+	// Repellent instensity
+	float repellent;
+
+	ColonyCell()
+		: intensity{ min_intensity, min_intensity }
+		, permanent{ false, false }
+		, repellent(0.0f)
+	{}
+
+	void update(float dt)
+	{
+		// Update toFood and toHome
+		intensity[0] -= permanent[0] ? dt : 0.0f;
+		intensity[1] -= permanent[1] ? dt : 0.0f;
+		// Update repellents
+		repellent -= dt;
+		repellent = std::max(0.0f, repellent);
+	}
+};
+
+
+struct WorldCell
+{
+	ColonyCell markers[max_colonies_count];
 	// Food quantity in the cell
 	uint32_t food;
 	uint32_t wall;
-	// Repellent
-	float repellent;
 	// Density of ants a a certain point
 	float density;
 	// Dist to wall
 	float wall_dist;
 	float discovered;
-	// Colony ID of the marker
-	uint8_t colony_id = 0;
 
 	WorldCell()
-		: intensity{ 0.0f, 0.0f }
-		, permanent{ false, false }
+		: markers{}
 		, food(0)
 		, wall(0)
-		, repellent(0.0f)
 		, density(0.0f)
 		, wall_dist(0.0f)
 		, discovered(1.0f)
@@ -42,27 +61,13 @@ struct WorldCell
 	void update(float dt)
 	{
 		// Update intensities
-		intensity[0] -= (!permanent[0]) * dt;
-		intensity[1] -= (!permanent[1]) * dt;
-		// Avoid negative values
-		intensity[0] = std::max(min_intensity, intensity[0]);
-		intensity[1] = std::max(min_intensity, intensity[1]);
-		// Remove food marker if no food
-		intensity[1] = intensity[1] * to<float>(!bool(!food && permanent[1]));
-		permanent[1] &= to<bool>(food);
-		// Reset colony ID if empty
-		colony_id = isEmpty() ? 0 : colony_id;
-		// Update repellents
-		repellent -= dt;
-		repellent = std::max(0.0f, repellent);
+		for (uint8_t i(max_colonies_count); i--;) {
+			markers[i].update(dt);
+		}
+		
 		// Update density
 		density *= 0.99f;
 		discovered += dt * float(bool(discovered));
-	}
-
-	bool isEmpty() const
-	{
-		return (intensity[0] == min_intensity) && (intensity[1] == min_intensity);
 	}
 
 	bool pick()
@@ -72,19 +77,24 @@ struct WorldCell
 		return last;
 	}
 
-	float getIntensity(Mode mode, uint8_t col_id) const
+	float& getRepellent(uint8_t colony_id)
 	{
-		return intensity[to<uint32_t>(mode)] * (colony_id == col_id || colony_id == 0);
+		return markers[colony_id].repellent;
 	}
 
-	bool isPermanent(Mode mode) const
+	float getIntensity(Mode mode, uint8_t colony_id) const
 	{
-		return permanent[to<uint32_t>(mode)];
+		return std::max(min_intensity, markers[colony_id].intensity[to<uint32_t>(mode)]);
 	}
 
-	void degrade()
+	bool isPermanent(Mode mode, uint8_t colony_id) const
 	{
-		intensity[to<uint32_t>(Mode::ToFood)] *= 0.25f;
+		return markers[colony_id].permanent[to<uint32_t>(mode)];
+	}
+
+	void degrade(uint8_t colony_id, Mode mode, float ratio)
+	{
+		markers[colony_id].intensity[to<uint32_t>(mode)] *= ratio;
 	}
 
 	void addPresence()
@@ -127,33 +137,26 @@ struct WorldGrid : public Grid<WorldCell>
 
 	void addMarker(sf::Vector2f pos, Mode type, float intensity, uint8_t colony_id, bool permanent = false)
 	{
-		WorldCell& cell = get(pos);
+		ColonyCell& cell = get(pos).markers[colony_id];
 		const uint32_t mode_index = to<uint32_t>(type);
 		cell.permanent[mode_index] |= permanent;
-		cell.colony_id = colony_id;
 		// Overwrite intensity if different colony
-		if (colony_id == cell.colony_id) {
-			cell.intensity[mode_index] = std::max(cell.intensity[mode_index], intensity);
-		}
-		else {
-			cell.intensity[mode_index] = intensity;
-		}
+		cell.intensity[mode_index] = std::max(cell.intensity[mode_index], intensity);
+
 	}
 
 	void addFood(sf::Vector2f pos, uint32_t quantity)
 	{
 		WorldCell& cell = get(pos);
 		cell.food += quantity;
-		cell.intensity[1] = 1.0f;
-		cell.permanent[1] = true;
 	}
 
-	void remove(sf::Vector2f pos, Mode type)
+	void remove(sf::Vector2f pos, Mode type, uint8_t colony_id)
 	{
 		WorldCell& cell = get(pos);
 		const uint32_t mode_index = to<uint32_t>(type);
-		cell.permanent[mode_index] = false;
-		cell.intensity[mode_index] = 0.0f;
+		cell.markers[colony_id].permanent[mode_index] = false;
+		cell.markers[colony_id].intensity[mode_index] = 0.0f;
 	}
 
 	void update(float dt)

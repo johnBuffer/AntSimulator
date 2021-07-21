@@ -71,7 +71,7 @@ struct Ant
 				findMarker(world);
 			}
 			else {
-				cell.degrade();
+				cell.degrade(col_id, Mode::ToFood, 0.25f);
 				direction += RNGf::getFullRange(direction_noise_range);
 			}
 			direction_update.reset();
@@ -125,7 +125,7 @@ struct Ant
 				marker_add.target = repellent_period;
 				marker_add.value = RNGf::getUnder(marker_add.target);
 				// Add a repellent for 300s
-				world.addMarkerRepellent(position, 300.0f);
+				world.addMarkerRepellent(position, col_id, 300.0f);
 			}
 		}
 	}
@@ -160,7 +160,7 @@ struct Ant
 	{
 		// Init
 		const Mode marker_phase = getMarkersSamplingType();
-		const float sample_angle_range = PI * 0.35f;
+		const float sample_angle_range = PI * 0.4f;
 		const float current_angle = direction.getCurrentAngle();
 		float max_intensity = 0.0f;
 		// To objective stuff
@@ -188,14 +188,14 @@ struct Ant
 			}
 			cell->discovered += 0.1f;
 			// Check for food or colony
-			if (cell->isPermanent(marker_phase)) {
+			if (cell->isPermanent(marker_phase, col_id) || (marker_phase == Mode::ToFood && cell->food)) {
 				max_direction = to_marker;
 				found_permanent = true;
 				break;
 			}
 			// Flee if repellent
-			if (cell->repellent > max_repellent) {
-				max_repellent = cell->repellent;
+			if (cell->getRepellent(col_id) > max_repellent) {
+				max_repellent = cell->getRepellent(col_id);
 				repellent_cell = cell;
 			}
 			// Check for the most intense marker
@@ -222,12 +222,12 @@ struct Ant
 		}
 		// Remove repellent if still food
 		if (repellent_cell && phase == Mode::ToHome) {
-			repellent_cell->repellent *= 0.95f;
+			repellent_cell->getRepellent(col_id) *= 0.95f;
 		}
 		// Update direction
 		if (max_intensity) {
 			if (RNGf::proba(0.2f) && phase == Mode::ToFood) {
-				max_cell->intensity[to<uint32_t>(phase)] *= 0.99f;
+				max_cell->degrade(col_id, phase, 0.99f);
 			}
 			direction = getAngle(max_direction);
 		}
@@ -242,7 +242,7 @@ struct Ant
 		}
 		else if (phase == Mode::ToHomeNoFood) {
 			const float intensity = to<float>(getMarkerIntensity(0.02f));
-			world.addMarkerRepellent(position, intensity);
+			world.addMarkerRepellent(position, col_id, intensity);
 		}
 	}
 

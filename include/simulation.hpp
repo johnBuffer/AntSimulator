@@ -78,10 +78,10 @@ struct Simulation
 	void createColony(float colony_x, float colony_y)
 	{
 		// Create the colony object
-		const uint8_t colony_id = to<uint8_t>(colonies.size()) + 1;
+		const uint8_t colony_id = to<uint8_t>(colonies.size());
 		colonies.emplace_back(colony_x, colony_y, Conf::ANTS_COUNT, colony_id);
 		Colony& colony = colonies.back();
-		colony.ants_color = Conf::COLONY_COLORS[colony.id - 1];
+		colony.ants_color = Conf::COLONY_COLORS[colony.id];
 		// Create colony markers
 		for (uint32_t i(0); i < 64; ++i) {
 			float angle = float(i) / 64.0f * (2.0f * PI);
@@ -96,8 +96,13 @@ struct Simulation
 		if (!ev_state.pause) {
 			// Update world cells (markers, density, walls)
 			world.update(dt);
+			// Update ants
 			for (Colony& colony : colonies) {
 				colony.update(dt, world);
+			}
+			// Then remove dead ones
+			for (Colony& colony : colonies) {
+				colony.removeDeadAnts();
 			}
 			// Update stats
 			renderer.updateColoniesStats(dt);
