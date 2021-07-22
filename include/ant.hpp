@@ -210,9 +210,9 @@ struct Ant
 				max_cell = cell;
 			}
 			// Eventually choose a different path
-			if (RNGf::proba(liberty_coef)) {
-				break;
-			}
+			// if (RNGf::proba(liberty_coef)) {
+			// 	break;
+			// }
 		}
 		// Check for repellent
 		if (phase == Mode::ToFood && max_repellent && !found_permanent) {

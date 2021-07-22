@@ -54,11 +54,14 @@ struct ColonyRenderer
 			ants_food_va[index + 3].texCoords = sf::Vector2f(100.0f, 100.0f);
 		}
 
+		const float margin = 10.0f;
 		const float GUI_MARGIN = 20.0f;
 		population.x = GUI_MARGIN;
-		population.y = Conf::WIN_HEIGHT - population.height - GUI_MARGIN;
+		population.y = Conf::WIN_HEIGHT - (population.height + GUI_MARGIN + 4.0f * margin) * colony.id;
 		food_acc.x = GUI_MARGIN;
 		food_acc.y = Conf::WIN_HEIGHT - population.height - GUI_MARGIN + 50.0f;
+
+		population.color = colony.ants_color;
 	}
 
 	void renderAnts(sf::RenderTarget& target, const sf::RenderStates& states)
@@ -109,8 +112,8 @@ struct ColonyRenderer
 		food_gauge.max_value = colony.base.max_food;
 		food_gauge.current_value = colony.base.food;
 		food_gauge.render(target, states);
-		
-		/*const float margin = 10.0f;
+
+		const float margin = 10.0f;
 		sf::RectangleShape population_background(sf::Vector2f(population.width + 2.0f * margin,
 															  population.height + 5.0f * margin));
 		population_background.setFillColor(sf::Color(50, 50, 50, 200));
@@ -139,6 +142,5 @@ struct ColonyRenderer
 		target.draw(text);
 
 		population.render(target);
-		food_acc.render(target);*/
 	}
 };

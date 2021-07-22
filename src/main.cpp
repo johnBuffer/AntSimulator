@@ -18,7 +18,7 @@ int main()
 
 	Simulation simulation(window);
 	simulation.createColony(100.0f, 100.0f);
-	simulation.createColony(100.0f, Conf::WIN_HEIGHT - 100.0f);
+	simulation.createColony(100.0f, Conf::WORLD_HEIGHT - 100.0f);
 	simulation.loadMap("res/map.bmp");
 	
 	sf::Clock clock;
