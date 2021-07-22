@@ -27,7 +27,7 @@ struct Ant
 	Mode phase;
 	sf::Vector2f position;
 	Direction direction;
-	uint32_t hits;
+	uint16_t hits;
 
 	Cooldown direction_update;
 	Cooldown marker_add;
@@ -37,7 +37,10 @@ struct Ant
 	float autonomy;
 	float max_autonomy = 300.0f;
 
+	uint32_t id;
 	uint8_t col_id;
+
+	Ant() = default;
 
 	Ant(float x, float y, float angle, uint8_t colony_id)
 		: position(x, y)
@@ -50,6 +53,7 @@ struct Ant
 		, hits(0)
 		, markers_count(0.0f)
 		, autonomy(0.0f)
+		, id(0)
 		, col_id(colony_id)
 	{
 	}
@@ -275,4 +279,9 @@ struct Ant
 	{
 		return Conf::MARKER_INTENSITY * expf(-coef * markers_count);
 	}
+
+	//void checkForFight(WorldCell& current_cell)
+	//{
+	//	//for ()
+	//}
 };

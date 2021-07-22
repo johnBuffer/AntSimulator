@@ -18,6 +18,8 @@ struct ColonyCell
 	bool permanent[2];
 	// Repellent instensity
 	float repellent;
+	// Current ant
+	int16_t current_ant;
 
 	ColonyCell()
 		: intensity{ min_intensity, min_intensity }

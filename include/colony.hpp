@@ -8,13 +8,14 @@
 #include "colony_base.hpp"
 #include "graph.hpp"
 #include "racc.hpp"
+#include "index_vector.hpp"
 
 
 struct Colony
 {
 	ColonyBase base;
 	uint32_t max_ants_count;
-	std::vector<Ant> ants;
+	civ::Vector<Ant> ants;
 	Cooldown ants_creation_cooldown;
 	float food_acc;
 	RMean<float> food_acc_mean;
@@ -43,7 +44,8 @@ struct Colony
 
 	void createAnt(sf::Vector2f pos, float angle)
 	{
-		ants.emplace_back(pos.x, pos.y, angle, id);
+		const uint64_t ant_id = ants.emplace_back(pos.x, pos.y, angle, id);
+		ants[ant_id].id = to<uint16_t>(ant_id);
 	}
 
 	void update(float dt, World& world)
@@ -71,7 +73,14 @@ struct Colony
 
 	void removeDeadAnts()
 	{
-		auto it = std::remove_if(ants.begin(), ants.end(), [](const Ant& a) { return a.autonomy > a.max_autonomy; });
-		ants.erase(it, ants.end());
+		std::list<uint64_t> to_remove;
+		for (Ant& a : ants) {
+			if (a.autonomy > a.max_autonomy) {
+				to_remove.push_back(a.id);
+			}
+		}
+		for (uint64_t ant_id : to_remove) {
+			ants.erase(ant_id);
+		}
 	}
 };
