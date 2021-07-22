@@ -285,7 +285,7 @@ struct Ref
 
     operator bool() const
     {
-        return array->isValid(id, validity_id) && array;
+        return array && array->isValid(id, validity_id);
     }
 
 private:

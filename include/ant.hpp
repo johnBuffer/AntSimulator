@@ -8,6 +8,7 @@
 #include "ant_mode.hpp"
 #include "cooldown.hpp"
 #include "colony_base.hpp"
+#include "index_vector.hpp"
 
 #include <iostream>
 
@@ -28,6 +29,11 @@ struct Ant
 	sf::Vector2f position;
 	Direction direction;
 	uint16_t hits;
+
+	// Fight info
+	bool fighting = false;
+	civ::Ref<Ant> target;
+	float dammage = 10.0f;
 
 	Cooldown direction_update;
 	Cooldown marker_add;
@@ -61,6 +67,16 @@ struct Ant
 	void update(float dt, World& world)
 	{
 		autonomy += dt;
+        // Update current direction
+        direction.update(dt);
+        // Add ant to current cell
+        world.map.get(position).markers[col_id].current_ant = id;
+        // Fight if needed
+		if (fighting) {
+			attack(dt);
+            return;
+		}
+		
 		updatePosition(world, dt);
 		if (phase == Mode::ToFood) {
 			checkFood(world);
@@ -86,8 +102,15 @@ struct Ant
 			addMarker(world);
 			marker_add.reset();
 		}
-		// Update current direction
-		direction.update(dt);
+	}
+
+	void attack(float dt)
+	{
+		if (target) {
+			target->autonomy += dt * dammage;
+		} else {
+			fighting = false;
+		}
 	}
 
 	void updatePosition(World& world, float dt)
@@ -175,7 +198,7 @@ struct Ant
 		float max_repellent = 0.0f;
 		WorldCell* repellent_cell = nullptr;
 		// Sample the world
-		const uint32_t sample_count = 48;
+		const uint32_t sample_count = 32;
 		for (uint32_t i(sample_count); i--;) {
 			// Get random point in range
 			const float sample_angle = current_angle + RNGf::getRange(sample_angle_range);
@@ -280,8 +303,9 @@ struct Ant
 		return Conf::MARKER_INTENSITY * expf(-coef * markers_count);
 	}
 
-	//void checkForFight(WorldCell& current_cell)
-	//{
-	//	//for ()
-	//}
+	void setTarget(civ::Ref<Ant> new_target)
+	{
+		target = new_target;
+		direction = getAngle(target->position - position);
+	}
 };

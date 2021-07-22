@@ -7,6 +7,7 @@
 #include "event_state.hpp"
 #include "renderer.hpp"
 #include "map_loader.hpp"
+#include "fight_system.hpp"
 
 
 struct Simulation
@@ -17,6 +18,7 @@ struct Simulation
 	Renderer renderer;
 	sfev::EventManager ev_manager;
 	EventSate ev_state;
+	FightSystem fight_system;
 
 	Simulation(sf::Window& window)
 		: world(Conf::WORLD_WIDTH, Conf::WORLD_HEIGHT)
@@ -100,6 +102,8 @@ struct Simulation
 			for (Colony& colony : colonies) {
 				colony.update(dt, world);
 			}
+			// Search for fights
+			fight_system.checkForFights(colonies, world);
 			// Then remove dead ones
 			for (Colony& colony : colonies) {
 				colony.removeDeadAnts();

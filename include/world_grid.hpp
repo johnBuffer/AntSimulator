@@ -29,6 +29,8 @@ struct ColonyCell
 
 	void update(float dt)
 	{
+		// Remove current ant
+		current_ant = 0;
 		// Update toFood and toHome
 		intensity[0] -= permanent[0] ? dt : 0.0f;
 		intensity[1] -= permanent[1] ? dt : 0.0f;
