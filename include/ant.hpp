@@ -34,7 +34,11 @@ struct Ant
 	bool fighting = false;
 	civ::Ref<Ant> target;
 	float dammage = 10.0f;
-
+    float fight_dist = length * 0.25f;
+    sf::Vector2f fight_pos;
+    sf::Vector2f fight_vec;
+    Cooldown attack_cooldown;
+    
 	Cooldown direction_update;
 	Cooldown marker_add;
 	Cooldown search_markers;
@@ -61,6 +65,7 @@ struct Ant
 		, autonomy(0.0f)
 		, id(0)
 		, col_id(colony_id)
+        , attack_cooldown(1.5f, 0.0f)
 	{
 	}
 
@@ -76,7 +81,8 @@ struct Ant
 			attack(dt);
             return;
 		}
-		
+		// Update the current pos and check for
+        // collision with food
 		updatePosition(world, dt);
 		if (phase == Mode::ToFood) {
 			checkFood(world);
@@ -87,6 +93,7 @@ struct Ant
 		search_markers.update(dt);
 		direction_update.update(dt);
 		if (direction_update.ready()) {
+            direction_update.reset();
 			if (search_markers.ready()) {
 				findMarker(world);
 			}
@@ -94,7 +101,6 @@ struct Ant
 				cell.degrade(col_id, Mode::ToFood, 0.25f);
 				direction += RNGf::getFullRange(direction_noise_range);
 			}
-			direction_update.reset();
 		}
 		// Add marker
 		marker_add.update(dt);
@@ -107,7 +113,12 @@ struct Ant
 	void attack(float dt)
 	{
 		if (target) {
-			target->autonomy += dt * dammage;
+            position = fight_pos - fight_vec * (0.5f * length + (attack_cooldown.getRatio()) * fight_dist);
+            attack_cooldown.update(dt);
+            if (attack_cooldown.ready()) {
+                attack_cooldown.reset();
+                target->autonomy += dammage;
+            }
 		} else {
 			fighting = false;
 		}
@@ -306,6 +317,8 @@ struct Ant
 	void setTarget(civ::Ref<Ant> new_target)
 	{
 		target = new_target;
-		direction = getAngle(target->position - position);
+        fight_pos = 0.5f * (target->position + position);
+        fight_vec = getNormalized(target->position - position);
+		direction = getAngle(fight_vec);
 	}
 };

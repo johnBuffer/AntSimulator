@@ -34,6 +34,11 @@ struct Cooldown
 	{
 		return value < target && value + dt >= target;
 	}
+    
+    float getRatio() const
+    {
+        return value / target;
+    }
 
 	void reset()
 	{
