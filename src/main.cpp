@@ -2,32 +2,17 @@
 #include <list>
 #include <fstream>
 #include "config.hpp"
-#include "display_manager.hpp"
 #include "distance_field_builder.hpp"
 #include "simulation.hpp"
-
-
-void loadUserConf()
-{
-	std::ifstream conf_file("conf.txt");
-	if (conf_file) {
-		conf_file >> Conf::WIN_WIDTH;
-		conf_file >> Conf::WIN_HEIGHT;
-		conf_file >> Conf::ANTS_COUNT;
-	}
-	else {
-		std::cout << "Couldn't find 'conf.txt', loading default" << std::endl;
-	}
-}
 
 
 int main()
 {
 	Conf::loadTextures();
-	loadUserConf();
+	MapLoader::loadUserConf();
 
 	sf::ContextSettings settings;
-	settings.antialiasingLevel = 4;
+	settings.antialiasingLevel = 1;
 	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", sf::Style::Fullscreen, settings);
 	window.setFramerateLimit(60);
 
@@ -36,10 +21,15 @@ int main()
 	simulation.createColony(100.0f, Conf::WIN_HEIGHT - 100.0f);
 	simulation.loadMap("res/map.bmp");
 	
-	sf::Vector2f last_clic;
-
 	sf::Clock clock;
 	RMean<float> fps(100);
+	sf::Text fps_text;
+	sf::Font fps_font;
+	fps_font.loadFromFile("res/font.ttf");
+	fps_text.setFont(fps_font);
+	fps_text.setCharacterSize(32);
+	fps_text.setFillColor(sf::Color::White);
+	fps_text.setPosition(10.0f, 10.0f);
 
 	while (window.isOpen())
 	{
@@ -48,8 +38,11 @@ int main()
 		const float dt = 0.016f;
 		simulation.update(dt);
 
+		fps_text.setString(toStr(fps.get()));
+
 		window.clear(sf::Color(94, 87, 87));
 		simulation.render(window);
+		window.draw(fps_text);
 		window.display();
 
 		fps.addValue(1.0f / clock.restart().asSeconds());

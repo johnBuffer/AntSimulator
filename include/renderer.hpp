@@ -4,6 +4,7 @@
 #include "config.hpp"
 #include "event_manager.hpp"
 #include "world.hpp"
+#include "colony_renderer.hpp"
 
 
 struct Renderer

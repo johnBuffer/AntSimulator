@@ -6,7 +6,20 @@
 
 struct MapLoader
 {
-	static void load(World& world, const std::string& map_filename)
+	static void loadUserConf()
+	{
+		std::ifstream conf_file("conf.txt");
+		if (conf_file) {
+			conf_file >> Conf::WIN_WIDTH;
+			conf_file >> Conf::WIN_HEIGHT;
+			conf_file >> Conf::ANTS_COUNT;
+		}
+		else {
+			std::cout << "Couldn't find 'conf.txt', loading default" << std::endl;
+		}
+	}
+
+	static void loadMap(World& world, const std::string& map_filename)
 	{
 		sf::Image food_map;
 		if (food_map.loadFromFile(map_filename)) {

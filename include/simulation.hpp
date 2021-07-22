@@ -29,7 +29,7 @@ struct Simulation
 
 	void loadMap(const std::string& map_filename)
 	{
-		MapLoader::load(world, map_filename);
+		MapLoader::loadMap(world, map_filename);
 	}
 
 	void initEventCallbacks()

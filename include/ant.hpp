@@ -22,7 +22,7 @@ struct Ant
 	float direction_update_period = 0.25f;
 	float marker_period = 0.25f;
 	float direction_noise_range = PI * 0.07f;
-	float repellent_period = 32.0f;
+	float repellent_period = 8.0f;
 
 	Mode phase;
 	sf::Vector2f position;
@@ -49,7 +49,7 @@ struct Ant
 		, marker_add(marker_period, RNGf::getUnder(1.0f) * marker_period)
 		, search_markers(5.0f, 5.0f)
 		, phase(Mode::ToFood)
-		, liberty_coef(RNGf::getRange(0.003f, 0.03f))
+		, liberty_coef(RNGf::getRange(0.001f, 0.01f))
 		, hits(0)
 		, markers_count(0.0f)
 		, autonomy(0.0f)
