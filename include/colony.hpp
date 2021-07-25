@@ -56,7 +56,7 @@ struct Colony
  			pop_diff.addValue(ants.size());
 		}
 
-		const float ant_cost = 2.0f;
+		const float ant_cost = 4.0f;
 		ants_creation_cooldown.update(dt);
 		if (ants_creation_cooldown.ready() && ants.size() < max_ants_count && base.useFood(ant_cost)) {
 			createAnt(base.position, getRandRange(2.0f * PI));

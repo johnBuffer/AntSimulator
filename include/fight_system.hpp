@@ -27,6 +27,12 @@ struct FightSystem
     void checkForFight(Ant& ant, std::vector<Colony>& colonies, World& world)
     {
         WorldCell& current_cell = world.map.get(ant.position);
+        if (ant.getMarkersSamplingType() == Mode::ToFood) {
+            return;
+        }
+        if (current_cell.markers[ant.col_id].fighting) {
+            return;
+        }
         for (uint32_t i(max_colonies_count); i--;) {
 			if (i != ant.col_id) {
 				uint16_t ant_id = current_cell.markers[i].current_ant;

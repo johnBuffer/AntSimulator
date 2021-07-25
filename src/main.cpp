@@ -19,6 +19,7 @@ int main()
 	Simulation simulation(window);
 	simulation.createColony(78.0f*4.0f, 160.0f);
 	simulation.createColony(451.0f * 4.0f, 77.0f * 4.0f);
+    simulation.createColony(116.0f * 4.0f, 260.0f * 4.0f);
 	simulation.loadMap("res/map.png");
 	
 	sf::Clock clock;

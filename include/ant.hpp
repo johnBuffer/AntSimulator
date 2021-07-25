@@ -108,6 +108,9 @@ struct Ant
             }
             return;
         }
+        if (autonomy > 0.75f * max_autonomy) {
+            phase = Mode::Refill;
+        }
         // Check collision with food
 		if (phase == Mode::ToFood) {
 			checkFood(world);
@@ -256,7 +259,7 @@ struct Ant
 				continue;
 			}
             // Check if
-            if (cell->markers[col_id].fighting) {
+            if (cell->checkEnemyPresence(col_id)) {
                 found_fight = true;
                 max_direction = to_marker;
                 to_fight_time = 0.0f;
@@ -371,6 +374,7 @@ struct Ant
         if (phase == Mode::ToHome || phase == Mode::ToHomeNoFood) {
             world.addFoodAt(position.x, position.y, 1);
         }
+        world.addFoodAt(position.x, position.y, 5);
         phase = Mode::Dead;
     }
 };

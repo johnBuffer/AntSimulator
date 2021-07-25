@@ -6,7 +6,7 @@
 #include "grid.hpp"
 
 
-constexpr uint8_t max_colonies_count = 2;
+constexpr uint8_t max_colonies_count = 3;
 constexpr float min_intensity = 0.1f;
 
 

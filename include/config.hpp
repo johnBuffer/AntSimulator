@@ -78,6 +78,6 @@ std::shared_ptr<sf::Texture> DefaultConf<T>::ANT_TEXTURE;
 template<typename T>
 std::shared_ptr<sf::Texture> DefaultConf<T>::MARKER_TEXTURE;
 template<typename T>
-sf::Color DefaultConf<T>::COLONY_COLORS[8] = {sf::Color::Red, sf::Color::Green, sf::Color::Blue};
+sf::Color DefaultConf<T>::COLONY_COLORS[8] = {sf::Color::Red, sf::Color::Blue, sf::Color::Yellow};
 
 using Conf = DefaultConf<int>;
