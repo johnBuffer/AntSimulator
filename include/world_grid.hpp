@@ -20,17 +20,20 @@ struct ColonyCell
 	float repellent;
 	// Current ant
 	int16_t current_ant;
+    bool fighting;
 
 	ColonyCell()
 		: intensity{ min_intensity, min_intensity }
 		, permanent{ false, false }
 		, repellent(0.0f)
+        , fighting(false)
 	{}
 
 	void update(float dt)
 	{
 		// Remove current ant
 		current_ant = 0;
+        fighting = false;
 		// Update toFood and toHome
 		intensity[0] -= permanent[0] ? dt : 0.0f;
 		intensity[1] -= permanent[1] ? dt : 0.0f;
@@ -79,6 +82,17 @@ struct WorldCell
 		food = (food - bool(food)) * (!last);
 		return last;
 	}
+    
+    bool checkEnemyPresence(uint8_t team)
+    {
+        // Update intensities
+        for (uint8_t i(max_colonies_count); i--;) {
+            if (i != team && markers[i].current_ant) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 	float& getRepellent(uint8_t colony_id)
 	{

@@ -13,6 +13,7 @@ struct ColonyBase
 	float food_acc;
 	RMean<float> food_acc_mean;
 	Cooldown food_acc_update;
+    uint32_t enemies_found_count = 0;
 
 	ColonyBase()
 		: radius(0.0f)

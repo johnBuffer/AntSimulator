@@ -8,5 +8,13 @@ enum class Mode : uint32_t
 	ToFood = 1,
 	Refill = 2,
 	Flee = 3,
-	ToHomeNoFood = 4
+	ToHomeNoFood = 4,
+    Dead = 5
+};
+
+enum class FightMode
+{
+    Fighting,
+    ToFight,
+    NoFight
 };

@@ -17,9 +17,9 @@ int main()
 	window.setFramerateLimit(60);
 
 	Simulation simulation(window);
-	simulation.createColony(100.0f, 100.0f);
-	simulation.createColony(100.0f, Conf::WORLD_HEIGHT - 100.0f);
-	simulation.loadMap("res/map.bmp");
+	simulation.createColony(78.0f*4.0f, 160.0f);
+	simulation.createColony(451.0f * 4.0f, 77.0f * 4.0f);
+	simulation.loadMap("res/map.png");
 	
 	sf::Clock clock;
 	RMean<float> fps(100);

@@ -96,6 +96,8 @@ struct Simulation
 	void update(float dt)
 	{
 		if (!ev_state.pause) {
+            // Mark ants with no more time left as dead
+            removeDeadAnts();
 			// Update world cells (markers, density, walls)
 			world.update(dt);
 			// Update ants
@@ -104,18 +106,29 @@ struct Simulation
 			}
 			// Search for fights
 			fight_system.checkForFights(colonies, world);
-			// Then remove dead ones
-			for (Colony& colony : colonies) {
-				colony.removeDeadAnts();
-			}
 			// Update stats
 			renderer.updateColoniesStats(dt);
 		}
 	}
+    
+    void removeDeadAnts()
+    {
+        // Mark old ants as dead
+        for (Colony& colony : colonies) {
+            const uint32_t killed = colony.killWeakAnts(world);
+            if (killed) {
+                const uint32_t initial_size = colony.ants.size();
+                renderer.colonies[colony.id].cleanVAs(initial_size - killed, initial_size);
+            }
+        }
+        // Remove them
+        for (Colony& colony : colonies) {
+            colony.removeDeadAnts();
+        }
+    }
 
 	void render(sf::RenderTarget& target)
 	{
 		renderer.render(world, target);
 	}
 };
-

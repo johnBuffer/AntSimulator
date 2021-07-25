@@ -22,8 +22,8 @@ struct Ant
 	float marker_detection_max_dist = 40.0f;
 	float direction_update_period = 0.25f;
 	float marker_period = 0.25f;
-	float direction_noise_range = PI * 0.07f;
-	float repellent_period = 8.0f;
+	float direction_noise_range = PI * 0.02f;
+	float repellent_period = 32.0f;
 
 	Mode phase;
 	sf::Vector2f position;
@@ -31,13 +31,16 @@ struct Ant
 	uint16_t hits;
 
 	// Fight info
-	bool fighting = false;
+	FightMode fight_mode;
 	civ::Ref<Ant> target;
 	float dammage = 10.0f;
     float fight_dist = length * 0.25f;
     sf::Vector2f fight_pos;
     sf::Vector2f fight_vec;
     Cooldown attack_cooldown;
+    bool enemy_found = false;
+    float to_fight_timeout = 3.0f;
+    float to_fight_time = 0.0f;
     
 	Cooldown direction_update;
 	Cooldown marker_add;
@@ -61,6 +64,7 @@ struct Ant
 		, phase(Mode::ToFood)
 		, liberty_coef(RNGf::getRange(0.001f, 0.01f))
 		, hits(0)
+        , fight_mode(FightMode::NoFight)
 		, markers_count(0.0f)
 		, autonomy(0.0f)
 		, id(0)
@@ -68,6 +72,20 @@ struct Ant
         , attack_cooldown(1.5f, 0.0f)
 	{
 	}
+    
+    void addToWorldGrid(World& world)
+    {
+        ColonyCell& cell = world.map.get(position).markers[col_id];
+        if (!cell.fighting) {
+            cell.current_ant = id;
+            cell.fighting = isFighting();
+        }
+    }
+    
+    bool isFighting() const
+    {
+        return fight_mode == FightMode::Fighting;
+    }
 
 	void update(float dt, World& world)
 	{
@@ -75,15 +93,22 @@ struct Ant
         // Update current direction
         direction.update(dt);
         // Add ant to current cell
-        world.map.get(position).markers[col_id].current_ant = id;
+        addToWorldGrid(world);
         // Fight if needed
-		if (fighting) {
+		if (isFighting()) {
 			attack(dt);
             return;
-		}
-		// Update the current pos and check for
-        // collision with food
+        }
 		updatePosition(world, dt);
+        // If fight found, go for it
+        if (fight_mode == FightMode::ToFight) {
+            to_fight_time += dt;
+            if (to_fight_time > to_fight_timeout) {
+                fight_mode = FightMode::NoFight;
+            }
+            return;
+        }
+        // Check collision with food
 		if (phase == Mode::ToFood) {
 			checkFood(world);
 		}
@@ -96,10 +121,11 @@ struct Ant
             direction_update.reset();
 			if (search_markers.ready()) {
 				findMarker(world);
+                direction += RNGf::getFullRange(direction_noise_range);
 			}
 			else {
 				cell.degrade(col_id, Mode::ToFood, 0.25f);
-				direction += RNGf::getFullRange(direction_noise_range);
+				direction += RNGf::getFullRange(2.0f * direction_noise_range);
 			}
 		}
 		// Add marker
@@ -113,14 +139,16 @@ struct Ant
 	void attack(float dt)
 	{
 		if (target) {
+            Ant& opponent = *target;
             position = fight_pos - fight_vec * (0.5f * length + (attack_cooldown.getRatio()) * fight_dist);
             attack_cooldown.update(dt);
             if (attack_cooldown.ready()) {
                 attack_cooldown.reset();
-                target->autonomy += dammage;
+                opponent.autonomy += dammage;
             }
 		} else {
-			fighting = false;
+            enemy_found = true;
+			fight_mode = FightMode::NoFight;
 		}
 	}
 
@@ -176,6 +204,8 @@ struct Ant
 				phase = Mode::ToFood;
 				base.addFood(1.0f);
 				direction.addNow(PI);
+                base.enemies_found_count += enemy_found;
+                enemy_found = false;
 			}
 			// Refill
 			const float refill_cost = 1.0f;
@@ -198,13 +228,14 @@ struct Ant
 	{
 		// Init
 		const Mode marker_phase = getMarkersSamplingType();
-		const float sample_angle_range = PI * 0.4f;
+		const float sample_angle_range = PI * 0.5f;
 		const float current_angle = direction.getCurrentAngle();
 		float max_intensity = 0.0f;
 		// To objective stuff
 		sf::Vector2f max_direction = direction.getVec();
 		WorldCell* max_cell = nullptr;
 		bool found_permanent = false;
+        bool found_fight = false;
 		// Repellent stuff
 		float max_repellent = 0.0f;
 		WorldCell* repellent_cell = nullptr;
@@ -224,6 +255,13 @@ struct Ant
 				}
 				continue;
 			}
+            // Check if
+            if (cell->markers[col_id].fighting) {
+                found_fight = true;
+                max_direction = to_marker;
+                to_fight_time = 0.0f;
+                break;
+            }
 			cell->discovered += 0.1f;
 			// Check for food or colony
 			if (cell->isPermanent(marker_phase, col_id) || (marker_phase == Mode::ToFood && cell->food)) {
@@ -244,9 +282,9 @@ struct Ant
 				max_cell = cell;
 			}
 			// Eventually choose a different path
-			// if (RNGf::proba(liberty_coef)) {
-			// 	break;
-			// }
+//            if (RNGf::proba(liberty_coef)) {
+//			 	break;
+//            }
 		}
 		// Check for repellent
 		if (phase == Mode::ToFood && max_repellent && !found_permanent) {
@@ -258,6 +296,11 @@ struct Ant
 				return;
 			}
 		}
+        if (found_fight) {
+            direction = getAngle(max_direction);
+            fight_mode = FightMode::ToFight;
+            return;
+        }
 		// Remove repellent if still food
 		if (repellent_cell && phase == Mode::ToHome) {
 			repellent_cell->getRepellent(col_id) *= 0.95f;
@@ -300,13 +343,14 @@ struct Ant
 
 	void render_in(sf::VertexArray& va, const uint32_t index) const
 	{
-		const sf::Vector2f dir_vec(direction.getVec());
-		const sf::Vector2f nrm_vec(-dir_vec.y, dir_vec.x);
+        const float size_ratio = width / length;
+		const sf::Vector2f dir_vec(direction.getVec() * length);
+		const sf::Vector2f nrm_vec(-dir_vec.y * size_ratio, dir_vec.x * size_ratio);
 
-		va[index + 0].position = position - width * nrm_vec + length * dir_vec;
-		va[index + 1].position = position + width * nrm_vec + length * dir_vec;
-		va[index + 2].position = position + width * nrm_vec - length * dir_vec;
-		va[index + 3].position = position - width * nrm_vec - length * dir_vec;
+		va[index + 0].position = position - nrm_vec + dir_vec;
+		va[index + 1].position = position + nrm_vec + dir_vec;
+		va[index + 2].position = position + nrm_vec - dir_vec;
+		va[index + 3].position = position - nrm_vec - dir_vec;
 	}
 
 	float getMarkerIntensity(float coef)
@@ -321,4 +365,12 @@ struct Ant
         fight_vec = getNormalized(target->position - position);
 		direction = getAngle(fight_vec);
 	}
+    
+    void kill(World& world)
+    {
+        if (phase == Mode::ToHome || phase == Mode::ToHomeNoFood) {
+            world.addFoodAt(position.x, position.y, 1);
+        }
+        phase = Mode::Dead;
+    }
 };

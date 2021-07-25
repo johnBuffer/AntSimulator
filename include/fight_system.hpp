@@ -14,8 +14,12 @@ struct FightSystem
     void checkForFights(Colony& colony, std::vector<Colony>& colonies, World& world)
 	{
 		for (Ant& a : colony.ants) {
-            if (!a.fighting) {
+            if (!a.isFighting()) {
                 checkForFight(a, colonies, world);
+            } else if (a.target) {
+                if (!a.target->isFighting()) {
+                    a.target->setTarget(colony.ants.getRef(a.id));
+                }
             }
         }
 	}
@@ -28,12 +32,11 @@ struct FightSystem
 				uint16_t ant_id = current_cell.markers[i].current_ant;
 				if (ant_id) {
                     // Set fight mode for this ant
-                    ant.fighting = true;
+                    ant.fight_mode = FightMode::Fighting;
                     civ::Ref<Ant> other = colonies[i].ants.getRef(ant_id);
                     ant.setTarget(other);
-                    //std::cout << "Fight found between (" << int(ant.col_id) << ", " << ant.id << ") and (" << i << ", " << ant_id << ")" << std::endl;
                     // And for the other one
-                    other->fighting = true;
+                    ant.fight_mode = FightMode::Fighting;
                     other->setTarget(colonies[ant.col_id].ants.getRef(ant.id));
                     return;
 				}

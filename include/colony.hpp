@@ -36,7 +36,7 @@ struct Colony
 		, id(col_id)
 	{
 		base.food = 0.0f;
-		uint32_t ants_count = 128;
+		uint32_t ants_count = 8;
 		for (uint32_t i(ants_count); i--;) {
 			createAnt(base.position, getRandRange(2.0f * PI));
 		}
@@ -75,7 +75,7 @@ struct Colony
 	{
 		std::list<uint64_t> to_remove;
 		for (Ant& a : ants) {
-			if (a.autonomy > a.max_autonomy) {
+			if (a.phase == Mode::Dead) {
 				to_remove.push_back(a.id);
 			}
 		}
@@ -83,4 +83,16 @@ struct Colony
 			ants.erase(ant_id);
 		}
 	}
+    
+    uint32_t killWeakAnts(World& world)
+    {
+        uint32_t count = 0;
+        for (Ant& a : ants) {
+            if (a.autonomy > a.max_autonomy) {
+                a.kill(world);
+                ++count;
+            }
+        }
+        return count;
+    }
 };

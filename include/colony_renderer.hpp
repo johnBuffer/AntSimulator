@@ -43,6 +43,10 @@ struct ColonyRenderer
 			ants_va[index + 1].texCoords = sf::Vector2f(73.0f, 0.0f);
 			ants_va[index + 2].texCoords = sf::Vector2f(73.0f, 107.0f);
 			ants_va[index + 3].texCoords = sf::Vector2f(0.0f, 107.0f);
+            ants_va[index + 0].position = sf::Vector2f(0.0f, 0.0f);
+            ants_va[index + 1].position = sf::Vector2f(0.0f, 0.0f);
+            ants_va[index + 2].position = sf::Vector2f(0.0f, 0.0f);
+            ants_va[index + 3].position = sf::Vector2f(0.0f, 0.0f);
 			// Food
 			ants_food_va[index + 0].color = Conf::FOOD_COLOR;
 			ants_food_va[index + 1].color = Conf::FOOD_COLOR;
@@ -52,6 +56,10 @@ struct ColonyRenderer
 			ants_food_va[index + 1].texCoords = sf::Vector2f(200.0f, 0.0f);
 			ants_food_va[index + 2].texCoords = sf::Vector2f(200.0f, 100.0f);
 			ants_food_va[index + 3].texCoords = sf::Vector2f(100.0f, 100.0f);
+            ants_food_va[index + 0].position = sf::Vector2f(0.0f, 0.0f);
+            ants_food_va[index + 1].position = sf::Vector2f(0.0f, 0.0f);
+            ants_food_va[index + 2].position = sf::Vector2f(0.0f, 0.0f);
+            ants_food_va[index + 3].position = sf::Vector2f(0.0f, 0.0f);
 		}
 
 		const float margin = 10.0f;
@@ -73,22 +81,31 @@ struct ColonyRenderer
 			++index;
 		}
 
-		constexpr float no_draw_position = -10000.0f;
-		const Ant placeholder(no_draw_position, no_draw_position, 0.0f, 0);
-		for (uint32_t i(index); i < colony.max_ants_count; ++i) {
-			placeholder.render_in(ants_va, 4 * i);
-		}
-
 		sf::RenderStates rs = states;
 		rs.texture = &(*Conf::MARKER_TEXTURE);
 		target.draw(ants_food_va, rs);
 		rs.texture = &(*Conf::ANT_TEXTURE);
 		target.draw(ants_va, rs);
 	}
+    
+    void cleanVAs(uint32_t from, uint32_t to)
+    {
+        for (uint32_t i(from); i<to; ++i) {
+            ants_va[4 * i + 0].position = {};
+            ants_va[4 * i + 1].position = {};
+            ants_va[4 * i + 2].position = {};
+            ants_va[4 * i + 3].position = {};
+            ants_food_va[4 * i + 0].position = {};
+            ants_food_va[4 * i + 1].position = {};
+            ants_food_va[4 * i + 2].position = {};
+            ants_food_va[4 * i + 3].position = {};
+        }
+    }
 
 	void updatePopulation(float dt)
 	{
 		population.setLastValue(to<float>(colony.ants.size()));
+        //population.setLastValue(to<float>(colony.base.enemies_found_count));
 		food_acc.setLastValue(colony.base.food_acc_mean.get());
 
 		population_update.update(dt);
