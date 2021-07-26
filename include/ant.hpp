@@ -231,7 +231,7 @@ struct Ant
 	{
 		// Init
 		const Mode marker_phase = getMarkersSamplingType();
-		const float sample_angle_range = PI * 0.5f;
+		const float sample_angle_range = PI * 0.35f;
 		const float current_angle = direction.getCurrentAngle();
 		float max_intensity = 0.0f;
 		// To objective stuff
