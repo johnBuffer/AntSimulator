@@ -65,7 +65,7 @@ struct WorldRenderer : public AsyncRenderer
 					else if (selected_colony != -1) {
 						if ((cell.markers[selected_colony].intensity[0] < 1.0 && cell.markers[selected_colony].intensity[1] < 1.0) || !draw_markers) {
 							const float ratio = std::min(1.0f, cell.discovered);
-							color = sf::Color(50 * ratio, 50 * ratio, 50 * ratio);
+							color = vec3ToColor(sf::Vector3f{ 50.0f * ratio, 50.0f * ratio, 50.0f * ratio });
 							const float offset = 32.0f;
 							va[4 * i + 0].texCoords = sf::Vector2f(200.0f + offset, offset);
 							va[4 * i + 1].texCoords = sf::Vector2f(300.0f - offset, offset);

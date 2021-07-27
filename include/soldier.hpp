@@ -24,6 +24,9 @@ struct SoldierUpdater
 		const Mode marker_phase = ant.getMarkersSamplingType();
 		const float sample_angle_range = PI * 0.35f;
 		const float current_angle = getAngle(result.max_direction);
+		const float fight_dist = 10.0f;
+
+		ant.fight_request = false;
 
 		// Sample the world
 		const uint32_t sample_count = 32;

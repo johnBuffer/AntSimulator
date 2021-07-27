@@ -65,6 +65,9 @@ struct Ant
     bool enemy_found = false;
     float to_fight_timeout = 3.0f;
     float to_fight_time = 0.0f;
+	bool fight_request = false;
+	uint16_t target_id = 0;
+	uint8_t target_col_id = 0;
     
 	Cooldown direction_update;
 	Cooldown marker_add;
@@ -80,7 +83,6 @@ struct Ant
 	Type type;
 
 	Ant() = default;
-
 	Ant(float x, float y, float angle, uint8_t colony_id)
 		: position(x, y)
 		, direction(angle)
@@ -281,4 +283,11 @@ struct Ant
         //world.addFoodAt(position.x, position.y, 5);
         phase = Mode::Dead;
     }
+
+	void requestFight(uint8_t target_c_id, uint16_t target_a_id)
+	{
+		fight_request = true;
+		target_col_id = target_c_id;
+		target_id = target_a_id;
+	}
 };
