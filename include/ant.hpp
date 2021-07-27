@@ -100,14 +100,14 @@ struct Ant
             return;
         }
 		updatePosition(world, dt);
-        // If fight found, go for it
-        if (fight_mode == FightMode::ToFight) {
-            to_fight_time += dt;
-            if (to_fight_time > to_fight_timeout) {
-                fight_mode = FightMode::NoFight;
-            }
-            return;
-        }
+		// If fight found, go for it
+		if (fight_mode == FightMode::ToFight) {
+			to_fight_time += dt;
+			if (to_fight_time > to_fight_timeout) {
+				fight_mode = FightMode::NoFight;
+			}
+			return;
+		}
         if (autonomy > 0.75f * max_autonomy) {
             phase = Mode::Refill;
         }
@@ -238,7 +238,7 @@ struct Ant
 		sf::Vector2f max_direction = direction.getVec();
 		WorldCell* max_cell = nullptr;
 		bool found_permanent = false;
-        bool found_fight = false;
+		bool found_fight = false;
 		// Repellent stuff
 		float max_repellent = 0.0f;
 		WorldCell* repellent_cell = nullptr;
@@ -259,17 +259,18 @@ struct Ant
 				continue;
 			}
             // Check if
-            if (cell->checkEnemyPresence(col_id)) {
-                found_fight = true;
-                max_direction = to_marker;
-                to_fight_time = 0.0f;
-                break;
-            }
 			cell->discovered += 0.1f;
 			// Check for food or colony
 			if (cell->isPermanent(marker_phase, col_id) || (marker_phase == Mode::ToFood && cell->food)) {
 				max_direction = to_marker;
 				found_permanent = true;
+				break;
+			}
+			// Check for enemy
+			if (cell->checkEnemyPresence(col_id)) {
+				found_fight = true;
+				max_direction = to_marker;
+				to_fight_time = 0.0f;
 				break;
 			}
 			// Flee if repellent
@@ -289,6 +290,11 @@ struct Ant
 //			 	break;
 //            }
 		}
+		if (found_fight) {
+			direction = getAngle(max_direction);
+			fight_mode = FightMode::ToFight;
+			return;
+		}
 		// Check for repellent
 		if (phase == Mode::ToFood && max_repellent && !found_permanent) {
 			const float repellent_prob_factor = 0.3f;
@@ -299,11 +305,6 @@ struct Ant
 				return;
 			}
 		}
-        if (found_fight) {
-            direction = getAngle(max_direction);
-            fight_mode = FightMode::ToFight;
-            return;
-        }
 		// Remove repellent if still food
 		if (repellent_cell && phase == Mode::ToHome) {
 			repellent_cell->getRepellent(col_id) *= 0.95f;
@@ -363,6 +364,7 @@ struct Ant
 
 	void setTarget(civ::Ref<Ant> new_target)
 	{
+		fight_mode = FightMode::Fighting;
 		target = new_target;
         fight_pos = 0.5f * (target->position + position);
         fight_vec = getNormalized(target->position - position);

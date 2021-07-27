@@ -25,14 +25,16 @@ struct WorldRenderer : public AsyncRenderer
 	{
 		va = sf::VertexArray(sf::Quads, grid.width * grid.height * 4);
 		uint64_t i = 0;
+		constexpr float eps = 0.01f;
 		const float cell_size = to<float>(grid.cell_size);
+		const float cell_size_eps = cell_size + 2.0f * eps;
 		for (int32_t x(0); x < grid.width; x++) {
 			for (int32_t y(0); y < grid.height; y++) {
-				const sf::Vector2f position(x * cell_size, y * cell_size);
+				const sf::Vector2f position(x * cell_size - eps, y * cell_size - eps);
 				va[4 * i + 0].position = position;
-				va[4 * i + 1].position = position + sf::Vector2f(cell_size, 0.0f);
-				va[4 * i + 2].position = position + sf::Vector2f(cell_size, cell_size);
-				va[4 * i + 3].position = position + sf::Vector2f(0.0f, cell_size);
+				va[4 * i + 1].position = position + sf::Vector2f(cell_size_eps, 0.0f);
+				va[4 * i + 2].position = position + sf::Vector2f(cell_size_eps, cell_size_eps);
+				va[4 * i + 3].position = position + sf::Vector2f(0.0f, cell_size_eps);
 				++i;
 			}
 		}
@@ -96,7 +98,7 @@ struct WorldRenderer : public AsyncRenderer
 					}
 				}
 				else if (cell.food) {
-					const float max_food = 10.0f;
+					const float max_food = 20.0f;
 					const float ratio = cell.food / max_food * (cell.discovered > 0.0f ? 1.0f : 0.0f);
 					color = sf::Color(0, to<uint8_t>(ratio * 255), 0);
 					const float offset = 4.0f;
@@ -109,7 +111,7 @@ struct WorldRenderer : public AsyncRenderer
 					const sf::Color base = Conf::WALL_COLOR;
 					const float ratio = std::min(1.0f, cell.discovered);
 					color = vec3ToColor(sf::Vector3f(base.r * ratio, base.g * ratio, base.b * ratio));
-					const float offset = 4.0f;
+					const float offset = 10.0f;
 					va[4 * i + 0].texCoords = sf::Vector2f(200.0f + offset, offset);
 					va[4 * i + 1].texCoords = sf::Vector2f(300.0f - offset, offset);
 					va[4 * i + 2].texCoords = sf::Vector2f(300.0f - offset, 100.0f - offset);

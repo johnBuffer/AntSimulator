@@ -38,11 +38,9 @@ struct FightSystem
 				uint16_t ant_id = current_cell.markers[i].current_ant;
 				if (ant_id) {
                     // Set fight mode for this ant
-                    ant.fight_mode = FightMode::Fighting;
                     civ::Ref<Ant> other = colonies[i].ants.getRef(ant_id);
                     ant.setTarget(other);
                     // And for the other one
-                    ant.fight_mode = FightMode::Fighting;
                     other->setTarget(colonies[ant.col_id].ants.getRef(ant.id));
                     return;
 				}
