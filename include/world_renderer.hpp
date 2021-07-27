@@ -11,6 +11,7 @@ struct WorldRenderer : public AsyncRenderer
 	const Grid<WorldCell>& grid;
 	bool draw_markers;
 	bool draw_density;
+	int8_t selected_colony = -1;
 
 	WorldRenderer(Grid<WorldCell>& grid_, DoubleObject<sf::VertexArray>& target)
 		: AsyncRenderer(target)
@@ -61,8 +62,8 @@ struct WorldRenderer : public AsyncRenderer
 						va[4 * i + 2].texCoords = sf::Vector2f(300.0f - offset, 100.0f - offset);
 						va[4 * i + 3].texCoords = sf::Vector2f(200.0f + offset, 100.0f - offset);*/
 					}
-					else {
-						/*if ((cell.intensity[0] < 1.0 && cell.intensity[1] < 1.0) || !draw_markers) {
+					else if (selected_colony != -1) {
+						if ((cell.markers[selected_colony].intensity[0] < 1.0 && cell.markers[selected_colony].intensity[1] < 1.0) || !draw_markers) {
 							const float ratio = std::min(1.0f, cell.discovered);
 							color = sf::Color(50 * ratio, 50 * ratio, 50 * ratio);
 							const float offset = 32.0f;
@@ -73,7 +74,7 @@ struct WorldRenderer : public AsyncRenderer
 						}
 						else if (draw_markers) {
 							const float offset = 32.0f;
-							if (cell.repellent) {
+							if (cell.markers[selected_colony].repellent) {
 								color = sf::Color::Blue;
 								va[4 * i + 0].texCoords = sf::Vector2f(offset, offset);
 								va[4 * i + 1].texCoords = sf::Vector2f(100.0f - offset, offset);
@@ -81,8 +82,8 @@ struct WorldRenderer : public AsyncRenderer
 								va[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
 							}
 							else {
-								const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * float(cell.intensity[0]);
-								const sf::Vector3f intensity_2_color = intensity_factor * to_food_color * float(cell.intensity[1]);
+								const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * float(cell.markers[selected_colony].intensity[0]);
+								const sf::Vector3f intensity_2_color = intensity_factor * to_food_color * float(cell.markers[selected_colony].intensity[1]);
 								const sf::Vector3f mixed_color(
 									std::min(255.0f, intensity_1_color.x + intensity_2_color.x),
 									std::min(255.0f, intensity_1_color.y + intensity_2_color.y),
@@ -94,7 +95,7 @@ struct WorldRenderer : public AsyncRenderer
 								va[4 * i + 2].texCoords = sf::Vector2f(100.0f - offset, 100.0f - offset);
 								va[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
 							}
-						}*/
+						}
 					}
 				}
 				else if (cell.food) {

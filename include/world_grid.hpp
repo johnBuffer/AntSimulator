@@ -13,7 +13,7 @@ constexpr float min_intensity = 0.1f;
 struct ColonyCell
 {
 	// Stores the intensity of ToHome and ToFood markers
-	float intensity[2];
+	float intensity[3];
 	// Is the marker permanent ?
 	bool permanent[2];
 	// Repellent instensity
@@ -37,6 +37,7 @@ struct ColonyCell
 		// Update toFood and toHome
 		intensity[0] -= permanent[0] ? dt : 0.0f;
 		intensity[1] -= permanent[1] ? dt : 0.0f;
+		intensity[2] -= dt;
 		// Update repellents
 		repellent -= dt;
 		repellent = std::max(0.0f, repellent);
@@ -93,6 +94,11 @@ struct WorldCell
         }
         return false;
     }
+
+	bool checkFight(uint8_t colony_id)
+	{
+		return markers[colony_id].fighting;
+	}
 
 	float& getRepellent(uint8_t colony_id)
 	{

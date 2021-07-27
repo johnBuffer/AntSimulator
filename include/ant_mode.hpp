@@ -4,12 +4,13 @@
 
 enum class Mode : uint32_t
 {
-	ToHome = 0,
-	ToFood = 1,
-	Refill = 2,
-	Flee = 3,
-	ToHomeNoFood = 4,
-    Dead = 5
+	ToHome       = 0,
+	ToFood       = 1,
+	ToEnemy      = 2,
+	Refill       = 3,
+	Flee         = 4,
+	ToHomeNoFood = 5,
+    Dead         = 6
 };
 
 enum class FightMode
