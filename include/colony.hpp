@@ -2,13 +2,12 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <list>
-#include "ant.hpp"
 #include "utils.hpp"
-#include "world.hpp"
 #include "colony_base.hpp"
 #include "graph.hpp"
 #include "racc.hpp"
 #include "index_vector.hpp"
+#include "ant_updater.hpp"
 
 
 struct Colony
@@ -64,11 +63,10 @@ struct Colony
 		}
 		
 		for (Ant& ant : ants) {
-			ant.update(dt, world);
+			//ant.update(dt, world);
+			AntUpdater::updateAnt(ant, world, dt);
 			ant.checkColony(base);
 		}
-
-		base.updateFoodAcc(dt);
 	}
 
 	void removeDeadAnts()

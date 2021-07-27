@@ -10,7 +10,6 @@
 #include "colony_base.hpp"
 #include "index_vector.hpp"
 
-#include <iostream>
 
 
 struct Ant
@@ -95,58 +94,6 @@ struct Ant
     {
         return fight_mode == FightMode::Fighting;
     }
-
-	void update(float dt, World& world)
-	{
-		autonomy += dt;
-        // Update current direction
-        direction.update(dt);
-        // Add ant to current cell
-        addToWorldGrid(world);
-        // Fight if needed
-		if (isFighting()) {
-			attack(dt);
-            return;
-        }
-		updatePosition(world, dt);
-		// If fight found, go for it
-		if (fight_mode == FightMode::ToFight) {
-			to_fight_time += dt;
-			if (to_fight_time > to_fight_timeout) {
-				fight_mode = FightMode::NoFight;
-			}
-			return;
-		}
-        if (autonomy > 0.75f * max_autonomy) {
-            phase = Mode::Refill;
-        }
-        // Check collision with food
-		if (phase == Mode::ToFood) {
-			checkFood(world);
-		}
-		// Get current cell
-		WorldCell& cell = world.map.get(position);
-		cell.addPresence();
-		search_markers.update(dt);
-		direction_update.update(dt);
-		if (direction_update.ready()) {
-            direction_update.reset();
-			if (search_markers.ready()) {
-				findMarker(world);
-                direction += RNGf::getFullRange(direction_noise_range);
-			}
-			else {
-				cell.degrade(col_id, Mode::ToFood, 0.25f);
-				direction += RNGf::getFullRange(2.0f * direction_noise_range);
-			}
-		}
-		// Add marker
-		marker_add.update(dt);
-		if (marker_add.ready()) {
-			addMarker(world);
-			marker_add.reset();
-		}
-	}
 
 	void attack(float dt)
 	{

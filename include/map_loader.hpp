@@ -2,6 +2,7 @@
 #include "world.hpp"
 #include "distance_field_builder.hpp"
 #include <SFML/Graphics.hpp>
+#include <iostream>
 
 
 struct MapLoader
