@@ -43,8 +43,8 @@ struct PopulationChart
 
 	void updateData(Colony& colony, float dt)
 	{
-		pop_diff = colony.pop_diff.get();
-		ants_count = colony.ants.size();
+		pop_diff = to<int32_t>(colony.pop_diff.get());
+		ants_count = to<int32_t>(colony.ants.size());
 		population.setLastValue(to<float>(ants_count));
 
 		population_update.update(dt);

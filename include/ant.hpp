@@ -15,6 +15,12 @@
 
 struct Ant
 {
+	enum class Type
+	{
+		Worker,
+		Soldier
+	};
+
 	// Parameters
 	float width = 3.0f;
 	float length = 4.7f;
@@ -52,6 +58,7 @@ struct Ant
 
 	uint32_t id;
 	uint8_t col_id;
+	Type type;
 
 	Ant() = default;
 
@@ -70,6 +77,8 @@ struct Ant
 		, id(0)
 		, col_id(colony_id)
         , attack_cooldown(1.5f, 0.0f)
+		, type(Type::Worker)
+
 	{
 	}
     
@@ -77,7 +86,7 @@ struct Ant
     {
         ColonyCell& cell = world.map.get(position).markers[col_id];
         if (!cell.fighting) {
-            cell.current_ant = id;
+            cell.current_ant = to<uint16_t>(id);
             cell.fighting = isFighting();
         }
     }

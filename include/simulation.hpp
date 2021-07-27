@@ -117,7 +117,7 @@ struct Simulation
         for (Colony& colony : colonies) {
             const uint32_t killed = colony.killWeakAnts(world);
             if (killed) {
-                const uint32_t initial_size = colony.ants.size();
+                const uint32_t initial_size = to<int32_t>(colony.ants.size());
                 renderer.colonies[colony.id].cleanVAs(initial_size - killed, initial_size);
             }
         }
