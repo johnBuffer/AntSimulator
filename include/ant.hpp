@@ -72,7 +72,7 @@ struct Ant
 	Cooldown direction_update;
 	Cooldown marker_add;
 	Cooldown search_markers;
-	float markers_count;
+	float internal_clock = 0.0f;
 	float to_enemy_markers_count;
 	float liberty_coef;
 	float autonomy;
@@ -93,7 +93,6 @@ struct Ant
 		, liberty_coef(RNGf::getRange(0.001f, 0.01f))
 		, hits(0)
         , fight_mode(FightMode::NoFight)
-		, markers_count(0.0f)
 		, to_enemy_markers_count(0.0f)
 		, autonomy(0.0f)
 		, id(0)
@@ -170,7 +169,7 @@ struct Ant
 			phase = Mode::ToHome;
 			direction.addNow(PI);
 			autonomy = 0.0f;
-			markers_count = 0.0f;
+			internal_clock = 0.0f;
 			if (world.map.pickFood(position)) {
 				phase = Mode::ToHomeNoFood;
 				marker_add.target = repellent_period;
@@ -201,6 +200,13 @@ struct Ant
 		}
 	}
 
+	void updateClocks(float dt)
+	{
+		autonomy += dt;
+		internal_clock += dt;
+		to_enemy_markers_count += dt;
+	}
+
 	Mode getMarkersSamplingType() const
 	{
 		if (phase == Mode::ToHome || phase == Mode::Refill || phase == Mode::ToHomeNoFood) {
@@ -211,23 +217,21 @@ struct Ant
 
 	void resetMarkers()
 	{
-		markers_count = 0.0f;
+		internal_clock = 0.0f;
 		to_enemy_markers_count = 0.0f;
 	}
 
 	void addMarker(World& world)
 	{
-		markers_count += marker_add.target;
 		if (phase == Mode::ToHome || phase == Mode::ToFood) {
-			const float intensity = getMarkerIntensity(0.05f, markers_count);
+			const float intensity = getMarkerIntensity(0.05f, internal_clock);
 			world.addMarker(position, phase == Mode::ToFood ? Mode::ToHome : Mode::ToFood, intensity, col_id);
 		}
 		else if (phase == Mode::ToHomeNoFood) {
-			const float intensity = to<float>(getMarkerIntensity(0.1f, markers_count));
+			const float intensity = to<float>(getMarkerIntensity(0.1f, internal_clock));
 			world.addMarkerRepellent(position, col_id, intensity);
 		}
 		if (enemy_found) {
-			to_enemy_markers_count += marker_add.target;
 			// If enemy found add ToEnemy markers
 			const float intensity = getMarkerIntensity(0.1f, to_enemy_markers_count);
 			world.addMarker(position, Mode::ToEnemy, intensity, col_id);

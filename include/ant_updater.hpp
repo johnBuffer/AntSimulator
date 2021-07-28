@@ -10,7 +10,7 @@ struct AntUpdater
 	static void updateAnt(Ant& ant, World& world, float dt)
 	{
 		// Generic updates
-		ant.autonomy += dt;
+		ant.updateClocks(dt);
 		// Update current direction
 		ant.direction.update(dt);
 		// Add ant to current cell
