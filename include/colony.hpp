@@ -36,7 +36,7 @@ struct Colony
 		, id(col_id)
 	{
 		base.food = 0.0f;
-		uint32_t ants_count = 8;
+		uint32_t ants_count = 1000;
 		for (uint32_t i(ants_count); i--;) {
 			createWorker(base.position, getRandRange(2.0f * PI));
 		}
@@ -55,6 +55,7 @@ struct Colony
 		Ant& ant = ants[ant_id];
 		ant.id = to<uint16_t>(ant_id);
 		ant.type = Ant::Type::Soldier;
+
 		const float soldier_scale = 2.0f;
 		ant.length *= soldier_scale;
 		ant.width *= soldier_scale;
@@ -69,7 +70,7 @@ struct Colony
  			pop_diff.addValue(ants.size());
 		}
 
-		const float ant_cost = 4.0f;
+		const float ant_cost = 1.0f;
 		ants_creation_cooldown.update(dt);
 		if (ants_creation_cooldown.ready() && ants.size() < max_ants_count) {
 			if (base.enemies_found_count && (ant_creation_id % 10 == 0)) {

@@ -46,7 +46,7 @@ struct SoldierUpdater
 			}
 			cell->discovered += 0.1f;
 			// Check for food or colony
-			if (cell->isPermanent(marker_phase, ant.col_id)) {
+			if (cell->isPermanent(ant.col_id) && (marker_phase == Mode::ToHome)) {
 				result.max_direction = to_marker;
 				result.found_permanent = true;
 				break;
@@ -79,9 +79,6 @@ struct SoldierUpdater
 		}
 		// Update direction
 		if (result.max_intensity) {
-			if (RNGf::proba(0.2f) && ant.phase == Mode::ToFood) {
-				result.max_cell->degrade(ant.col_id, ant.phase, 0.99f);
-			}
 			ant.direction = getAngle(result.max_direction);
 		}
 	}

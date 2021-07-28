@@ -206,7 +206,7 @@ struct Ant
 		if (phase == Mode::ToHome || phase == Mode::Refill || phase == Mode::ToHomeNoFood) {
 			return Mode::ToHome;
 		}
-		return Mode::ToFood;
+		return phase;
 	}
 
 	void resetMarkers()
@@ -219,17 +219,17 @@ struct Ant
 	{
 		markers_count += marker_add.target;
 		if (phase == Mode::ToHome || phase == Mode::ToFood) {
-			const float intensity = getMarkerIntensity(0.02f);
+			const float intensity = getMarkerIntensity(0.05f, markers_count);
 			world.addMarker(position, phase == Mode::ToFood ? Mode::ToHome : Mode::ToFood, intensity, col_id);
 		}
 		else if (phase == Mode::ToHomeNoFood) {
-			const float intensity = to<float>(getMarkerIntensity(0.1f));
+			const float intensity = to<float>(getMarkerIntensity(0.1f, markers_count));
 			world.addMarkerRepellent(position, col_id, intensity);
 		}
 		if (enemy_found) {
 			to_enemy_markers_count += marker_add.target;
 			// If enemy found add ToEnemy markers
-			const float intensity = getMarkerIntensity(0.04f);
+			const float intensity = getMarkerIntensity(0.1f, to_enemy_markers_count);
 			world.addMarker(position, Mode::ToEnemy, intensity, col_id);
 		}
 	}
@@ -260,9 +260,9 @@ struct Ant
 		va[index + 3].position = position - nrm_vec - dir_vec;
 	}
 
-	float getMarkerIntensity(float coef)
+	float getMarkerIntensity(float coef, float count)
 	{
-		return Conf::MARKER_INTENSITY * expf(-coef * markers_count);
+		return Conf::MARKER_INTENSITY * expf(-coef * count);
 	}
 
 	void setTarget(civ::Ref<Ant> new_target)

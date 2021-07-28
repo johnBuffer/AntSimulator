@@ -9,6 +9,7 @@
 
 struct Renderer
 {
+	bool render_ants = true;
 	ViewportHandler vp_handler;
 	std::vector<ColonyRenderer> colonies;
 	
@@ -16,6 +17,11 @@ struct Renderer
 		: vp_handler({ to<float>(Conf::WIN_WIDTH), to<float>(Conf::WIN_HEIGHT) })
 	{
 		colonies.reserve(8);
+	}
+
+	void toggleRenderAnts()
+	{
+		render_ants = !render_ants;
 	}
 
 	void addColony(Colony& colony)
@@ -41,7 +47,9 @@ struct Renderer
 		world.render(target, rs);
 		// Draw ants and colonies
 		for (ColonyRenderer& colony : colonies) {
-			colony.renderAnts(target, rs);
+			if (render_ants) {
+				colony.renderAnts(target, rs);
+			}
 			colony.render(target, rs);
 		}
 	}

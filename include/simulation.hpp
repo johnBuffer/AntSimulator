@@ -70,6 +70,10 @@ struct Simulation
 			ev_state.pause = !ev_state.pause;
 		});
 
+		ev_manager.addKeyPressedCallback(sf::Keyboard::A, [this](sfev::CstEv) {
+			renderer.toggleRenderAnts();
+		});
+
 		ev_manager.addKeyPressedCallback(sf::Keyboard::S, [this](sfev::CstEv) {
 			ev_state.fullspeed = !ev_state.fullspeed;
 			ev_manager.getWindow().setFramerateLimit(60 * (!ev_state.fullspeed));

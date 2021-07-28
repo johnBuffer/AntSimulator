@@ -33,7 +33,7 @@ struct WorkerUpdater
 			// Check if
 			cell->discovered += 0.1f;
 			// Check for food or colony
-			if (cell->isPermanent(marker_phase, ant.col_id) || (marker_phase == Mode::ToFood && cell->food)) {
+			if ((cell->isPermanent(ant.col_id) && marker_phase == Mode::ToHome) || (marker_phase == Mode::ToFood && cell->food)) {
 				result.max_direction = to_marker;
 				result.found_permanent = true;
 				break;
@@ -120,8 +120,8 @@ struct WorkerUpdater
 		// Add marker
 		ant.marker_add.update(dt);
 		if (ant.marker_add.ready()) {
-			ant.addMarker(world);
 			ant.marker_add.reset();
+			ant.addMarker(world);
 		}
 	}
 };
