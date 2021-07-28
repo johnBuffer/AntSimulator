@@ -73,7 +73,8 @@ struct ViewportHandler
 
     void reset()
     {
-
+        state.zoom = 1.0f;
+        setFocus(state.center);
     }
 
     const sf::RenderStates& getRenderState() const

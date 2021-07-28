@@ -52,26 +52,9 @@ struct WorldRenderer : public AsyncRenderer
 				const auto& cell = grid.getCst(sf::Vector2i(x, y));
 				sf::Color color = sf::Color::Black;
 				if (!cell.food && !cell.wall) {
-					if (draw_density) {
-						/*color = vec3ToColor(sf::Vector3f(255.0f, 73.0f, 68.0f) * cell.wall_dist);
-						const float offset = 4.0f;
-						va[4 * i + 0].texCoords = sf::Vector2f(200.0f + offset, offset);
-						va[4 * i + 1].texCoords = sf::Vector2f(300.0f - offset, offset);
-						va[4 * i + 2].texCoords = sf::Vector2f(300.0f - offset, 100.0f - offset);
-						va[4 * i + 3].texCoords = sf::Vector2f(200.0f + offset, 100.0f - offset);*/
-					}
-					else if (selected_colony != -1) {
+					if (selected_colony != -1) {
 						const ColonyCell& colony_cell = cell.markers[selected_colony];
-						if ((colony_cell.intensity[0] < 1.0 && colony_cell.intensity[1] < 1.0) || !draw_markers) {
-							const float ratio = std::min(1.0f, cell.discovered);
-							color = vec3ToColor(sf::Vector3f{ 50.0f * ratio, 50.0f * ratio, 50.0f * ratio });
-							const float offset = 32.0f;
-							va[4 * i + 0].texCoords = sf::Vector2f(200.0f + offset, offset);
-							va[4 * i + 1].texCoords = sf::Vector2f(300.0f - offset, offset);
-							va[4 * i + 2].texCoords = sf::Vector2f(300.0f - offset, 100.0f - offset);
-							va[4 * i + 3].texCoords = sf::Vector2f(200.0f + offset, 100.0f - offset);
-						}
-						else if (draw_markers) {
+						if (draw_markers) {
 							const float offset = 32.0f;
 							if (colony_cell.repellent) {
 								color = sf::Color::Blue;
@@ -82,7 +65,7 @@ struct WorldRenderer : public AsyncRenderer
 							}
 							else {
 								const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * float(colony_cell.intensity[0]);
-								const sf::Vector3f intensity_2_color = intensity_factor * to_food_color * 0.0f;// float(cell.markers[selected_colony].intensity[1]);
+								const sf::Vector3f intensity_2_color = intensity_factor * to_food_color * float(colony_cell.intensity[1]);
 								const sf::Vector3f mixed_color(
 									intensity_1_color.x + intensity_2_color.x,
 									intensity_1_color.y + intensity_2_color.y,

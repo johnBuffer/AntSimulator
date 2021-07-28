@@ -55,7 +55,7 @@ struct SoldierUpdater
 			if (cell->checkEnemyPresence(ant.col_id) || cell->checkFight(ant.col_id)) {
 				result.found_fight = true;
 				result.max_direction = to_marker;
-				ant.to_fight_time = 0.0f;
+				ant.detectEnemy();
 				break;
 			}
 			// Flee if repellent

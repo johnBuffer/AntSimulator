@@ -47,7 +47,7 @@ struct Ant
 	float direction_update_period = 0.25f;
 	float marker_period = 0.25f;
 	float direction_noise_range = PI * 0.02f;
-	float repellent_period = 64.0f;
+	float repellent_period = 128.0f;
 
 	Mode phase;
 	sf::Vector2f position;
@@ -284,9 +284,16 @@ struct Ant
         if (phase == Mode::ToHome || phase == Mode::ToHomeNoFood) {
             world.addFoodAt(position.x, position.y, 1);
         }
-        //world.addFoodAt(position.x, position.y, 5);
+        world.addFoodAt(position.x, position.y, 2);
         phase = Mode::Dead;
     }
+
+	void detectEnemy()
+	{
+		enemy_found = true;
+		to_enemy_markers_count = 0.0f;
+		to_fight_time = 0.0f;
+	}
 
 	void requestFight(uint8_t target_c_id, uint16_t target_a_id)
 	{

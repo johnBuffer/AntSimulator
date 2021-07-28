@@ -37,8 +37,8 @@ struct FightSystem
         }
         for (uint32_t i(max_colonies_count); i--;) {
 			if (i != ant.col_id) {
-				uint16_t ant_id = current_cell.markers[i].current_ant;
-				if (ant_id) {
+				int16_t ant_id = current_cell.markers[i].current_ant;
+				if (ant_id > -1) {
                     // Set fight mode for this ant
                     civ::Ref<Ant> other = colonies[i].ants.getRef(ant_id);
                     ant.setTarget(other);

@@ -31,7 +31,7 @@ struct ColonyCell
 	void update(float dt)
 	{
 		// Remove current ant
-		current_ant = 0;
+		current_ant = -1;
         fighting = false;
 		// Update toFood and toHome
 		intensity[0] -= permanent ? dt : 0.0f;
@@ -90,7 +90,7 @@ struct WorldCell
     {
         // Update intensities
         for (uint8_t i(max_colonies_count); i--;) {
-            if (i != team && markers[i].current_ant) {
+            if (i != team && markers[i].current_ant > -1) {
                 return true;
             }
         }

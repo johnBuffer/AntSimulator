@@ -39,17 +39,16 @@ struct WorkerUpdater
 				break;
 			}
 			// Check for enemy
-			//if (cell->checkEnemyPresence(ant.col_id)) {
-			//	ant.enemy_found = true;
-			//}
-			//// Help in case of a fight
-			//if (cell->checkFight(ant.col_id)) {
-			//	result.found_fight = true;
-			//	result.max_direction = to_marker;
-			//	ant.to_fight_time = 0.0f;
-			//	ant.enemy_found = true;
-			//	break;
-			//}
+			if (cell->checkEnemyPresence(ant.col_id)) {
+				ant.detectEnemy();
+			}
+			// Help in case of a fight
+			if (cell->checkFight(ant.col_id)) {
+				result.found_fight = true;
+				result.max_direction = to_marker;
+				ant.detectEnemy();
+				break;
+			}
 			// Flee if repellent
 			if (cell->getRepellent(ant.col_id) > result.max_repellent) {
 				result.max_repellent = cell->getRepellent(ant.col_id);

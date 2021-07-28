@@ -36,7 +36,7 @@ struct Colony
 		, id(col_id)
 	{
 		base.food = 0.0f;
-		uint32_t ants_count = 1000;
+		uint32_t ants_count = 1200;
 		for (uint32_t i(ants_count); i--;) {
 			createWorker(base.position, getRandRange(2.0f * PI));
 		}
@@ -70,10 +70,10 @@ struct Colony
  			pop_diff.addValue(ants.size());
 		}
 
-		const float ant_cost = 1.0f;
+		const float ant_cost = 4.0f;
 		ants_creation_cooldown.update(dt);
 		if (ants_creation_cooldown.ready() && ants.size() < max_ants_count) {
-			if (base.enemies_found_count && (ant_creation_id % 10 == 0)) {
+			if (base.enemies_found_count && (ant_creation_id % 5 == 0)) {
 				if (base.useFood(3.0f * ant_cost)) {
 					createSoldier(base.position, getRandRange(2.0f * PI));
 					++ant_creation_id;
