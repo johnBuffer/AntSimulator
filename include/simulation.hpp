@@ -125,14 +125,14 @@ struct Simulation
             // Mark ants with no more time left as dead
             removeDeadAnts();
 			// Update world cells (markers, density, walls)
-			clock.restart();
 			world.update(dt);
-			uint32_t t = clock.getElapsedTime().asMicroseconds();
-			std::cout << t << std::endl;
 			// Update ants
+			clock.restart();
 			for (Colony& colony : colonies) {
 				colony.update(dt, world);
 			}
+			uint32_t t = clock.getElapsedTime().asMicroseconds();
+			std::cout << t << std::endl;
 			// Search for fights
 			fight_system.checkForFights(colonies, world);
 			// Update stats
