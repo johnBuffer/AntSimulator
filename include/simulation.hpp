@@ -19,6 +19,7 @@ struct Simulation
 	sfev::EventManager ev_manager;
 	EventSate ev_state;
 	FightSystem fight_system;
+	sf::Clock clock;
 
 	Simulation(sf::Window& window)
 		: world(Conf::WORLD_WIDTH, Conf::WORLD_HEIGHT)
@@ -39,6 +40,10 @@ struct Simulation
 		ev_manager.addMousePressedCallback(sf::Mouse::Left, [&](sfev::CstEv) {
 			ev_state.clicking = true;
 			renderer.vp_handler.click(ev_manager.getFloatMousePosition());
+		});
+
+		ev_manager.addMousePressedCallback(sf::Mouse::Right, [&](sfev::CstEv) {
+			selectColony();
 		});
 
 		ev_manager.addMouseReleasedCallback(sf::Mouse::Left, [&](sfev::CstEv) {
@@ -66,10 +71,31 @@ struct Simulation
 			ev_state.pause = !ev_state.pause;
 		});
 
+		ev_manager.addKeyPressedCallback(sf::Keyboard::A, [this](sfev::CstEv) {
+			renderer.toggleRenderAnts();
+		});
+
+		ev_manager.addKeyPressedCallback(sf::Keyboard::R, [this](sfev::CstEv) {
+			renderer.vp_handler.reset();
+		});
+
 		ev_manager.addKeyPressedCallback(sf::Keyboard::S, [this](sfev::CstEv) {
 			ev_state.fullspeed = !ev_state.fullspeed;
 			ev_manager.getWindow().setFramerateLimit(60 * (!ev_state.fullspeed));
 		});
+	}
+
+	void selectColony()
+	{
+		for (const Colony& c : colonies) {
+			const sf::Vector2f world_mouse_pos = renderer.vp_handler.getMouseWorldPosition();
+			const float length = getLength(world_mouse_pos - c.base.position);
+			if (length < c.base.radius) {
+				world.renderer.selected_colony = c.id;
+				return;
+			}
+		}
+		world.renderer.selected_colony = -1;
 	}
 
 	void processEvents()
@@ -117,7 +143,7 @@ struct Simulation
         for (Colony& colony : colonies) {
             const uint32_t killed = colony.killWeakAnts(world);
             if (killed) {
-                const uint32_t initial_size = colony.ants.size();
+                const uint32_t initial_size = to<int32_t>(colony.ants.size());
                 renderer.colonies[colony.id].cleanVAs(initial_size - killed, initial_size);
             }
         }

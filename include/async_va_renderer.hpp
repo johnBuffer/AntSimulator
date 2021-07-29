@@ -11,10 +11,12 @@ struct AsyncRenderer
 	std::thread thread;
 	std::mutex mutex;
 	bool run;
+	bool swap_ok;
 
 	AsyncRenderer(DoubleObject<sf::VertexArray>& target)
 		: vertex_array(target)
 		, run(true)
+		, swap_ok(true)
 	{}
 
 	// To be overloaded
@@ -39,7 +41,9 @@ private:
 	void update()
 	{
 		while (run) {
-			updateVertexArray();
+			if (swap_ok) {
+				updateVertexArray();
+			}
 			trySwap();
 		}
 	}
@@ -47,8 +51,12 @@ private:
 	void trySwap()
 	{
 		if (mutex.try_lock()) {
+			swap_ok = true;
 			vertex_array.swap();
 			mutex.unlock();
+		}
+		else {
+			swap_ok = false;
 		}
 	}
 };

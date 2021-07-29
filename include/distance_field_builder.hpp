@@ -10,7 +10,7 @@ struct DistanceFieldBuilder
 			for (int32_t y(0); y < grid.height; ++y) {
 				WorldCell& cell = grid.get(sf::Vector2i(x, y));
 				if (cell.wall) {
-					cell.wall_dist = 0.0f;// getMinDist(x, y, grid, false, 20);
+					cell.wall_dist = getMinDist(x, y, grid, false, 20);
 				}
 				else {
 					cell.wall_dist = getMinDist(x, y, grid, true, 3);

@@ -2,13 +2,12 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <list>
-#include "ant.hpp"
 #include "utils.hpp"
-#include "world.hpp"
 #include "colony_base.hpp"
 #include "graph.hpp"
 #include "racc.hpp"
 #include "index_vector.hpp"
+#include "ant_updater.hpp"
 
 
 struct Colony
@@ -23,6 +22,7 @@ struct Colony
 	RDiff<int64_t> pop_diff;
 	uint8_t id;
 	sf::Color ants_color = sf::Color::White;
+	uint64_t ant_creation_id = 0;
 
 
 	Colony(float x, float y, uint32_t n, uint8_t col_id)
@@ -38,14 +38,29 @@ struct Colony
 		base.food = 0.0f;
 		uint32_t ants_count = 8;
 		for (uint32_t i(ants_count); i--;) {
-			createAnt(base.position, getRandRange(2.0f * PI));
+			createWorker(base.position, getRandRange(2.0f * PI));
 		}
 	}
 
-	void createAnt(sf::Vector2f pos, float angle)
+	void createWorker(sf::Vector2f pos, float angle)
 	{
 		const uint64_t ant_id = ants.emplace_back(pos.x, pos.y, angle, id);
 		ants[ant_id].id = to<uint16_t>(ant_id);
+		ants[ant_id].type = Ant::Type::Worker;
+	}
+
+	void createSoldier(sf::Vector2f pos, float angle)
+	{
+		const uint64_t ant_id = ants.emplace_back(pos.x, pos.y, angle, id);
+		Ant& ant = ants[ant_id];
+		ant.id = to<uint16_t>(ant_id);
+		ant.type = Ant::Type::Soldier;
+
+		const float soldier_scale = 2.0f;
+		ant.length *= soldier_scale;
+		ant.width *= soldier_scale;
+		ant.dammage *= soldier_scale * 2.0f;
+		ant.max_autonomy *= soldier_scale;
 	}
 
 	void update(float dt, World& world)
@@ -58,17 +73,27 @@ struct Colony
 
 		const float ant_cost = 4.0f;
 		ants_creation_cooldown.update(dt);
-		if (ants_creation_cooldown.ready() && ants.size() < max_ants_count && base.useFood(ant_cost)) {
-			createAnt(base.position, getRandRange(2.0f * PI));
+		if (ants_creation_cooldown.ready() && ants.size() < max_ants_count) {
+			if (base.enemies_found_count && (ant_creation_id % 5 == 0)) {
+				if (base.useFood(3.0f * ant_cost)) {
+					createSoldier(base.position, getRandRange(2.0f * PI));
+					++ant_creation_id;
+					--base.enemies_found_count;
+				}
+			}
+			else {
+				if (base.useFood(ant_cost)) {
+					createWorker(base.position, getRandRange(2.0f * PI));
+					++ant_creation_id;
+				}
+			}
 			ants_creation_cooldown.reset();
 		}
 		
 		for (Ant& ant : ants) {
-			ant.update(dt, world);
+			AntUpdater::updateAnt(ant, world, dt);
 			ant.checkColony(base);
 		}
-
-		base.updateFoodAcc(dt);
 	}
 
 	void removeDeadAnts()

@@ -10,11 +10,35 @@
 #include "colony_base.hpp"
 #include "index_vector.hpp"
 
-#include <iostream>
+
+struct MarkerSample
+{
+
+};
+
+
+struct SamplingResult
+{
+	float max_intensity = 0.0f;
+	// To objective stuff
+	sf::Vector2f max_direction;
+	WorldCell* max_cell = nullptr;
+	bool found_permanent = false;
+	bool found_fight = false;
+	// Repellent stuff
+	float max_repellent = 0.0f;
+	WorldCell* repellent_cell = nullptr;
+};
 
 
 struct Ant
 {
+	enum class Type
+	{
+		Worker,
+		Soldier
+	};
+
 	// Parameters
 	float width = 3.0f;
 	float length = 4.7f;
@@ -23,7 +47,7 @@ struct Ant
 	float direction_update_period = 0.25f;
 	float marker_period = 0.25f;
 	float direction_noise_range = PI * 0.02f;
-	float repellent_period = 32.0f;
+	float repellent_period = 128.0f;
 
 	Mode phase;
 	sf::Vector2f position;
@@ -41,20 +65,24 @@ struct Ant
     bool enemy_found = false;
     float to_fight_timeout = 3.0f;
     float to_fight_time = 0.0f;
+	bool fight_request = false;
+	uint16_t target_id = 0;
+	uint8_t target_col_id = 0;
     
 	Cooldown direction_update;
 	Cooldown marker_add;
 	Cooldown search_markers;
-	float markers_count;
+	float internal_clock = 0.0f;
+	float to_enemy_markers_count;
 	float liberty_coef;
 	float autonomy;
 	float max_autonomy = 300.0f;
 
 	uint32_t id;
 	uint8_t col_id;
+	Type type;
 
 	Ant() = default;
-
 	Ant(float x, float y, float angle, uint8_t colony_id)
 		: position(x, y)
 		, direction(angle)
@@ -65,11 +93,13 @@ struct Ant
 		, liberty_coef(RNGf::getRange(0.001f, 0.01f))
 		, hits(0)
         , fight_mode(FightMode::NoFight)
-		, markers_count(0.0f)
+		, to_enemy_markers_count(0.0f)
 		, autonomy(0.0f)
 		, id(0)
 		, col_id(colony_id)
         , attack_cooldown(1.5f, 0.0f)
+		, type(Type::Worker)
+
 	{
 	}
     
@@ -77,7 +107,7 @@ struct Ant
     {
         ColonyCell& cell = world.map.get(position).markers[col_id];
         if (!cell.fighting) {
-            cell.current_ant = id;
+            cell.current_ant = to<uint16_t>(id);
             cell.fighting = isFighting();
         }
     }
@@ -86,58 +116,6 @@ struct Ant
     {
         return fight_mode == FightMode::Fighting;
     }
-
-	void update(float dt, World& world)
-	{
-		autonomy += dt;
-        // Update current direction
-        direction.update(dt);
-        // Add ant to current cell
-        addToWorldGrid(world);
-        // Fight if needed
-		if (isFighting()) {
-			attack(dt);
-            return;
-        }
-		updatePosition(world, dt);
-        // If fight found, go for it
-        if (fight_mode == FightMode::ToFight) {
-            to_fight_time += dt;
-            if (to_fight_time > to_fight_timeout) {
-                fight_mode = FightMode::NoFight;
-            }
-            return;
-        }
-        if (autonomy > 0.75f * max_autonomy) {
-            phase = Mode::Refill;
-        }
-        // Check collision with food
-		if (phase == Mode::ToFood) {
-			checkFood(world);
-		}
-		// Get current cell
-		WorldCell& cell = world.map.get(position);
-		cell.addPresence();
-		search_markers.update(dt);
-		direction_update.update(dt);
-		if (direction_update.ready()) {
-            direction_update.reset();
-			if (search_markers.ready()) {
-				findMarker(world);
-                direction += RNGf::getFullRange(direction_noise_range);
-			}
-			else {
-				cell.degrade(col_id, Mode::ToFood, 0.25f);
-				direction += RNGf::getFullRange(2.0f * direction_noise_range);
-			}
-		}
-		// Add marker
-		marker_add.update(dt);
-		if (marker_add.ready()) {
-			addMarker(world);
-			marker_add.reset();
-		}
-	}
 
 	void attack(float dt)
 	{
@@ -150,8 +128,11 @@ struct Ant
                 opponent.autonomy += dammage;
             }
 		} else {
-            enemy_found = true;
 			fight_mode = FightMode::NoFight;
+			if (type == Type::Soldier) {
+				// Restaure some energy
+				autonomy = std::max(0.0f, autonomy - 3.0f);
+			}
 		}
 	}
 
@@ -161,10 +142,9 @@ struct Ant
 		const sf::Vector2f next_position = position + (dt * move_speed) * v;
 		const HitPoint hit = world.map.getFirstHit(position, v, dt * move_speed);
 		if (hit.cell) {
-			const uint32_t hits_threshold = 8;
+			const uint32_t hits_threshold = 4;
 			if (hits > hits_threshold) {
-				const float new_angle = RNGf::getUnder(2.0f * PI);
-				v = sf::Vector2f(cos(new_angle), sin(new_angle));
+				terminate();
 			}
 			else {
 				v.x *= hit.normal.x ? -1.0f : 1.0f;
@@ -177,8 +157,9 @@ struct Ant
 			hits = 0;
 			position += (dt * move_speed) * v;
 			// Ants outside the map go back to home
-			position.x = (position.x < 0.0f || position.x > Conf::WIN_WIDTH) ? Conf::COLONY_POSITION.x : position.x;
-			position.y = (position.y < 0.0f || position.y > Conf::WIN_HEIGHT) ? Conf::COLONY_POSITION.y : position.y;
+			if (position.x < 0.0f || position.x > Conf::WORLD_WIDTH || position.y < 0.0f || position.y > Conf::WORLD_HEIGHT) {
+				terminate();
+			}
 		}
 	}
 
@@ -188,7 +169,7 @@ struct Ant
 			phase = Mode::ToHome;
 			direction.addNow(PI);
 			autonomy = 0.0f;
-			markers_count = 0.0f;
+			internal_clock = 0.0f;
 			if (world.map.pickFood(position)) {
 				phase = Mode::ToHomeNoFood;
 				marker_add.target = repellent_period;
@@ -204,19 +185,26 @@ struct Ant
 		if (getLength(position - base.position) < base.radius) {
 			marker_add.target = marker_period;
 			if (phase == Mode::ToHome || phase == Mode::ToHomeNoFood) {
-				phase = Mode::ToFood;
 				base.addFood(1.0f);
 				direction.addNow(PI);
                 base.enemies_found_count += enemy_found;
-                enemy_found = false;
 			}
 			// Refill
-			const float refill_cost = 1.0f;
-			const float needed_refill = refill_cost * (autonomy / max_autonomy);
 			autonomy = 0.0f;
 			phase = Mode::ToFood;
-			markers_count = 0.0f;
+			resetMarkers();
+			enemy_found = false;
+			if (type == Type::Soldier) {
+				phase = Mode::ToEnemy;
+			}
 		}
+	}
+
+	void updateClocks(float dt)
+	{
+		autonomy += dt;
+		internal_clock += dt;
+		to_enemy_markers_count += dt;
 	}
 
 	Mode getMarkersSamplingType() const
@@ -224,109 +212,30 @@ struct Ant
 		if (phase == Mode::ToHome || phase == Mode::Refill || phase == Mode::ToHomeNoFood) {
 			return Mode::ToHome;
 		}
-		return Mode::ToFood;
+		return phase;
 	}
 
-	void findMarker(World& world)
+	void resetMarkers()
 	{
-		// Init
-		const Mode marker_phase = getMarkersSamplingType();
-		const float sample_angle_range = PI * 0.35f;
-		const float current_angle = direction.getCurrentAngle();
-		float max_intensity = 0.0f;
-		// To objective stuff
-		sf::Vector2f max_direction = direction.getVec();
-		WorldCell* max_cell = nullptr;
-		bool found_permanent = false;
-        bool found_fight = false;
-		// Repellent stuff
-		float max_repellent = 0.0f;
-		WorldCell* repellent_cell = nullptr;
-		// Sample the world
-		const uint32_t sample_count = 32;
-		for (uint32_t i(sample_count); i--;) {
-			// Get random point in range
-			const float sample_angle = current_angle + RNGf::getRange(sample_angle_range);
-			const float distance = RNGf::getUnder(marker_detection_max_dist);
-			const sf::Vector2f to_marker(cos(sample_angle), sin(sample_angle));
-			auto* cell = world.map.getSafe(position + distance * to_marker);
-			const HitPoint hit_result = world.map.getFirstHit(position, to_marker, distance);
-			// Check cell
-			if (!cell || hit_result.cell) {
-				if (hit_result.cell) {
-					hit_result.cell->discovered = 1.0f;
-				}
-				continue;
-			}
-            // Check if
-            if (cell->checkEnemyPresence(col_id)) {
-                found_fight = true;
-                max_direction = to_marker;
-                to_fight_time = 0.0f;
-                break;
-            }
-			cell->discovered += 0.1f;
-			// Check for food or colony
-			if (cell->isPermanent(marker_phase, col_id) || (marker_phase == Mode::ToFood && cell->food)) {
-				max_direction = to_marker;
-				found_permanent = true;
-				break;
-			}
-			// Flee if repellent
-			if (cell->getRepellent(col_id) > max_repellent) {
-				max_repellent = cell->getRepellent(col_id);
-				repellent_cell = cell;
-			}
-			// Check for the most intense marker
-			const float marker_intensity = to<float>(cell->getIntensity(marker_phase, col_id) * std::pow(cell->wall_dist, 2.0));
-			if (marker_intensity > max_intensity) {
-				max_intensity = marker_intensity;
-				max_direction = to_marker;
-				max_cell = cell;
-			}
-			// Eventually choose a different path
-//            if (RNGf::proba(liberty_coef)) {
-//			 	break;
-//            }
-		}
-		// Check for repellent
-		if (phase == Mode::ToFood && max_repellent && !found_permanent) {
-			const float repellent_prob_factor = 0.3f;
-			if (RNGf::proba(repellent_prob_factor * (1.0f - max_intensity / to<float>(Conf::MARKER_INTENSITY)))) {
-				//phase = Mode::Flee;
-				direction.addNow(RNGf::getUnder(2.0f * PI));
-				search_markers.reset();
-				return;
-			}
-		}
-        if (found_fight) {
-            direction = getAngle(max_direction);
-            fight_mode = FightMode::ToFight;
-            return;
-        }
-		// Remove repellent if still food
-		if (repellent_cell && phase == Mode::ToHome) {
-			repellent_cell->getRepellent(col_id) *= 0.95f;
-		}
-		// Update direction
-		if (max_intensity) {
-			if (RNGf::proba(0.2f) && phase == Mode::ToFood) {
-				max_cell->degrade(col_id, phase, 0.99f);
-			}
-			direction = getAngle(max_direction);
-		}
+		internal_clock = 0.0f;
+		to_enemy_markers_count = 0.0f;
 	}
 
 	void addMarker(World& world)
 	{
-		markers_count += marker_add.target;
 		if (phase == Mode::ToHome || phase == Mode::ToFood) {
-			const float intensity = getMarkerIntensity(0.01f);
+			const float intensity = getMarkerIntensity(0.05f, internal_clock);
 			world.addMarker(position, phase == Mode::ToFood ? Mode::ToHome : Mode::ToFood, intensity, col_id);
 		}
 		else if (phase == Mode::ToHomeNoFood) {
-			const float intensity = to<float>(getMarkerIntensity(0.02f));
+			const float intensity = to<float>(getMarkerIntensity(0.1f, internal_clock));
 			world.addMarkerRepellent(position, col_id, intensity);
+		}
+		if (enemy_found) {
+			// If enemy found add ToEnemy markers
+			const float intensity_factor = 0.2f;
+			const float intensity = intensity_factor * getMarkerIntensity(0.1f, to_enemy_markers_count);
+			world.addMarker(position, Mode::ToEnemy, intensity, col_id);
 		}
 	}
 
@@ -356,17 +265,19 @@ struct Ant
 		va[index + 3].position = position - nrm_vec - dir_vec;
 	}
 
-	float getMarkerIntensity(float coef)
+	float getMarkerIntensity(float coef, float count)
 	{
-		return Conf::MARKER_INTENSITY * expf(-coef * markers_count);
+		return Conf::MARKER_INTENSITY * expf(-coef * count);
 	}
 
 	void setTarget(civ::Ref<Ant> new_target)
 	{
+		fight_mode = FightMode::Fighting;
 		target = new_target;
         fight_pos = 0.5f * (target->position + position);
         fight_vec = getNormalized(target->position - position);
 		direction = getAngle(fight_vec);
+		enemy_found = true;
 	}
     
     void kill(World& world)
@@ -374,7 +285,26 @@ struct Ant
         if (phase == Mode::ToHome || phase == Mode::ToHomeNoFood) {
             world.addFoodAt(position.x, position.y, 1);
         }
-        world.addFoodAt(position.x, position.y, 5);
+        //world.addFoodAt(position.x, position.y, 2);
         phase = Mode::Dead;
     }
+
+	void detectEnemy()
+	{
+		enemy_found = true;
+		to_enemy_markers_count = 0.0f;
+		to_fight_time = 0.0f;
+	}
+
+	void requestFight(uint8_t target_c_id, uint16_t target_a_id)
+	{
+		fight_request = true;
+		target_col_id = target_c_id;
+		target_id = target_a_id;
+	}
+
+	void terminate()
+	{
+		autonomy = max_autonomy + 1.0f;
+	}
 };

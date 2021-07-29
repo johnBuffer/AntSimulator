@@ -26,23 +26,20 @@ struct FightSystem
 
     void checkForFight(Ant& ant, std::vector<Colony>& colonies, World& world)
     {
+        // Only soldiers can initiate fights
+        if (ant.type == Ant::Type::Worker && ant.fight_mode == FightMode::NoFight) {
+            return;
+        }
+        // Check for potential enemies
         WorldCell& current_cell = world.map.get(ant.position);
-        if (ant.getMarkersSamplingType() == Mode::ToFood) {
-            return;
-        }
-        if (current_cell.markers[ant.col_id].fighting) {
-            return;
-        }
         for (uint32_t i(max_colonies_count); i--;) {
 			if (i != ant.col_id) {
-				uint16_t ant_id = current_cell.markers[i].current_ant;
-				if (ant_id) {
+				int16_t ant_id = current_cell.markers[i].current_ant;
+				if (ant_id > -1) {
                     // Set fight mode for this ant
-                    ant.fight_mode = FightMode::Fighting;
                     civ::Ref<Ant> other = colonies[i].ants.getRef(ant_id);
                     ant.setTarget(other);
                     // And for the other one
-                    ant.fight_mode = FightMode::Fighting;
                     other->setTarget(colonies[ant.col_id].ants.getRef(ant.id));
                     return;
 				}

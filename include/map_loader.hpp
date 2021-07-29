@@ -2,6 +2,7 @@
 #include "world.hpp"
 #include "distance_field_builder.hpp"
 #include <SFML/Graphics.hpp>
+#include <iostream>
 
 
 struct MapLoader
@@ -31,7 +32,7 @@ struct MapLoader
 					}
 					else if (food_map.getPixel(x, y).g > 100) {
 						const float green = food_map.getPixel(x, y).g;
-						world.addFoodAt(position.x, position.y, 20);
+						world.addFoodAt(position.x, position.y, 5);
 					}
 				}
 			}
