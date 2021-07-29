@@ -19,6 +19,7 @@ struct Simulation
 	sfev::EventManager ev_manager;
 	EventSate ev_state;
 	FightSystem fight_system;
+	sf::Clock clock;
 
 	Simulation(sf::Window& window)
 		: world(Conf::WORLD_WIDTH, Conf::WORLD_HEIGHT)
@@ -124,7 +125,10 @@ struct Simulation
             // Mark ants with no more time left as dead
             removeDeadAnts();
 			// Update world cells (markers, density, walls)
+			clock.restart();
 			world.update(dt);
+			uint32_t t = clock.getElapsedTime().asMicroseconds();
+			std::cout << t << std::endl;
 			// Update ants
 			for (Colony& colony : colonies) {
 				colony.update(dt, world);
