@@ -127,12 +127,9 @@ struct Simulation
 			// Update world cells (markers, density, walls)
 			world.update(dt);
 			// Update ants
-			clock.restart();
 			for (Colony& colony : colonies) {
 				colony.update(dt, world);
 			}
-			uint32_t t = clock.getElapsedTime().asMicroseconds();
-			std::cout << t << std::endl;
 			// Search for fights
 			fight_system.checkForFights(colonies, world);
 			// Update stats

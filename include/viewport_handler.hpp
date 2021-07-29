@@ -73,7 +73,7 @@ struct ViewportHandler
 
     void reset()
     {
-        state.zoom = 1.0f;
+        state.zoom = 1.05f;
         setFocus(state.center);
     }
 

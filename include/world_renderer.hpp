@@ -92,7 +92,7 @@ struct WorldRenderer : public AsyncRenderer
 				}
 				else if (cell.wall) {
 					const sf::Color base = Conf::WALL_COLOR;
-					const float ratio = std::min(1.0f, cell.discovered);
+					const float ratio = std::min(2.0f, 0.5f + cell.wall_dist);
 					color = vec3ToColor(sf::Vector3f(base.r * ratio, base.g * ratio, base.b * ratio));
 					const float offset = 10.0f;
 					va[4 * i + 0].texCoords = sf::Vector2f(200.0f + offset, offset);

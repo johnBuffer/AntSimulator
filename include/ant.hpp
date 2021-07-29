@@ -142,10 +142,9 @@ struct Ant
 		const sf::Vector2f next_position = position + (dt * move_speed) * v;
 		const HitPoint hit = world.map.getFirstHit(position, v, dt * move_speed);
 		if (hit.cell) {
-			const uint32_t hits_threshold = 8;
+			const uint32_t hits_threshold = 4;
 			if (hits > hits_threshold) {
-				const float new_angle = RNGf::getUnder(2.0f * PI);
-				v = sf::Vector2f(cos(new_angle), sin(new_angle));
+				terminate();
 			}
 			else {
 				v.x *= hit.normal.x ? -1.0f : 1.0f;
@@ -158,8 +157,9 @@ struct Ant
 			hits = 0;
 			position += (dt * move_speed) * v;
 			// Ants outside the map go back to home
-			position.x = (position.x < 0.0f || position.x > Conf::WIN_WIDTH) ? Conf::COLONY_POSITION.x : position.x;
-			position.y = (position.y < 0.0f || position.y > Conf::WIN_HEIGHT) ? Conf::COLONY_POSITION.y : position.y;
+			if (position.x < 0.0f || position.x > Conf::WORLD_WIDTH || position.y < 0.0f || position.y > Conf::WORLD_HEIGHT) {
+				terminate();
+			}
 		}
 	}
 
@@ -301,5 +301,10 @@ struct Ant
 		fight_request = true;
 		target_col_id = target_c_id;
 		target_id = target_a_id;
+	}
+
+	void terminate()
+	{
+		autonomy = max_autonomy + 1.0f;
 	}
 };

@@ -17,9 +17,9 @@ int main()
 	window.setFramerateLimit(60);
 
 	Simulation simulation(window);
-	simulation.createColony(88.0f*4.0f, 114*4.0f);
+	simulation.createColony(67.0f*4.0f, 180*4.0f);
 	simulation.createColony(435.0f * 4.0f, 224.0f * 4.0f);
-    //simulation.createColony(116.0f * 4.0f, 260.0f * 4.0f);
+    simulation.createColony(250.0f * 4.0f, 70.0f * 4.0f);
 	simulation.loadMap("res/map.png");
 	
 	sf::Clock clock;

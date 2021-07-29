@@ -36,7 +36,7 @@ struct Colony
 		, id(col_id)
 	{
 		base.food = 0.0f;
-		uint32_t ants_count = 4000;
+		uint32_t ants_count = 8;
 		for (uint32_t i(ants_count); i--;) {
 			createWorker(base.position, getRandRange(2.0f * PI));
 		}
