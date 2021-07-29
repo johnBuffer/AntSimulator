@@ -233,7 +233,8 @@ struct Ant
 		}
 		if (enemy_found) {
 			// If enemy found add ToEnemy markers
-			const float intensity = getMarkerIntensity(0.1f, to_enemy_markers_count);
+			const float intensity_factor = 0.2f;
+			const float intensity = intensity_factor * getMarkerIntensity(0.1f, to_enemy_markers_count);
 			world.addMarker(position, Mode::ToEnemy, intensity, col_id);
 		}
 	}
@@ -284,7 +285,7 @@ struct Ant
         if (phase == Mode::ToHome || phase == Mode::ToHomeNoFood) {
             world.addFoodAt(position.x, position.y, 1);
         }
-        world.addFoodAt(position.x, position.y, 2);
+        //world.addFoodAt(position.x, position.y, 2);
         phase = Mode::Dead;
     }
 

@@ -60,6 +60,7 @@ struct Colony
 		ant.length *= soldier_scale;
 		ant.width *= soldier_scale;
 		ant.dammage *= soldier_scale * 2.0f;
+		ant.max_autonomy *= soldier_scale;
 	}
 
 	void update(float dt, World& world)
