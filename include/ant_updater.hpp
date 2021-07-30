@@ -7,7 +7,7 @@
 
 struct AntUpdater
 {
-	static void updateAnt(Ant& ant, World& world, float dt)
+	static void initialUpdate(Ant& ant, World& world, float dt)
 	{
 		// Generic updates
 		ant.updateClocks(dt);
@@ -15,6 +15,10 @@ struct AntUpdater
 		ant.direction.update(dt);
 		// Add ant to current cell
 		ant.addToWorldGrid(world);
+	}
+
+	static void update(Ant& ant, World& world, float dt)
+	{
 		// Fight if needed
 		if (ant.isFighting()) {
 			ant.attack(dt);
@@ -33,7 +37,6 @@ struct AntUpdater
 		if (ant.autonomy > 0.75f * ant.max_autonomy) {
 			ant.phase = Mode::Refill;
 		}
-
 		// Specific updates
 		if (ant.type == Ant::Type::Worker) {
 			WorkerUpdater::update(ant, world, dt);

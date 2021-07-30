@@ -31,8 +31,8 @@ struct MapLoader
 						world.addWall(position);
 					}
 					else if (food_map.getPixel(x, y).g > 100) {
-						const float green = food_map.getPixel(x, y).g;
-						world.addFoodAt(position.x, position.y, 5);
+						const uint32_t green = food_map.getPixel(x, y).g - 100;
+						world.addFoodAt(position.x, position.y, green);
 					}
 				}
 			}

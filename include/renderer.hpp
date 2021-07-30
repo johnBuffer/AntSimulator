@@ -52,6 +52,10 @@ struct Renderer
 			}
 			colony.render(target, rs);
 		}
+		// Render UI elements
+		for (ColonyRenderer& colony : colonies) {
+			colony.render_charts(target);
+		}
 	}
 };
 

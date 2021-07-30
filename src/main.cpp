@@ -17,9 +17,10 @@ int main()
 	window.setFramerateLimit(60);
 
 	Simulation simulation(window);
-	simulation.createColony(67.0f*4.0f, 180*4.0f);
-	simulation.createColony(435.0f * 4.0f, 224.0f * 4.0f);
-    simulation.createColony(250.0f * 4.0f, 70.0f * 4.0f);
+	simulation.createColony(38.0f*4.0f, 35.0f*4.0f);
+	simulation.createColony(84.0f * 4.0f, 231.0f * 4.0f);
+	simulation.createColony(434.0f * 4.0f, 221.0f * 4.0f);
+	simulation.createColony(433.0f * 4.0f, 47.0f * 4.0f);
 	simulation.loadMap("res/map.png");
 	
 	sf::Clock clock;
@@ -39,7 +40,7 @@ int main()
 		const float dt = 0.016f;
 		simulation.update(dt);
 
-		fps_text.setString(toStr(fps.get()));
+		//fps_text.setString(toStr(fps.get()));
 
 		window.clear(sf::Color(94, 87, 87));
 		simulation.render(window);

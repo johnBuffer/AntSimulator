@@ -44,6 +44,12 @@ struct Simulation
 
 		ev_manager.addMousePressedCallback(sf::Mouse::Right, [&](sfev::CstEv) {
 			selectColony();
+			world.renderer.draw_to_enemies = false;
+		});
+
+		ev_manager.addMousePressedCallback(sf::Mouse::Middle, [&](sfev::CstEv) {
+			selectColony();
+			world.renderer.draw_to_enemies = true;
 		});
 
 		ev_manager.addMouseReleasedCallback(sf::Mouse::Left, [&](sfev::CstEv) {
@@ -126,7 +132,11 @@ struct Simulation
             removeDeadAnts();
 			// Update world cells (markers, density, walls)
 			world.update(dt);
-			// Update ants
+			// First perform position update and grid registration
+			for (Colony& colony : colonies) {
+				colony.genericAntsUpdate(dt, world);
+			}
+			// Then update objectives and world sampling
 			for (Colony& colony : colonies) {
 				colony.update(dt, world);
 			}

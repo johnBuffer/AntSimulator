@@ -8,7 +8,7 @@ struct ColonyBase
 	sf::Vector2f position;
 	float radius;
 	float food;
-	float max_food = 100.0f;
+	float max_food = 1000.0f;
 	// Profiling
 	float food_acc;
 	RMean<float> food_acc_mean;

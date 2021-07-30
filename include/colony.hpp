@@ -36,7 +36,7 @@ struct Colony
 		, id(col_id)
 	{
 		base.food = 0.0f;
-		uint32_t ants_count = 8;
+		uint32_t ants_count = 16;
 		for (uint32_t i(ants_count); i--;) {
 			createWorker(base.position, getRandRange(2.0f * PI));
 		}
@@ -61,6 +61,13 @@ struct Colony
 		ant.width *= soldier_scale;
 		ant.dammage *= soldier_scale * 2.0f;
 		ant.max_autonomy *= soldier_scale;
+	}
+
+	void genericAntsUpdate(float dt, World& world)
+	{
+		for (Ant& ant : ants) {
+			AntUpdater::initialUpdate(ant, world, dt);
+		}
 	}
 
 	void update(float dt, World& world)
@@ -91,7 +98,7 @@ struct Colony
 		}
 		
 		for (Ant& ant : ants) {
-			AntUpdater::updateAnt(ant, world, dt);
+			AntUpdater::update(ant, world, dt);
 			ant.checkColony(base);
 		}
 	}

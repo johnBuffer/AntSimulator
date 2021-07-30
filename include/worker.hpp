@@ -25,9 +25,6 @@ struct WorkerUpdater
 			const HitPoint hit_result = world.map.getFirstHit(ant.position, to_marker, distance);
 			// Check cell
 			if (!cell || hit_result.cell) {
-				if (hit_result.cell) {
-					hit_result.cell->discovered = 1.0f;
-				}
 				continue;
 			}
 			// Check if

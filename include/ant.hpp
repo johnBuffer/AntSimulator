@@ -9,6 +9,7 @@
 #include "cooldown.hpp"
 #include "colony_base.hpp"
 #include "index_vector.hpp"
+#include <iostream>
 
 
 struct MarkerSample
@@ -63,11 +64,11 @@ struct Ant
     sf::Vector2f fight_vec;
     Cooldown attack_cooldown;
     bool enemy_found = false;
-    float to_fight_timeout = 3.0f;
+	float enemy_intensity = 0.0f;
+    float to_fight_timeout = 1.0f;
     float to_fight_time = 0.0f;
-	bool fight_request = false;
-	uint16_t target_id = 0;
-	uint8_t target_col_id = 0;
+	AntRef fight_request;
+	
     
 	Cooldown direction_update;
 	Cooldown marker_add;
@@ -78,7 +79,7 @@ struct Ant
 	float autonomy;
 	float max_autonomy = 300.0f;
 
-	uint32_t id;
+	int16_t id;
 	uint8_t col_id;
 	Type type;
 
@@ -107,10 +108,18 @@ struct Ant
     {
         ColonyCell& cell = world.map.get(position).markers[col_id];
         if (!cell.fighting) {
-            cell.current_ant = to<uint16_t>(id);
+            cell.current_ant = id;
             cell.fighting = isFighting();
         }
     }
+
+	void removeFromWorldGrid(World& world)
+	{
+		ColonyCell& cell = world.map.get(position).markers[col_id];
+		if (cell.current_ant == id) {
+			cell.current_ant = -1;
+		}
+	}
     
     bool isFighting() const
     {
@@ -190,12 +199,17 @@ struct Ant
                 base.enemies_found_count += enemy_found;
 			}
 			// Refill
-			autonomy = 0.0f;
-			phase = Mode::ToFood;
+			if (!isFighting()) {
+				autonomy = 0.0f;
+			}
+			enemy_intensity = 0.0f;
 			resetMarkers();
 			enemy_found = false;
 			if (type == Type::Soldier) {
 				phase = Mode::ToEnemy;
+			}
+			else {
+				phase = Mode::ToFood;
 			}
 		}
 	}
@@ -233,8 +247,7 @@ struct Ant
 		}
 		if (enemy_found) {
 			// If enemy found add ToEnemy markers
-			const float intensity_factor = 0.2f;
-			const float intensity = intensity_factor * getMarkerIntensity(0.1f, to_enemy_markers_count);
+			const float intensity = std::min(0.1f, enemy_intensity) * getMarkerIntensity(0.05f, to_enemy_markers_count);
 			world.addMarker(position, Mode::ToEnemy, intensity, col_id);
 		}
 	}
@@ -272,6 +285,9 @@ struct Ant
 
 	void setTarget(civ::Ref<Ant> new_target)
 	{
+		// Disable fight request
+		fight_request.active = false;
+		// Set fight parameters
 		fight_mode = FightMode::Fighting;
 		target = new_target;
         fight_pos = 0.5f * (target->position + position);
@@ -287,6 +303,7 @@ struct Ant
         }
         //world.addFoodAt(position.x, position.y, 2);
         phase = Mode::Dead;
+		removeFromWorldGrid(world);
     }
 
 	void detectEnemy()
@@ -294,13 +311,13 @@ struct Ant
 		enemy_found = true;
 		to_enemy_markers_count = 0.0f;
 		to_fight_time = 0.0f;
+		enemy_intensity += 0.001f;
 	}
 
-	void requestFight(uint8_t target_c_id, uint16_t target_a_id)
+	void request_fight(AntRef ref)
 	{
-		fight_request = true;
-		target_col_id = target_c_id;
-		target_id = target_a_id;
+		fight_mode = FightMode::ToFight;
+		fight_request = ref;
 	}
 
 	void terminate()

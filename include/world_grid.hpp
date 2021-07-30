@@ -6,8 +6,16 @@
 #include "grid.hpp"
 
 
-constexpr uint8_t max_colonies_count = 3;
+constexpr uint8_t max_colonies_count = 4;
 constexpr float min_intensity = 0.1f;
+
+
+struct AntRef
+{
+	bool     active = false;
+	uint8_t  col_id;
+	uint16_t ant_id;
+};
 
 
 struct ColonyCell
@@ -19,7 +27,7 @@ struct ColonyCell
 	// Repellent instensity
 	float repellent;
 	// Current ant
-	int16_t current_ant = 0;
+	int16_t current_ant = -1;
     bool fighting;
 
 	ColonyCell()
@@ -30,7 +38,7 @@ struct ColonyCell
 
 	void update(float dt)
 	{
-		// Remove current ant
+		// Reset current ant
 		current_ant = -1;
         fighting = false;
 		// Update toFood and toHome
@@ -86,16 +94,31 @@ struct WorldCell
 		return last;
 	}
     
-    bool checkEnemyPresence(uint8_t team)
+    AntRef getEnemy(uint8_t team)
     {
+		AntRef res;
         // Update intensities
         for (uint8_t i(max_colonies_count); i--;) {
             if (i != team && markers[i].current_ant > -1) {
-                return true;
+				res.active = true;
+				res.ant_id = markers[i].current_ant;
+				res.col_id = i;
+                return res;
             }
         }
-        return false;
+        return res;
     }
+
+	bool checkEnemyPresence(uint8_t team)
+	{
+		// Update intensities
+		for (uint8_t i(0); i<max_colonies_count; ++i) {
+			if (i != team && markers[i].current_ant > -1) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	bool checkFight(uint8_t colony_id)
 	{
@@ -172,7 +195,9 @@ struct WorldGrid : public Grid<WorldCell>
 	void addFood(sf::Vector2f pos, uint32_t quantity)
 	{
 		WorldCell& cell = get(pos);
-		cell.food += quantity;
+		if (!cell.wall) {
+			cell.food += quantity;
+		}
 	}
 
 	void remove(sf::Vector2f pos, Mode type, uint8_t colony_id)

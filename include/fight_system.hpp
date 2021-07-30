@@ -14,9 +14,19 @@ struct FightSystem
     void checkForFights(Colony& colony, std::vector<Colony>& colonies, World& world)
 	{
 		for (Ant& a : colony.ants) {
-            if (!a.isFighting()) {
+            // Check if the ant has an active fight request
+            // from markers sampling
+            if (a.fight_request.active) {
+                const uint8_t col_id = a.fight_request.col_id;
+                const uint16_t ant_id = a.fight_request.ant_id;
+                a.setTarget(colonies[col_id].ants.getRef(ant_id));
+            }
+            // Check only for non already fighting ants
+            else if (!a.isFighting()) {
                 checkForFight(a, colonies, world);
-            } else if (a.target) {
+            }
+            // Check that the target is also in fight
+            else if (a.target) {
                 if (!a.target->isFighting()) {
                     a.target->setTarget(colony.ants.getRef(a.id));
                 }

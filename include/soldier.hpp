@@ -22,14 +22,14 @@ struct SoldierUpdater
 		SamplingResult result;
 		result.max_direction = ant.direction.getVec();
 		const Mode marker_phase = ant.getMarkersSamplingType();
-		const float sample_angle_range = PI * 0.35f;
+		const float sample_angle_range = PI * 0.7f;
 		const float current_angle = getAngle(result.max_direction);
 		const float fight_dist = 10.0f;
 
-		ant.fight_request = false;
+		ant.fight_request.active = false;
 
 		// Sample the world
-		const uint32_t sample_count = 32;
+		const uint32_t sample_count = 64;
 		for (uint32_t i(sample_count); i--;) {
 			// Get random point in range
 			const float sample_angle = current_angle + RNGf::getRange(sample_angle_range);
@@ -51,8 +51,16 @@ struct SoldierUpdater
 				result.found_permanent = true;
 				break;
 			}
+			// Check for close enemy
+			if (distance < ant.length) {
+				const AntRef enemy = cell->getEnemy(ant.col_id);
+				if (enemy.active) {
+					ant.request_fight(enemy);
+					return;
+				}
+			}
 			// Check for enemy
-			if (cell->checkEnemyPresence(ant.col_id) || cell->checkFight(ant.col_id)) {
+			if (cell->checkFight(ant.col_id)) {
 				result.found_fight = true;
 				result.max_direction = to_marker;
 				ant.detectEnemy();

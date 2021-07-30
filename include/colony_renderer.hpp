@@ -130,8 +130,9 @@ struct ColonyRenderer
 	
 		const float margin = 10.0f;
 		const sf::Vector2f size(400.0f, 100.0f);
-		const float start_x = (Conf::WIN_WIDTH - size.x * 3.0f - 2.0f * margin) * 0.5f;
-		population.configure({start_x + (size.x + margin) * colony.id, to<float>(Conf::WIN_HEIGHT) - size.y - margin}, size);
+		const float colonies_count = 4.0f;
+		const float start_x = (Conf::WIN_WIDTH - size.x * colonies_count - (colonies_count - 1.0f) * margin) * 0.5f;
+		population.configure({start_x + (size.x + margin) * colony.id, margin}, size);
 		population.population.color = colony.ants_color;
 	}
 
@@ -183,7 +184,10 @@ struct ColonyRenderer
 		food_gauge.max_value = colony.base.max_food;
 		food_gauge.current_value = colony.base.food;
 		food_gauge.render(target, states);
+	}
 
+	void render_charts(sf::RenderTarget& target)
+	{
 		population.render(target);
 	}
 };
