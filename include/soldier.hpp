@@ -9,43 +9,37 @@ struct SoldierUpdater
 	{
 		WorldCell& cell = world.map.get(ant.position);
 		cell.addPresence();
-		ant.direction_update.update(dt);
-		if (ant.direction_update.ready()) {
-			ant.direction_update.reset();
+		if (ant.direction_update.updateAutoReset(dt)) {
 			findMarker(ant, world);
 		}
 	}
 
 	static void findMarker(Ant& ant, World& world)
 	{
+		// Consts
+		constexpr float sample_angle_range = PI * 0.7f;
+		constexpr float fight_dist         = 10.0f;
+		constexpr uint32_t sample_count    = 64u;
 		// Init
 		SamplingResult result;
-		result.max_direction = ant.direction.getVec();
-		const Mode marker_phase = ant.getMarkersSamplingType();
-		const float sample_angle_range = PI * 0.7f;
+		result.max_direction      = ant.direction.getVec();
+		const Mode marker_phase   = ant.getMarkersSamplingType();
 		const float current_angle = getAngle(result.max_direction);
-		const float fight_dist = 10.0f;
-
-		ant.fight_request.active = false;
-
+		ant.fight_request.active  = false;
 		// Sample the world
-		const uint32_t sample_count = 64;
 		for (uint32_t i(sample_count); i--;) {
 			// Get random point in range
-			const float sample_angle = current_angle + RNGf::getRange(sample_angle_range);
-			const float distance = RNGf::getUnder(ant.marker_detection_max_dist);
-			const sf::Vector2f to_marker(cos(sample_angle), sin(sample_angle));
-			auto* cell = world.map.getSafe(ant.position + distance * to_marker);
-			const HitPoint hit_result = world.map.getFirstHit(ant.position, to_marker, distance);
+			const float sample_angle     = current_angle + RNGf::getRange(sample_angle_range);
+			const float distance         = RNGf::getUnder(ant.marker_detection_max_dist);
+			const sf::Vector2f to_marker = { cos(sample_angle), sin(sample_angle) };
+			auto* cell                   = world.map.getSafe(ant.position + distance * to_marker);
+			// This is to ensure that the sampled cell is not behind a wall
+			const HitPoint hit_result    = world.map.getFirstHit(ant.position, to_marker, distance);
 			// Check cell
 			if (!cell || hit_result.cell) {
-				if (hit_result.cell) {
-					hit_result.cell->discovered = 1.0f;
-				}
 				continue;
 			}
-			cell->discovered += 0.1f;
-			// Check for food or colony
+			// Check for colony
 			if (cell->isPermanent(ant.col_id) && (marker_phase == Mode::ToHome)) {
 				result.max_direction = to_marker;
 				result.found_permanent = true;
@@ -65,11 +59,6 @@ struct SoldierUpdater
 				result.max_direction = to_marker;
 				ant.detectEnemy();
 				break;
-			}
-			// Flee if repellent
-			if (cell->getRepellent(ant.col_id) > result.max_repellent) {
-				result.max_repellent = cell->getRepellent(ant.col_id);
-				result.repellent_cell = cell;
 			}
 			// Check for the most intense marker
 			const float marker_intensity = to<float>(cell->getIntensity(marker_phase, ant.col_id) * std::pow(cell->wall_dist, 2.0));

@@ -324,4 +324,14 @@ struct Ant
 	{
 		autonomy = max_autonomy + 1.0f;
 	}
+
+	bool isDone() const
+	{
+		return autonomy >= max_autonomy;
+	}
+
+	bool isDead() const
+	{
+		return phase == Mode::Dead;
+	}
 };

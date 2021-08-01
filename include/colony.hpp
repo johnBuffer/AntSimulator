@@ -36,27 +36,27 @@ struct Colony
 		, id(col_id)
 	{
 		base.food = 0.0f;
-		uint32_t ants_count = 16;
+		uint32_t ants_count = 2000;
 		for (uint32_t i(ants_count); i--;) {
-			createWorker(base.position, getRandRange(2.0f * PI));
+			createWorker();
 		}
 	}
 
-	void createWorker(sf::Vector2f pos, float angle)
+	Ant& createWorker()
 	{
-		const uint64_t ant_id = ants.emplace_back(pos.x, pos.y, angle, id);
-		ants[ant_id].id = to<uint16_t>(ant_id);
-		ants[ant_id].type = Ant::Type::Worker;
-	}
-
-	void createSoldier(sf::Vector2f pos, float angle)
-	{
-		const uint64_t ant_id = ants.emplace_back(pos.x, pos.y, angle, id);
+		++ant_creation_id;
+		const uint64_t ant_id = ants.emplace_back(base.position.x, base.position.y, getRandRange(2.0f * PI), id);
 		Ant& ant = ants[ant_id];
 		ant.id = to<uint16_t>(ant_id);
-		ant.type = Ant::Type::Soldier;
+		ant.type = Ant::Type::Worker;
+		return ant;
+	}
 
+	void specializeSoldier(Ant& ant)
+	{
+		--base.enemies_found_count;
 		const float soldier_scale = 2.0f;
+		ant.type = Ant::Type::Soldier;
 		ant.length *= soldier_scale;
 		ant.width *= soldier_scale;
 		ant.dammage *= soldier_scale * 2.0f;
@@ -70,33 +70,40 @@ struct Colony
 		}
 	}
 
+	bool mustCreateSoldier() const
+	{
+		const uint32_t soldiers_creation_discard = 5;
+		return base.enemies_found_count && (ant_creation_id % soldiers_creation_discard == 0);
+	}
+
+	bool isNotFull() const
+	{
+		return ants.size() < max_ants_count;
+	}
+
+	void createNewAnts(float dt)
+	{
+		const float ant_cost = 4.0f;
+		if (ants_creation_cooldown.updateAutoReset(dt) && isNotFull()) {
+			if (mustCreateSoldier()) {
+				if (base.useFood(3.0f * ant_cost)) {
+					specializeSoldier(createWorker());
+				}
+			}
+			else if (base.useFood(ant_cost)) {
+				createWorker();
+			}
+		}
+	}
+
 	void update(float dt, World& world)
 	{
-		pop_diff_update.update(dt);
-		if (pop_diff_update.ready()) {
-			pop_diff_update.reset();
+		// Update stats
+		if (pop_diff_update.updateAutoReset(dt)) {
  			pop_diff.addValue(ants.size());
 		}
-
-		const float ant_cost = 4.0f;
-		ants_creation_cooldown.update(dt);
-		if (ants_creation_cooldown.ready() && ants.size() < max_ants_count) {
-			if (base.enemies_found_count && (ant_creation_id % 5 == 0)) {
-				if (base.useFood(3.0f * ant_cost)) {
-					createSoldier(base.position, getRandRange(2.0f * PI));
-					++ant_creation_id;
-					--base.enemies_found_count;
-				}
-			}
-			else {
-				if (base.useFood(ant_cost)) {
-					createWorker(base.position, getRandRange(2.0f * PI));
-					++ant_creation_id;
-				}
-			}
-			ants_creation_cooldown.reset();
-		}
-		
+		createNewAnts(dt);
+		// Update ants and check if collision with colony
 		for (Ant& ant : ants) {
 			AntUpdater::update(ant, world, dt);
 			ant.checkColony(base);
@@ -105,9 +112,9 @@ struct Colony
 
 	void removeDeadAnts()
 	{
-		std::list<uint64_t> to_remove;
+		std::list<int16_t> to_remove;
 		for (Ant& a : ants) {
-			if (a.phase == Mode::Dead) {
+			if (a.isDead()) {
 				to_remove.push_back(a.id);
 			}
 		}
@@ -120,7 +127,7 @@ struct Colony
     {
         uint32_t count = 0;
         for (Ant& a : ants) {
-            if (a.autonomy > a.max_autonomy) {
+            if (a.isDone()) {
                 a.kill(world);
                 ++count;
             }

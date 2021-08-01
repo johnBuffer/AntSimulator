@@ -17,10 +17,11 @@ int main()
 	window.setFramerateLimit(60);
 
 	Simulation simulation(window);
-	simulation.createColony(38.0f*4.0f, 35.0f*4.0f);
-	simulation.createColony(84.0f * 4.0f, 231.0f * 4.0f);
-	simulation.createColony(434.0f * 4.0f, 221.0f * 4.0f);
-	simulation.createColony(433.0f * 4.0f, 47.0f * 4.0f);
+	const float margin = 160.0f;
+	simulation.createColony(margin, margin);
+	simulation.createColony(margin, Conf::WIN_HEIGHT - margin);
+	simulation.createColony(Conf::WIN_WIDTH - margin, margin);
+	simulation.createColony(Conf::WIN_WIDTH - margin, Conf::WIN_HEIGHT - margin);
 	simulation.loadMap("res/map.png");
 	
 	sf::Clock clock;

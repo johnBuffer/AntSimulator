@@ -25,6 +25,16 @@ struct Cooldown
 		value += dt;
 	}
 
+	bool updateAutoReset(float dt)
+	{
+		update(dt);
+		bool res = ready();
+		if (res) {
+			reset();
+		}
+		return res;
+	}
+
 	bool ready() const
 	{
 		return value >= target;

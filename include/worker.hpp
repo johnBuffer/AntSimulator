@@ -7,28 +7,28 @@ struct WorkerUpdater
 {
 	static void findMarker(Ant& ant, World& world)
 	{
+		// Consts
+		constexpr float sample_angle_range    = PI * 0.5f;
+		constexpr uint32_t sample_count       = 32u;
+		constexpr float repellent_prob_factor = 0.3f;
 		// Init
 		SamplingResult result;
-		result.max_direction = ant.direction.getVec();
-		const Mode marker_phase = ant.getMarkersSamplingType();
-		const float sample_angle_range = PI * 0.5f;
+		result.max_direction      = ant.direction.getVec();
+		const Mode marker_phase   = ant.getMarkersSamplingType();
 		const float current_angle = getAngle(result.max_direction);
 
 		// Sample the world
-		const uint32_t sample_count = 32;
 		for (uint32_t i(sample_count); i--;) {
 			// Get random point in range
-			const float sample_angle = current_angle + RNGf::getRange(sample_angle_range);
-			const float distance = RNGf::getUnder(ant.marker_detection_max_dist);
-			const sf::Vector2f to_marker(cos(sample_angle), sin(sample_angle));
-			auto* cell = world.map.getSafe(ant.position + distance * to_marker);
-			const HitPoint hit_result = world.map.getFirstHit(ant.position, to_marker, distance);
+			const float sample_angle     = current_angle + RNGf::getRange(sample_angle_range);
+			const float distance         = RNGf::getUnder(ant.marker_detection_max_dist);
+			const sf::Vector2f to_marker = { cos(sample_angle), sin(sample_angle) };
+			auto* cell                   = world.map.getSafe(ant.position + distance * to_marker);
+			const HitPoint hit_result    = world.map.getFirstHit(ant.position, to_marker, distance);
 			// Check cell
 			if (!cell || hit_result.cell) {
 				continue;
 			}
-			// Check if
-			cell->discovered += 0.1f;
 			// Check for food or colony
 			if ((cell->isPermanent(ant.col_id) && marker_phase == Mode::ToHome) || (marker_phase == Mode::ToFood && cell->food)) {
 				result.max_direction = to_marker;
@@ -70,20 +70,20 @@ struct WorkerUpdater
 		}
 		// Check for repellent
 		if (ant.phase == Mode::ToFood && result.max_repellent && !result.found_permanent) {
-			const float repellent_prob_factor = 0.3f;
 			if (RNGf::proba(repellent_prob_factor * (1.0f - result.max_intensity / to<float>(Conf::MARKER_INTENSITY)))) {
-				//phase = Mode::Flee;
 				ant.direction.addNow(RNGf::getUnder(2.0f * PI));
+				// This cooldown prevent from searching markers when fleeing
 				ant.search_markers.reset();
 				return;
 			}
 		}
-		// Remove repellent if still food
+		// Degrade repellent if still food
 		if (result.repellent_cell && ant.phase == Mode::ToHome) {
 			result.repellent_cell->getRepellent(ant.col_id) *= 0.95f;
 		}
 		// Update direction
 		if (result.max_intensity) {
+			// Slowly degrade the track to accelerate its dissipation
 			if (RNGf::proba(0.2f) && ant.phase == Mode::ToFood) {
 				result.max_cell->degrade(ant.col_id, ant.phase, 0.99f);
 			}
@@ -101,22 +101,19 @@ struct WorkerUpdater
 		WorldCell& cell = world.map.get(ant.position);
 		cell.addPresence();
 		ant.search_markers.update(dt);
-		ant.direction_update.update(dt);
-		if (ant.direction_update.ready()) {
-			ant.direction_update.reset();
+		if (ant.direction_update.updateAutoReset(dt)) {
 			if (ant.search_markers.ready()) {
 				findMarker(ant, world);
 				ant.direction += RNGf::getFullRange(ant.direction_noise_range);
 			}
 			else {
+				// Fleeing from repellent
 				cell.degrade(ant.col_id, Mode::ToFood, 0.25f);
 				ant.direction += RNGf::getFullRange(2.0f * ant.direction_noise_range);
 			}
 		}
 		// Add marker
-		ant.marker_add.update(dt);
-		if (ant.marker_add.ready()) {
-			ant.marker_add.reset();
+		if (ant.marker_add.updateAutoReset(dt)) {
 			ant.addMarker(world);
 		}
 	}
