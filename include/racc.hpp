@@ -87,6 +87,6 @@ struct RDiff : public RAccBase<T>
 
     T get() const override
     {
-        return values[getIndex(-1)] - values[getIndex()];
+        return RAccBase<T>::values[RAccBase<T>::getIndex(-1)] - RAccBase<T>::values[RAccBase<T>::getIndex()];
     }
 };
