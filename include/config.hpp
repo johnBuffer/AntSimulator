@@ -69,8 +69,6 @@ template<typename T>
 double DefaultConf<T>::MARKER_INTENSITY = 1000.0;
 template<typename T>
 sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(500.0f, DefaultConf<T>::WIN_HEIGHT * 0.5f);
-//sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(110.0f, 80.0f);
-//sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(1100.0f, 514.0f);
 
 template<typename T>
 std::shared_ptr<sf::Texture> DefaultConf<T>::ANT_TEXTURE;
