@@ -57,7 +57,7 @@ const sf::Color DefaultConf<T>::WALL_COLOR = sf::Color(114, 107, 107);
 template<typename T>
 uint32_t DefaultConf<T>::WIN_WIDTH = 1920;
 template<typename T>
-uint32_t DefaultConf<T>::WIN_HEIGHT = 1600;
+uint32_t DefaultConf<T>::WIN_HEIGHT = 1080;
 template<typename T>
 uint32_t DefaultConf<T>::WORLD_WIDTH = 1920;
 template<typename T>
