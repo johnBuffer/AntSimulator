@@ -1,6 +1,6 @@
 #pragma once
 #include "ant.hpp"
-#include "world.hpp"
+#include "simulation/world/world.hpp"
 #include "soldier.hpp"
 #include "worker.hpp"
 

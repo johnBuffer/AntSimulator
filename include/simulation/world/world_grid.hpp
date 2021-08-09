@@ -1,9 +1,9 @@
 #pragma once
 #include <vector>
 
-#include "ant_mode.hpp"
-#include "utils.hpp"
-#include "grid.hpp"
+#include "simulation/ant/ant_mode.hpp"
+#include "common/utils.hpp"
+#include "common/grid.hpp"
 
 
 constexpr uint8_t max_colonies_count = 4;

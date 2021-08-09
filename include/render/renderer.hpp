@@ -1,9 +1,9 @@
 #pragma once
-#include "viewport_handler.hpp"
-#include "utils.hpp"
-#include "config.hpp"
-#include "event_manager.hpp"
-#include "world.hpp"
+#include "common/viewport_handler.hpp"
+#include "common/utils.hpp"
+#include "simulation/config.hpp"
+#include "common/event_manager.hpp"
+#include "simulation/world/world.hpp"
 #include "colony_renderer.hpp"
 
 

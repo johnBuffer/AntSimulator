@@ -1,5 +1,4 @@
-#include "colony.hpp"
-#include "world.hpp"
+#include "simulation/colony/colony.hpp"
 
 
 struct FightSystem

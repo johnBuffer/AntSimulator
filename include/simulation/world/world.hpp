@@ -4,11 +4,11 @@
 #include <SFML/System.hpp>
 
 #include "world_grid.hpp"
-#include "utils.hpp"
+#include "common/utils.hpp"
 #include "wall.hpp"
-#include "grid.hpp"
-#include "ant_mode.hpp"
-#include "world_renderer.hpp"
+#include "common/grid.hpp"
+#include "simulation/ant/ant_mode.hpp"
+#include "render/world_renderer.hpp"
 
 
 struct World

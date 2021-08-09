@@ -1,6 +1,5 @@
 #pragma once
 #include "ant.hpp"
-#include "world.hpp"
 
 
 struct SoldierUpdater

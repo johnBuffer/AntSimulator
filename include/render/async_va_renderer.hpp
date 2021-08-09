@@ -2,7 +2,7 @@
 #include <thread>
 #include <mutex>
 #include <SFML/Graphics.hpp>
-#include "double_buffer.hpp"
+#include "common/double_buffer.hpp"
 
 
 struct AsyncRenderer

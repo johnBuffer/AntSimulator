@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/System.hpp>
-#include "racc.hpp"
+#include "common/racc.hpp"
 
 
 struct ColonyBase

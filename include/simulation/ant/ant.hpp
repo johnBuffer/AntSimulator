@@ -1,21 +1,14 @@
 #pragma once
 
 #include <list>
-#include "world.hpp"
-#include "config.hpp"
-#include "direction.hpp"
-#include "number_generator.hpp"
+#include "simulation/world/world.hpp"
+#include "simulation/config.hpp"
+#include "common/direction.hpp"
+#include "common/number_generator.hpp"
 #include "ant_mode.hpp"
-#include "cooldown.hpp"
-#include "colony_base.hpp"
-#include "index_vector.hpp"
-#include <iostream>
-
-
-struct MarkerSample
-{
-
-};
+#include "common/cooldown.hpp"
+#include "simulation/colony/colony_base.hpp"
+#include "common/index_vector.hpp"
 
 
 struct SamplingResult

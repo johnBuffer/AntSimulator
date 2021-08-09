@@ -1,13 +1,13 @@
 #pragma once
-#include "world.hpp"
-#include "colony.hpp"
+#include "world/world.hpp"
+#include "colony/colony.hpp"
 #include "config.hpp"
-#include "viewport_handler.hpp"
-#include "event_manager.hpp"
+#include "common/viewport_handler.hpp"
+#include "common/event_manager.hpp"
 #include "event_state.hpp"
-#include "renderer.hpp"
-#include "map_loader.hpp"
-#include "fight_system.hpp"
+#include "render/renderer.hpp"
+#include "simulation/world/map_loader.hpp"
+#include "simulation/ant/fight_system.hpp"
 
 
 struct Simulation

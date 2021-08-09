@@ -1,8 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include "config.hpp"
-#include "colony.hpp"
-#include "circular_gauge.hpp"
+#include "simulation/config.hpp"
+#include "simulation/colony/colony.hpp"
+#include "common/circular_gauge.hpp"
 
 
 struct PopulationChart
@@ -119,8 +119,8 @@ struct ColonyRenderer
 			ants_food_va[index + 2].color = Conf::FOOD_COLOR;
 			ants_food_va[index + 3].color = Conf::FOOD_COLOR;
 			ants_food_va[index + 0].texCoords = sf::Vector2f(100.0f, 0.0f);
-			ants_food_va[index + 1].texCoords = sf::Vector2f(200.0f, 0.0f);
-			ants_food_va[index + 2].texCoords = sf::Vector2f(200.0f, 100.0f);
+			ants_food_va[index + 1].texCoords = sf::Vector2f(199.0f, 0.0f);
+			ants_food_va[index + 2].texCoords = sf::Vector2f(199.0f, 100.0f);
 			ants_food_va[index + 3].texCoords = sf::Vector2f(100.0f, 100.0f);
             ants_food_va[index + 0].position = sf::Vector2f(0.0f, 0.0f);
             ants_food_va[index + 1].position = sf::Vector2f(0.0f, 0.0f);

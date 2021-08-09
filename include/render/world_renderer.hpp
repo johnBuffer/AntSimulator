@@ -1,9 +1,9 @@
 #pragma once
 #include "async_va_renderer.hpp"
-#include "grid.hpp"
-#include "config.hpp"
-#include "world_grid.hpp"
-#include "utils.hpp"
+#include "common/grid.hpp"
+#include "simulation/config.hpp"
+#include "simulation/world/world_grid.hpp"
+#include "common/utils.hpp"
 
 
 struct WorldRenderer : public AsyncRenderer

@@ -1,9 +1,9 @@
 #include <SFML/Graphics.hpp>
 #include <list>
 #include <fstream>
-#include "config.hpp"
-#include "distance_field_builder.hpp"
-#include "simulation.hpp"
+#include "simulation/config.hpp"
+#include "simulation/world/distance_field_builder.hpp"
+#include "simulation/simulation.hpp"
 
 
 int main()
@@ -19,9 +19,7 @@ int main()
 	Simulation simulation(window);
 	const float margin = 160.0f;
 	simulation.createColony(margin, margin);
-	simulation.createColony(margin, Conf::WIN_HEIGHT - margin);
-	simulation.createColony(Conf::WIN_WIDTH - margin, margin);
-	simulation.createColony(Conf::WIN_WIDTH - margin, Conf::WIN_HEIGHT - margin);
+	simulation.createColony(Conf::WORLD_WIDTH - margin, Conf::WORLD_HEIGHT - margin);
 	simulation.loadMap("res/map.png");
 	
 	sf::Clock clock;
@@ -41,7 +39,7 @@ int main()
 		const float dt = 0.016f;
 		simulation.update(dt);
 
-		//fps_text.setString(toStr(fps.get()));
+		fps_text.setString(toStr(fps.get()));
 
 		window.clear(sf::Color(94, 87, 87));
 		simulation.render(window);

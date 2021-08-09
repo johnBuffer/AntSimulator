@@ -2,12 +2,12 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <list>
-#include "utils.hpp"
+#include "common/utils.hpp"
 #include "colony_base.hpp"
-#include "graph.hpp"
-#include "racc.hpp"
-#include "index_vector.hpp"
-#include "ant_updater.hpp"
+#include "common/graph.hpp"
+#include "common/racc.hpp"
+#include "common/index_vector.hpp"
+#include "simulation/ant/ant_updater.hpp"
 
 
 struct Colony
@@ -45,7 +45,7 @@ struct Colony
 	Ant& createWorker()
 	{
 		++ant_creation_id;
-		const uint64_t ant_id = ants.emplace_back(base.position.x, base.position.y, getRandRange(2.0f * PI), id);
+		const uint64_t ant_id = ants.emplace_back(base.position.x, base.position.y, RNGf::getUnder(2.0f * PI), id);
 		Ant& ant = ants[ant_id];
 		ant.id = to<uint16_t>(ant_id);
 		ant.type = Ant::Type::Worker;
