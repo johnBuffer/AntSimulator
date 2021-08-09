@@ -4,11 +4,11 @@
 #include <SFML/System.hpp>
 
 #include "world_grid.hpp"
-#include "utils.hpp"
+#include "common/utils.hpp"
 #include "wall.hpp"
-#include "grid.hpp"
-#include "ant_mode.hpp"
-#include "world_renderer.hpp"
+#include "common/grid.hpp"
+#include "simulation/ant/ant_mode.hpp"
+#include "render/world_renderer.hpp"
 
 
 struct World
@@ -16,7 +16,6 @@ struct World
 	sf::Vector2f size;
 	WorldGrid map;
 	DoubleObject<sf::VertexArray> va_map;
-	DoubleObject<sf::VertexArray> va_walls;
 	WorldRenderer renderer;
 
 	World(uint32_t width, uint32_t height)
@@ -38,14 +37,14 @@ struct World
 		map.update(dt);
 	}
 
-	void addMarker(sf::Vector2f pos, Mode type, double intensity, bool permanent = false)
+	void addMarker(sf::Vector2f pos, Mode type, float intensity, uint8_t colony_id, bool permanent = false)
 	{
-		map.addMarker(pos, type, intensity, permanent);
+		map.addMarker(pos, type, intensity, colony_id, permanent);
 	}
 
-	void addMarkerRepellent(sf::Vector2f pos, float amount)
+	void addMarkerRepellent(sf::Vector2f pos, uint8_t colony_id, float amount)
 	{
-		map.get(pos).repellent += amount;
+		map.get(pos).markers[colony_id].repellent += amount;
 	}
 
 	void addWall(const sf::Vector2f& position)
@@ -62,7 +61,7 @@ struct World
 		}
 	}
 
-	void renderMap(sf::RenderTarget& target, sf::RenderStates states)
+	void render(sf::RenderTarget& target, sf::RenderStates states)
 	{
 		states.texture = &(*Conf::MARKER_TEXTURE);
 		renderer.mutex.lock();

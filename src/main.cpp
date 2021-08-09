@@ -1,108 +1,49 @@
 #include <SFML/Graphics.hpp>
-#include <vector>
 #include <list>
 #include <fstream>
-#include "colony.hpp"
-#include "config.hpp"
-#include "display_manager.hpp"
-#include "distance_field_builder.hpp"
-#include "racc.hpp"
-
-
-void loadUserConf()
-{
-	std::ifstream conf_file("conf.txt");
-	if (conf_file) {
-		conf_file >> Conf::WIN_WIDTH;
-		conf_file >> Conf::WIN_HEIGHT;
-		conf_file >> Conf::ANTS_COUNT;
-	}
-	else {
-		std::cout << "Couldn't find 'conf.txt', loading default" << std::endl;
-	}
-}
+#include "simulation/config.hpp"
+#include "simulation/world/distance_field_builder.hpp"
+#include "simulation/simulation.hpp"
 
 
 int main()
 {
 	Conf::loadTextures();
-	loadUserConf();
+	MapLoader::loadUserConf();
 
 	sf::ContextSettings settings;
-	settings.antialiasingLevel = 4;
+	settings.antialiasingLevel = 1;
 	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", sf::Style::Fullscreen, settings);
 	window.setFramerateLimit(60);
 
-	World world(Conf::WORLD_WIDTH, Conf::WORLD_HEIGHT);
-	Colony colony(Conf::COLONY_POSITION.x, Conf::COLONY_POSITION.y, Conf::ANTS_COUNT);
-	for (uint32_t i(0); i < 64; ++i) {
-		float angle = float(i) / 64.0f * (2.0f * PI);
-		world.addMarker(colony.base.position + 16.0f * sf::Vector2f(cos(angle), sin(angle)), Mode::ToHome, 10.0f, true);
-	}
+	Simulation simulation(window);
+	const float margin = 160.0f;
+	simulation.createColony(margin, margin);
+	simulation.createColony(Conf::WORLD_WIDTH - margin, Conf::WORLD_HEIGHT - margin);
+	simulation.loadMap("res/map.png");
 	
-	DisplayManager display_manager(window, window, world, colony);
-	display_manager.setZoom(1.02f);
-
-	sf::Vector2f last_clic;
-
-	sf::Image food_map;
-	if (food_map.loadFromFile("map.bmp")) {
-		for (uint32_t x(0); x < food_map.getSize().x; ++x) {
-			for (uint32_t y(0); y < food_map.getSize().y; ++y) {
-				const sf::Vector2f position = float(world.map.cell_size) * sf::Vector2f(to<float>(x), to<float>(y));
-				if (food_map.getPixel(x, y).r > 100) {
-					world.addWall(position);
-				}
-				else if (food_map.getPixel(x, y).g > 100) {
-					const float green = food_map.getPixel(x, y).g;
-					world.addFoodAt(position.x, position.y, to<int32_t>(green * 0.025f));
-				}
-			}
-		}
-	}
-
-	DistanceFieldBuilder::computeDistance(world.map);
-
-	display_manager.pause = true;
-	display_manager.render_ants = true;
-	world.renderer.draw_density = false;
-	world.renderer.draw_markers = false;
-
 	sf::Clock clock;
 	RMean<float> fps(100);
+	sf::Text fps_text;
+	sf::Font fps_font;
+	fps_font.loadFromFile("res/font.ttf");
+	fps_text.setFont(fps_font);
+	fps_text.setCharacterSize(32);
+	fps_text.setFillColor(sf::Color::White);
+	fps_text.setPosition(10.0f, 10.0f);
 
 	while (window.isOpen())
 	{
-		display_manager.processEvents();
-		// Add food on clic
-		if (display_manager.clic) {
-			const sf::Vector2i mouse_position = sf::Mouse::getPosition(window);
-			const sf::Vector2f world_position = display_manager.displayCoordToWorldCoord(sf::Vector2f(to<float>(mouse_position.x), to<float>(mouse_position.y)));
-			const float clic_min_dist = 2.0f;
-			if (getLength(world_position - last_clic) > clic_min_dist) {
-				if (display_manager.wall_mode) {
-					world.addWall(world_position);
-				}
-				else if (display_manager.remove_wall) {
-					world.removeWall(world_position);
-				}
-				else {
-					world.addFoodAt(world_position.x, world_position.y, 10);
-				}
-				last_clic = world_position;
-			}
-		}
+		simulation.processEvents();
 
 		const float dt = 0.016f;
+		simulation.update(dt);
 
-		if (!display_manager.pause) {
-			colony.update(dt, world);
-			display_manager.colony_renderer.updatePopulation(colony, dt);
-			world.update(dt);
-		}
+		fps_text.setString(toStr(fps.get()));
 
 		window.clear(sf::Color(94, 87, 87));
-		display_manager.draw();
+		simulation.render(window);
+		window.draw(fps_text);
 		window.display();
 
 		fps.addValue(1.0f / clock.restart().asSeconds());

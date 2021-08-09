@@ -25,6 +25,16 @@ struct Cooldown
 		value += dt;
 	}
 
+	bool updateAutoReset(float dt)
+	{
+		update(dt);
+		bool res = ready();
+		if (res) {
+			reset();
+		}
+		return res;
+	}
+
 	bool ready() const
 	{
 		return value >= target;
@@ -34,6 +44,11 @@ struct Cooldown
 	{
 		return value < target && value + dt >= target;
 	}
+    
+    float getRatio() const
+    {
+        return value / target;
+    }
 
 	void reset()
 	{

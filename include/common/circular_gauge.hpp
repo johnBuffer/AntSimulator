@@ -24,7 +24,7 @@ struct CircularGauge
 		, max_value(1.0f)
 	{}
 
-	void render(sf::RenderTarget& target, sf::RenderStates& states)
+	void render(sf::RenderTarget& target, const sf::RenderStates& states)
 	{
 		const float ratio = (current_value - min_value) / (max_value - min_value);
 		const float max_angle = 2.0f * PI * ratio;

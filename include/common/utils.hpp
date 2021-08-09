@@ -60,10 +60,21 @@ sf::Color vec3ToColor(const sf::Vector3<T>& v)
 					 to<uint8_t>(clamp(v.z, 0.0f, 255.0f)));
 }
 
-float getAngle(const sf::Vector2f& v);
+template<typename Vec2Type>
+float getAngle(const Vec2Type& v)
+{
+    const float a = acos(v.x / getLength(v));
+    return v.y > 0.0f ? a : -a;
+}
 
+template<typename Vec2Type>
+float dot(const Vec2Type& v1, const Vec2Type& v2)
+{
+    return v1.x * v2.x + v1.y * v2.y;
+}
 
-float dot(const sf::Vector2f& v1, const sf::Vector2f& v2);
-
-
-float sign(const float f);
+template<typename T>
+float sign(T f)
+{
+    return f < 0.0f ? -1.0f : 1.0f;
+}

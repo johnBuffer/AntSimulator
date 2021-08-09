@@ -16,6 +16,8 @@ struct Graphic
 	uint32_t current_index;
 	bool full;
 
+	float last_value = 0.0f;
+
 	Graphic(uint32_t values_count, sf::Vector2f size, sf::Vector2f position)
 		: va(sf::TriangleStrip, values_count * 2)
 		, values(values_count, 0.0f)
@@ -32,6 +34,7 @@ struct Graphic
 
 	void addValue(float value)
 	{
+		last_value = value;
 		const uint64_t size = values.size();
 		values[(current_index++) % size] = value;
 		max_value = std::max(max_value, value);
