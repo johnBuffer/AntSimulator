@@ -130,7 +130,7 @@ struct ColonyRenderer
 	
 		const float margin = 10.0f;
 		const sf::Vector2f size(400.0f, 100.0f);
-		const float colonies_count = 4.0f;
+		const float colonies_count = 2.0f;
 		const float start_x = (Conf::WIN_WIDTH - size.x * colonies_count - (colonies_count - 1.0f) * margin) * 0.5f;
 		population.configure({start_x + (size.x + margin) * colony.id, margin}, size);
 		population.population.color = colony.ants_color;

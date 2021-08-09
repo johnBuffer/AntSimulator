@@ -21,6 +21,7 @@ int main()
 	simulation.createColony(margin, margin);
 	simulation.createColony(Conf::WORLD_WIDTH - margin, Conf::WORLD_HEIGHT - margin);
 	simulation.loadMap("res/map.png");
+	simulation.renderer.vp_handler.reset();
 	
 	sf::Clock clock;
 	RMean<float> fps(100);
@@ -31,24 +32,22 @@ int main()
 	fps_text.setCharacterSize(32);
 	fps_text.setFillColor(sf::Color::White);
 	fps_text.setPosition(10.0f, 10.0f);
+	const float dt = 0.016f;
 
-	while (window.isOpen())
-	{
+	while (window.isOpen()) {
+		// Update simulation
 		simulation.processEvents();
-
-		const float dt = 0.016f;
 		simulation.update(dt);
-
+		// Update FPS metric
 		fps_text.setString(toStr(fps.get()));
-
+		// Render simulation
 		window.clear(sf::Color(94, 87, 87));
 		simulation.render(window);
 		window.draw(fps_text);
 		window.display();
-
+		// Add render time to the counter
 		fps.addValue(1.0f / clock.restart().asSeconds());
 	}
-
 	// Free textures
 	Conf::freeTextures();
 
