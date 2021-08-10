@@ -52,18 +52,19 @@ struct DefaultConf
                 if (line[0] == '#') {
                     continue;
                 }
+                const char* line_c = line.c_str();
                 switch (line_count) {
                     case 0:
-                        DefaultConf<T>::WIN_WIDTH = std::atoi(line.c_str());
+                        DefaultConf<T>::WIN_WIDTH = std::atoi(line_c);
                         break;
                     case 1:
-                        DefaultConf<T>::WIN_HEIGHT = std::atoi(line.c_str());
+                        DefaultConf<T>::WIN_HEIGHT = std::atoi(line_c);
                         break;
                     case 2:
-                        DefaultConf<T>::USE_FULLSCREEN = std::atoi(line.c_str());
+                        DefaultConf<T>::USE_FULLSCREEN = std::atoi(line_c);
                         break;
                     case 3:
-                        DefaultConf<T>::ANTS_COUNT = std::atoi(line.c_str());
+                        DefaultConf<T>::ANTS_COUNT = std::atoi(line_c);
                         break;
                     default:
                         break;
