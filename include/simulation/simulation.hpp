@@ -37,11 +37,6 @@ struct Simulation
 
 	void initEventCallbacks()
 	{
-		ev_manager.addMousePressedCallback(sf::Mouse::Left, [&](sfev::CstEv) {
-			ev_state.clicking = true;
-			renderer.vp_handler.click(ev_manager.getFloatMousePosition());
-		});
-
 		ev_manager.addMousePressedCallback(sf::Mouse::Right, [&](sfev::CstEv) {
 			selectColony();
 			world.renderer.draw_to_enemies = false;
@@ -52,25 +47,12 @@ struct Simulation
 			world.renderer.draw_to_enemies = true;
 		});
 
-		ev_manager.addMouseReleasedCallback(sf::Mouse::Left, [&](sfev::CstEv) {
-			ev_state.clicking = false;
-			renderer.vp_handler.unclick();
-		});
-
-		ev_manager.addEventCallback(sf::Event::MouseMoved, [&](sfev::CstEv) {
-			renderer.vp_handler.setMousePosition(ev_manager.getFloatMousePosition());
-		});
-
 		ev_manager.addEventCallback(sf::Event::Closed, [this](sfev::CstEv) {
 			ev_manager.getWindow().close();
 		});
 
 		ev_manager.addKeyPressedCallback(sf::Keyboard::Escape, [this](sfev::CstEv) {
 			ev_manager.getWindow().close();
-		});
-
-		ev_manager.addEventCallback(sf::Event::MouseWheelScrolled, [&](sfev::CstEv e) {
-			renderer.vp_handler.wheelZoom(e.mouseWheelScroll.delta);
 		});
 
 		ev_manager.addKeyPressedCallback(sf::Keyboard::P, [this](sfev::CstEv) {
@@ -81,14 +63,33 @@ struct Simulation
 			renderer.toggleRenderAnts();
 		});
 
-		ev_manager.addKeyPressedCallback(sf::Keyboard::R, [this](sfev::CstEv) {
-			renderer.vp_handler.reset();
-		});
-
 		ev_manager.addKeyPressedCallback(sf::Keyboard::S, [this](sfev::CstEv) {
 			ev_state.fullspeed = !ev_state.fullspeed;
 			ev_manager.getWindow().setFramerateLimit(60 * (!ev_state.fullspeed));
 		});
+        
+        // Viewport Handler controls
+        ev_manager.addMousePressedCallback(sf::Mouse::Left, [&](sfev::CstEv) {
+            ev_state.clicking = true;
+            renderer.vp_handler.click(ev_manager.getFloatMousePosition());
+        });
+
+        ev_manager.addMouseReleasedCallback(sf::Mouse::Left, [&](sfev::CstEv) {
+            ev_state.clicking = false;
+            renderer.vp_handler.unclick();
+        });
+
+        ev_manager.addEventCallback(sf::Event::MouseMoved, [&](sfev::CstEv) {
+            renderer.vp_handler.setMousePosition(ev_manager.getFloatMousePosition());
+        });
+        
+        ev_manager.addKeyPressedCallback(sf::Keyboard::R, [this](sfev::CstEv) {
+            renderer.vp_handler.reset();
+        });
+        
+        ev_manager.addEventCallback(sf::Event::MouseWheelScrolled, [&](sfev::CstEv e) {
+            renderer.vp_handler.wheelZoom(e.mouseWheelScroll.delta);
+        });
 	}
 
 	void selectColony()
