@@ -1,0 +1,8 @@
+# Window width
+1920
+# Window height
+1080
+# Window mode 0 -> Windowed, 1 -> Fullscreen
+0
+# Maximum ants count per colony
+4000

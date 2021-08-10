@@ -24,6 +24,7 @@ struct DefaultConf
 	static std::shared_ptr<sf::Texture> ANT_TEXTURE;
 	static std::shared_ptr<sf::Texture> MARKER_TEXTURE;
 	static sf::Color COLONY_COLORS[8];
+    static uint32_t USE_FULLSCREEN;
 
 	static void loadTextures()
 	{
@@ -40,6 +41,39 @@ struct DefaultConf
 		DefaultConf::ANT_TEXTURE = nullptr;
 		DefaultConf::MARKER_TEXTURE = nullptr;
 	}
+    
+    static bool loadUserConf()
+    {
+        std::ifstream conf_file("conf.txt");
+        if (conf_file) {
+            std::string line;
+            uint32_t line_count = 0;
+            while (std::getline(conf_file, line)) {
+                if (line[0] == '#') {
+                    continue;
+                }
+                switch (line_count) {
+                    case 0:
+                        DefaultConf<T>::WIN_WIDTH = std::atof(line.c_str());
+                        break;
+                    case 1:
+                        DefaultConf<T>::WIN_HEIGHT = std::atof(line.c_str());
+                        break;
+                    case 2:
+                        DefaultConf<T>::USE_FULLSCREEN = std::atof(line.c_str());
+                        break;
+                    case 3:
+                        DefaultConf<T>::ANTS_COUNT = std::atof(line.c_str());
+                        break;
+                    default:
+                        return;
+                }
+                ++line_count;
+            }
+            return true;
+        }
+        return false;
+    }
 };
 
 template<typename T>
@@ -78,4 +112,10 @@ std::shared_ptr<sf::Texture> DefaultConf<T>::MARKER_TEXTURE;
 template<typename T>
 sf::Color DefaultConf<T>::COLONY_COLORS[8] = {sf::Color::Red, sf::Color::Blue, sf::Color::Yellow, sf::Color(50, 255, 255)};
 
+template<typename T>
+uint32_t DefaultConf<T>::USE_FULLSCREEN = 1;
+
 using Conf = DefaultConf<int>;
+
+
+

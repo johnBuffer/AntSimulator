@@ -9,11 +9,14 @@
 int main()
 {
 	Conf::loadTextures();
-	MapLoader::loadUserConf();
+    if (!Conf::loadUserConf()) {
+        std::cout << "Couldn't find 'conf.txt', loading default" << std::endl;
+    }
 
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 1;
-	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", sf::Style::Fullscreen, settings);
+    int32_t window_style = Conf::USE_FULLSCREEN ? sf::Style::Fullscreen : sf::Style::Default;
+	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", window_style, settings);
 	window.setFramerateLimit(60);
 
 	Simulation simulation(window);
