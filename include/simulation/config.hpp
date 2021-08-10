@@ -54,25 +54,26 @@ struct DefaultConf
                 }
                 switch (line_count) {
                     case 0:
-                        DefaultConf<T>::WIN_WIDTH = std::atof(line.c_str());
+                        DefaultConf<T>::WIN_WIDTH = std::atoi(line.c_str());
                         break;
                     case 1:
-                        DefaultConf<T>::WIN_HEIGHT = std::atof(line.c_str());
+                        DefaultConf<T>::WIN_HEIGHT = std::atoi(line.c_str());
                         break;
                     case 2:
-                        DefaultConf<T>::USE_FULLSCREEN = std::atof(line.c_str());
+                        DefaultConf<T>::USE_FULLSCREEN = std::atoi(line.c_str());
                         break;
                     case 3:
-                        DefaultConf<T>::ANTS_COUNT = std::atof(line.c_str());
+                        DefaultConf<T>::ANTS_COUNT = std::atoi(line.c_str());
                         break;
                     default:
-                        return;
+                        break;
                 }
                 ++line_count;
             }
-            return true;
+        } else {
+            return false;
         }
-        return false;
+        return true;
     }
 };
 
