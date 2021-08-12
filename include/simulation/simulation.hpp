@@ -65,7 +65,7 @@ struct Simulation
 
 		ev_manager.addKeyPressedCallback(sf::Keyboard::S, [this](sfev::CstEv) {
 			ev_state.fullspeed = !ev_state.fullspeed;
-			ev_manager.getWindow().setFramerateLimit(60 * (!ev_state.fullspeed));
+			ev_manager.getWindow().setFramerateLimit(ev_state.fullspeed ? 2000 : 60);
 		});
         
         // Viewport Handler controls
