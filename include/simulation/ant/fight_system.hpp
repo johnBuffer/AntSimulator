@@ -1,3 +1,4 @@
+#pragma once
 #include "simulation/colony/colony.hpp"
 
 
