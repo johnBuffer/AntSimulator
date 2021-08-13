@@ -4,13 +4,19 @@
 #include "config.hpp"
 #include "simulation/world/map_loader.hpp"
 #include "simulation/ant/fight_system.hpp"
+#include "simulation_context.hpp"
 
 
-struct OffScreenSimulation
+namespace sim
 {
-    RealNumberGenerator<T> gen;
+
+struct Simulation
+{
+    RealNumberGenerator<float> gen;
     std::vector<Colony> colonies;
     World world;
     FightSystem fight_system;
-    sf::Clock clock;
 };
+
+}
+

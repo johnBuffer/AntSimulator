@@ -10,7 +10,10 @@
 #include "simulation/ant/fight_system.hpp"
 
 
-struct Simulation
+namespace sim
+{
+
+struct GUISimulation
 {
 	std::vector<Colony> colonies;
 	World world;
@@ -21,7 +24,7 @@ struct Simulation
 	FightSystem fight_system;
 	sf::Clock clock;
 
-	Simulation(sf::Window& window)
+    GUISimulation(sf::Window& window)
 		: world(Conf::WORLD_WIDTH, Conf::WORLD_HEIGHT)
 		, renderer()
 		, ev_manager(window, true)
@@ -169,3 +172,6 @@ struct Simulation
 		renderer.render(world, target);
 	}
 };
+
+}
+
