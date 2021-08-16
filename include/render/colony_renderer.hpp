@@ -19,6 +19,7 @@ struct PopulationChart
 	sf::Text text;
 
 	uint32_t ants_count = 0;
+	uint32_t soldiers_count = 0;
 	int32_t pop_diff = 0;
 
 	PopulationChart()
@@ -45,6 +46,7 @@ struct PopulationChart
 	{
 		pop_diff = to<int32_t>(colony.pop_diff.get());
 		ants_count = to<int32_t>(colony.ants.size());
+		soldiers_count = to<int32_t>(colony.soldiersCount());
 		population.setLastValue(to<float>(ants_count));
 
 		population_update.update(dt);
@@ -64,14 +66,18 @@ struct PopulationChart
 		text.setCharacterSize(20);
 		text.setFillColor(sf::Color::White);
 		text.setPosition(position.x + padding, position.y);
-		text.setString("Population " + toStr(ants_count));
+		text.setString("Population " + toStr(ants_count) + "/" + toStr(soldiers_count));
 		target.draw(text);
 
 		text.setCharacterSize(14);
 		text.setFillColor(pop_diff >= 0 ? sf::Color::Green : sf::Color::Red);
-		text.setPosition(position.x + 200.0f, position.y + 0.5f * padding);
+		//text.setPosition(position.x + 200.0f, position.y + 0.5f * padding);
 		const std::string sign = (pop_diff >= 0 ? "+" : "");
-		text.setString("(" + sign + toStr(pop_diff) + " Ants over last 60s)");
+		text.setString("(" + sign + toStr(pop_diff) + " last 60s)");
+		// right justify
+		sf::FloatRect bounds = text.getLocalBounds();
+		text.setPosition((position.x + population.width + padding) - bounds.width, position.y + 0.5f * padding);
+
 		target.draw(text);
 
 		population.render(target);
