@@ -8,7 +8,6 @@
 #include "common/racc.hpp"
 #include "common/index_vector.hpp"
 #include "simulation/ant/ant_updater.hpp"
-#include "simulation/simulation_context.hpp"
 
 
 struct Colony

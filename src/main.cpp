@@ -1,13 +1,8 @@
 #include <SFML/Graphics.hpp>
-#include <list>
-#include <fstream>
-#include "simulation/config.hpp"
-#include "simulation/world/distance_field_builder.hpp"
 #include "simulation/simulation.hpp"
-#include "simulation/offscreen_simulation.hpp"
 
 
-int main()
+int32_t main()
 {
 	Conf::loadTextures();
     if (!Conf::loadUserConf()) {

@@ -1,6 +1,5 @@
 #pragma once
 #include "ant.hpp"
-#include "simulation/simulation_context.hpp"
 
 
 struct WorkerUpdater
