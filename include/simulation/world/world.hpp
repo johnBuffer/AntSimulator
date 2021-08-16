@@ -15,13 +15,10 @@ struct World
 {
 	sf::Vector2f size;
 	WorldGrid map;
-	DoubleObject<sf::VertexArray> va_map;
-	WorldRenderer renderer;
 
 	World(uint32_t width, uint32_t height)
 		: map(width, height, 4)
 		, size(to<float>(width), to<float>(height))
-		, renderer(map, va_map)
 	{
 		for (int32_t x(0); x < map.width; x++) {
 			for (int32_t y(0); y < map.height; y++) {
@@ -59,14 +56,6 @@ struct World
 		if (map.checkCoords(position)) {
 			map.get(position).wall = 0;
 		}
-	}
-
-	void render(sf::RenderTarget& target, sf::RenderStates states)
-	{
-		states.texture = &(*Conf::MARKER_TEXTURE);
-		renderer.mutex.lock();
-		target.draw(va_map.getCurrent(), states);
-		renderer.mutex.unlock();
 	}
 
 	void addFoodAt(float x, float y, uint32_t quantity)

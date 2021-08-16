@@ -8,6 +8,8 @@
 
 struct WorldRenderer : public AsyncRenderer
 {
+    sf::RenderStates states;
+    DoubleObject<sf::VertexArray> va_map;
 	const Grid<WorldCell>& grid;
 	bool draw_markers = true;
 	bool draw_density = false;
@@ -18,6 +20,7 @@ struct WorldRenderer : public AsyncRenderer
 		: AsyncRenderer(target)
 		, grid(grid_)
 	{
+        states.texture = &(*Conf::MARKER_TEXTURE);
 		AsyncRenderer::start();
 	}
 
@@ -114,4 +117,12 @@ struct WorldRenderer : public AsyncRenderer
 			}
 		}
 	}
+    
+    void render(sf::RenderTarget& target, const sf::RenderStates& states)
+    {
+        this->states.transform = states.transform;
+        mutex.lock();
+        target.draw(va_map.getCurrent(), this->states);
+        mutex.unlock();
+    }
 };

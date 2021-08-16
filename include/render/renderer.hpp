@@ -12,9 +12,13 @@ struct Renderer
 	bool render_ants = true;
 	ViewportHandler vp_handler;
 	std::vector<ColonyRenderer> colonies;
+    WorldRenderer renderer;
+    
 	
-	Renderer()
+    Renderer(const Grid<WorldCell>& world_grid)
 		: vp_handler({ to<float>(Conf::WIN_WIDTH), to<float>(Conf::WIN_HEIGHT) })
+        , renderer(world_grid)
+
 	{
 		colonies.reserve(8);
 	}
