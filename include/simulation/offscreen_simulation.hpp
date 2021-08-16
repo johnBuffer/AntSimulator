@@ -12,7 +12,6 @@ namespace sim
 
 struct Simulation
 {
-    RealNumberGenerator<float> gen;
     std::vector<Colony> colonies;
     World world;
     FightSystem fight_system;
