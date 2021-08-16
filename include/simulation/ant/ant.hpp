@@ -99,10 +99,17 @@ struct Ant
     
     void addToWorldGrid(World& world)
     {
-        ColonyCell& cell = world.map.get(position).markers[col_id];
-        if (!cell.fighting) {
-            cell.current_ant = id;
-            cell.fighting = isFighting();
+		WorldCell* cell = world.map.getSafe(position);
+		if (!cell) {
+			// Set as dead if outside the world
+			terminate();
+			return;
+		}
+
+		ColonyCell& colony_cell = cell->markers[col_id];
+        if (!colony_cell.fighting) {
+			colony_cell.current_ant = id;
+			colony_cell.fighting = isFighting();
         }
     }
 
