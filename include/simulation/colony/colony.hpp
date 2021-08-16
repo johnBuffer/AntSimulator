@@ -134,4 +134,9 @@ struct Colony
         }
         return count;
     }
+
+	uint32_t soldiersCount() const
+	{
+		return to<uint32_t>(std::count_if(ants.begin(), ants.end(), [](const Ant& a) { return a.type == Ant::Type::Soldier; }));
+	}
 };
