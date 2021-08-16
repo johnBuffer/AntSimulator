@@ -20,12 +20,11 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", window_style, settings);
 	window.setFramerateLimit(2000);
 
-	Simulation simulation(window);
+	sim::Simulation simulation;
 	const float margin = 160.0f;
 	simulation.createColony(margin, margin);
 	simulation.createColony(Conf::WORLD_WIDTH - margin, Conf::WORLD_HEIGHT - margin);
 	simulation.loadMap("res/map.png");
-	simulation.renderer.vp_handler.reset();
 	
 	sf::Clock clock;
     sf::Clock global_clock;

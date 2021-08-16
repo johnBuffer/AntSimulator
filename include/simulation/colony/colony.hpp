@@ -23,7 +23,7 @@ struct Colony
 	uint8_t id;
 	sf::Color ants_color = sf::Color::White;
 	uint64_t ant_creation_id = 0;
-
+    
 
 	Colony(float x, float y, uint32_t n, uint8_t col_id)
 		: base(sf::Vector2f(x, y), 20.0f)
@@ -112,26 +112,29 @@ struct Colony
 
 	void removeDeadAnts()
 	{
-		std::list<int16_t> to_remove;
-		for (Ant& a : ants) {
-			if (a.isDead()) {
-				to_remove.push_back(a.id);
-			}
-		}
-		for (uint64_t ant_id : to_remove) {
-			ants.erase(ant_id);
-		}
+		
 	}
     
-    uint32_t killWeakAnts(World& world)
+    void killWeakAnts(World& world)
     {
-        uint32_t count = 0;
+        // Mark weak ants as dead
+        uint32_t dead_count = 0;
         for (Ant& a : ants) {
             if (a.isDone()) {
                 a.kill(world);
-                ++count;
+                ++dead_count;
             }
         }
-        return count;
+        // Clean the memory
+        std::vector<int16_t> to_remove;
+        to_remove.reserve(dead_count);
+        for (Ant& a : ants) {
+            if (a.isDead()) {
+                to_remove.push_back(a.id);
+            }
+        }
+        for (uint64_t ant_id : to_remove) {
+            ants.erase(ant_id);
+        }
     }
 };

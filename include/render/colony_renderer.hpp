@@ -152,9 +152,11 @@ struct ColonyRenderer
 		target.draw(ants_va, rs);
 	}
     
-    void cleanVAs(uint32_t from, uint32_t to)
+    void cleanVAs(uint32_t ants_count)
     {
-        for (uint32_t i(from); i<to; ++i) {
+        const uint32_t start_index = ants_count << 2;
+        const uint32_t end_index = ants_va.getVertexCount();
+        for (uint32_t i(start_index); i<end_index; ++i) {
             ants_va[4 * i + 0].position = {};
             ants_va[4 * i + 1].position = {};
             ants_va[4 * i + 2].position = {};

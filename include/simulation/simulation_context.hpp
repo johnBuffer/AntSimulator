@@ -1,4 +1,5 @@
-#include "world.hpp"
+#pragma once
+#include "simulation/world/world.hpp"
 #include "common/number_generator.hpp"
 
 
