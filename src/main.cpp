@@ -42,7 +42,7 @@ int main()
     clock.restart();
 	while (true) {
 		// Update simulation
-		simulation.update(dt);
+		simulation.update();
         frame_time.addValue(clock.restart().asSeconds());
 		// Print infos
         if (int(time) % 10 == 0) {

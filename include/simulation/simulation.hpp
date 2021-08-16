@@ -114,12 +114,12 @@ struct GUISimulation
         simulation.loadMap(filename);
     }
 
-	void update(float dt)
+	void update()
 	{
 		if (!ev_state.pause) {
-            simulation.update(dt);
+            simulation.update();
 			// Update stats
-			renderer.updateColoniesStats(dt);
+			renderer.updateColoniesStats(simulation.context.dt);
             cleanVAs();
 		}
 	}

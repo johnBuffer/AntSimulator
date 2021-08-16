@@ -16,6 +16,7 @@ struct Simulation
     std::vector<Colony> colonies;
     World world;
     FightSystem fight_system;
+    Context context;
     
     Simulation()
         : world(Conf::WORLD_WIDTH, Conf::WORLD_HEIGHT)
@@ -32,7 +33,7 @@ struct Simulation
     {
         // Create the colony object
         const uint8_t colony_id = to<uint8_t>(colonies.size());
-        colonies.emplace_back(colony_x, colony_y, Conf::ANTS_COUNT, colony_id);
+        colonies.emplace_back(colony_x, colony_y, Conf::ANTS_COUNT, colony_id, context);
         Colony& colony = colonies.back();
         colony.ants_color = Conf::COLONY_COLORS[colony.id];
         // Create colony markers
@@ -42,18 +43,18 @@ struct Simulation
         }
     }
     
-    void update(float dt)
+    void update()
     {
         removeDeadAnts();
         // Update world cells (markers, density, walls)
-        world.update(dt);
+        world.update(context.dt);
         // First perform position update and grid registration
         for (Colony& colony : colonies) {
-            colony.genericAntsUpdate(dt, world);
+            colony.genericAntsUpdate(world, context);
         }
         // Then update objectives and world sampling
         for (Colony& colony : colonies) {
-            colony.update(dt, world);
+            colony.update(world, context);
         }
         // Search for fights
         fight_system.checkForFights(colonies, world);

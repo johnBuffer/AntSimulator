@@ -1,17 +1,21 @@
 #pragma once
-#include "simulation/world/world.hpp"
 #include "common/number_generator.hpp"
 
 
-namespace simulation
+namespace sim
 {
 
 struct Context
 {
     float dt = 0.016f;
-    RealNumberGenerator<float> rng;
-    World world;
+    RandFloatGenerator rng;
     sf::Clock clock;
+    
+    Context()
+        : rng()
+    {
+        
+    }
 };
 
 }

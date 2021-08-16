@@ -77,14 +77,14 @@ struct Ant
 	Type type;
 
 	Ant() = default;
-	Ant(float x, float y, float angle, uint8_t colony_id)
-		: position(x, y)
+	Ant(sf::Vector2f pos, float angle, uint8_t colony_id, RandFloatGenerator& rng)
+		: position(pos)
 		, direction(angle)
-		, direction_update(direction_update_period, RNGf::getUnder(1.0f) * direction_update_period)
-		, marker_add(marker_period, RNGf::getUnder(1.0f) * marker_period)
+		, direction_update(direction_update_period, direction_update_period * rng.get())
+		, marker_add(marker_period, marker_period * rng.get())
 		, search_markers(5.0f, 5.0f)
 		, phase(Mode::ToFood)
-		, liberty_coef(RNGf::getRange(0.001f, 0.01f))
+		, liberty_coef(rng.getRange(0.001f, 0.01f))
 		, hits(0)
         , fight_mode(FightMode::NoFight)
 		, to_enemy_markers_count(0.0f)
@@ -175,7 +175,7 @@ struct Ant
 			if (world.map.pickFood(position)) {
 				phase = Mode::ToHomeNoFood;
 				marker_add.target = repellent_period;
-				marker_add.value = RNGf::getUnder(marker_add.target);
+                marker_add.reset();
 				// Add a repellent for 300s
 				world.addMarkerRepellent(position, col_id, 300.0f);
 			}

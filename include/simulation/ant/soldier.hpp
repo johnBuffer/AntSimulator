@@ -4,16 +4,16 @@
 
 struct SoldierUpdater
 {
-	static void update(Ant& ant, World& world, float dt)
+	static void update(Ant& ant, World& world, sim::Context& context)
 	{
 		WorldCell& cell = world.map.get(ant.position);
 		cell.addPresence();
-		if (ant.direction_update.updateAutoReset(dt)) {
-			findMarker(ant, world);
+		if (ant.direction_update.updateAutoReset(context.dt)) {
+			findMarker(ant, world, context);
 		}
 	}
 
-	static void findMarker(Ant& ant, World& world)
+	static void findMarker(Ant& ant, World& world, sim::Context& context)
 	{
 		// Consts
 		constexpr float sample_angle_range = PI * 0.7f;
@@ -28,8 +28,8 @@ struct SoldierUpdater
 		// Sample the world
 		for (uint32_t i(sample_count); i--;) {
 			// Get random point in range
-			const float sample_angle     = current_angle + RNGf::getRange(sample_angle_range);
-			const float distance         = RNGf::getUnder(ant.marker_detection_max_dist);
+			const float sample_angle     = current_angle + context.rng.getRange(sample_angle_range);
+			const float distance         = context.rng.getUnder(ant.marker_detection_max_dist);
 			const sf::Vector2f to_marker = { cos(sample_angle), sin(sample_angle) };
 			auto* cell                   = world.map.getSafe(ant.position + distance * to_marker);
 			// This is to ensure that the sampled cell is not behind a wall
