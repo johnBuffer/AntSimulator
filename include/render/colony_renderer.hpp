@@ -66,14 +66,14 @@ struct PopulationChart
 		text.setCharacterSize(20);
 		text.setFillColor(sf::Color::White);
 		text.setPosition(position.x + padding, position.y);
-		text.setString("Population " + toStr(soldiers_count) + "/" + toStr(ants_count));
+		text.setString("Population " + toStr(ants_count) + "/" + toStr(soldiers_count));
 		target.draw(text);
 
 		text.setCharacterSize(14);
 		text.setFillColor(pop_diff >= 0 ? sf::Color::Green : sf::Color::Red);
 		//text.setPosition(position.x + 200.0f, position.y + 0.5f * padding);
 		const std::string sign = (pop_diff >= 0 ? "+" : "");
-		text.setString("(" + sign + toStr(pop_diff) + " Ants over last 60s)");
+		text.setString("(" + sign + toStr(pop_diff) + " last 60s)");
 		// right justify
 		sf::FloatRect bounds = text.getLocalBounds();
 		text.setPosition((position.x + population.width + padding) - bounds.width, position.y + 0.5f * padding);
