@@ -4,6 +4,7 @@
 #include "simulation/config.hpp"
 #include "simulation/world/distance_field_builder.hpp"
 #include "simulation/simulation.hpp"
+#include "editor/editor_scene.hpp"
 
 
 int main()

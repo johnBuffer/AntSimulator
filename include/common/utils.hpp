@@ -78,3 +78,13 @@ float sign(T f)
 {
     return f < 0.0f ? -1.0f : 1.0f;
 }
+
+template<typename T>
+using SPtr = std::shared_ptr<T>;
+
+
+template<typename T, typename ...Args>
+SPtr<T> create(Args&&... args)
+{
+    return std::make_shared<T>(std::forward<Args>(args)...);
+}
