@@ -12,17 +12,18 @@ struct Scene
 {
     using Ptr = std::shared_ptr<Scene>;
     
-    sf::RenderWindow&      window;
-    sfev::EventManager     event_manager;
-    sf::Vector2f           mouse_position;
-    
+    sf::RenderWindow&  window;
+    sfev::EventManager event_manager;
+    sf::Vector2f       mouse_position;
+
     Item root;
     
     Scene(sf::RenderWindow& window_)
         : window(window_)
         , event_manager(window_, false)
-    , root(toVector2f(window_.getSize()))
+        , root(toVector2f(window_.getSize()))
     {
+        const auto size = window_.getSize();
         initializeEventsCallbacks();
     }
     

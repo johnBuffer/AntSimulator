@@ -35,6 +35,7 @@ struct TextLabel : public Item
     
     void onSizeChange() override
     {
+        updateOrigin();
         updateTextPosition();
     }
     
@@ -61,10 +62,14 @@ struct TextLabel : public Item
         const auto text_bounds = text.getGlobalBounds();
         switch (alignement) {
             case Alignement::Center:
-                text.setOrigin(text_bounds.width * 0.5f, text_bounds.height);
+                text.setOrigin(text_bounds.width * 0.5f - size.x * 0.5f, text_bounds.height - size.y * 0.5f);
                 break;
             case Alignement::Left:
                 text.setOrigin({});
+                break;
+            case Alignement::Right:
+                text.setOrigin(text_bounds.width - size.x, 0.0f);
+                break;
             default:
                 break;
         }
@@ -72,15 +77,7 @@ struct TextLabel : public Item
     
     void updateTextPosition()
     {
-        switch (alignement) {
-            case Alignement::Center:
-                text.setPosition(position + size * 0.5f);
-                break;
-            case Alignement::Left:
-                text.setPosition(position);
-            default:
-                break;
-        }
+        text.setPosition(position);
     }
     
     void render(sf::RenderTarget& target) override

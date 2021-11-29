@@ -3,12 +3,15 @@
 #include "color_picker.hpp"
 #include "GUI/container.hpp"
 #include "slider.hpp"
+#include "common/dynamic_blur.hpp"
+
 
 namespace edtr
 {
 
 struct Toolbox : public GUI::Container
 {
+    explicit
     Toolbox(sf::Vector2f size_, sf::Vector2f position_ = {})
         : GUI::Container(GUI::Container::Orientation::Vertical, size_, position_)
     {}

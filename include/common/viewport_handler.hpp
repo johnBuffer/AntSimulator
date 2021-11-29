@@ -77,6 +77,7 @@ struct ViewportHandler
         setFocus(state.center);
     }
 
+    [[nodiscard]]
     const sf::RenderStates& getRenderState() const
     {
         return state.state;
@@ -85,6 +86,11 @@ struct ViewportHandler
     void click(sf::Vector2f relative_click_position)
     {
         state.mouse_position = relative_click_position;
+        state.clicking = true;
+    }
+
+    void click()
+    {
         state.clicking = true;
     }
     

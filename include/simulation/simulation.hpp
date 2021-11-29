@@ -21,6 +21,7 @@ struct Simulation
 	FightSystem fight_system;
 	sf::Clock clock;
 
+    explicit
 	Simulation(sf::Window& window)
 		: world(Conf::WORLD_WIDTH, Conf::WORLD_HEIGHT)
 		, renderer()

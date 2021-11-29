@@ -29,7 +29,7 @@ struct ToolOption : public GUI::Button
     
     void render(sf::RenderTarget& target) override
     {
-        const float angle_radius = 10.0f;
+        const float angle_radius = 5.0f;
         const sf::Vector2f current_padding = sf::Vector2f(select_padding, select_padding);
         const sf::Vector2f inner_size = size - 2.0f * current_padding;
         const sf::Vector2f inner_offset = 0.5f * (size - inner_size);
@@ -64,7 +64,7 @@ struct ToolSelector : public GUI::Container
         , current_tool(Tool::BrushCreate)
     {
         padding = 0.0f;
-        setHeight(70.0f);
+        setHeight(30.0f);
         tool_create = create<ToolOption>("Create", [this](){
             current_tool = Tool::BrushCreate;
             select(tool_create);

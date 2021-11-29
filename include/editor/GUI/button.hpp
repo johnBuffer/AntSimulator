@@ -33,13 +33,13 @@ struct DefaultButton : public GUI::Item
 
 struct Button : public DefaultButton
 {
-    float angle_radius = 10.0f;
+    float angle_radius = 5.0f;
     SPtr<TextLabel> label;
 
     Button(const std::string& text, ButtonCallBack callback)
         : DefaultButton(callback)
     {
-        label = create<TextLabel>(text, 32);
+        label = create<TextLabel>(text, 14);
         label->catch_event = false;
         addItem(label);
     }
