@@ -51,7 +51,9 @@ struct Item
     ItemPtr active_item = nullptr;
 
     Item() = default;
-    Item(sf::Vector2f size_, sf::Vector2f position_ = {}, const std::string name_ = "")
+
+    explicit
+    Item(sf::Vector2f size_, sf::Vector2f position_ = {}, const std::string& name_ = "")
         : size(size_)
         , position(position_)
         , name(name_)
@@ -222,6 +224,10 @@ struct Item
             default:
                 break;
         }
+    }
+
+    virtual void removeItem(const std::string& item_name)
+    {
     }
     
     template<typename T>

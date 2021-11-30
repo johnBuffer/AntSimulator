@@ -11,13 +11,14 @@
 int main()
 {
     if (Conf::loadUserConf()) {
-        std::cout << "OK" << std::endl;
+        std::cout << "Configuration file loaded." << std::endl;
     } else {
-        std::cout << "Not OK" << std::endl;
+        std::cout << "Configuration file couldn't be found." << std::endl;
     }
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 1;
     int32_t window_style = Conf::USE_FULLSCREEN ? sf::Style::Fullscreen : sf::Style::Default;
+    //int32_t window_style = sf::Style::Default;
 	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", window_style, settings);
 	window.setFramerateLimit(60);
 

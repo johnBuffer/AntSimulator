@@ -10,6 +10,7 @@ namespace edtr
 struct ToolOption : public GUI::Button
 {
     trn::Transition<float> select_padding = 0.0f;
+    sf::Color color = sf::Color::White;
     
     ToolOption(const std::string& text, GUI::ButtonCallBack callback)
         : GUI::Button(text, callback)
@@ -37,14 +38,14 @@ struct ToolOption : public GUI::Button
         GUI::RoundedRectangle background(size, position, angle_radius);
         background.setFillColor(sf::Color(200, 200, 200));
         GUI::RoundedRectangle color_rect(inner_size, position + inner_offset, angle_radius - select_padding);
-        color_rect.setFillColor(sf::Color::White);
+        color_rect.setFillColor(color);
         draw(target, background);
         draw(target, color_rect);
     }
 };
 
 
-struct ToolSelector : public GUI::Container
+struct ToolSelector : public GUI::NamedContainer
 {
     enum class Tool
     {
@@ -55,41 +56,44 @@ struct ToolSelector : public GUI::Container
     
     Tool current_tool;
     
-    SPtr<ToolOption> tool_create;
-    SPtr<ToolOption> tool_delete;
-    SPtr<ToolOption> tool_color;
+    SPtr<ToolOption> tool_wall;
+    SPtr<ToolOption> tool_food;
+    SPtr<ToolOption> tool_erase;
     
     ToolSelector()
-        : GUI::Container(Container::Orientation::Horizontal)
+        : GUI::NamedContainer("Tools", Container::Orientation::Horizontal)
         , current_tool(Tool::BrushCreate)
     {
-        padding = 0.0f;
-        setHeight(30.0f);
-        tool_create = create<ToolOption>("Create", [this](){
+        padding = 5.0f;
+
+        root->setHeight(30.0f, GUI::Size::Fixed);
+        tool_wall = create<ToolOption>("Add Wall", [this](){
             current_tool = Tool::BrushCreate;
-            select(tool_create);
+            select(tool_wall);
         });
-        tool_delete = create<ToolOption>("Delete", [this](){
+        tool_food = create<ToolOption>("Add Food", [this](){
             current_tool = Tool::BrushDelete;
-            select(tool_delete);
+            select(tool_food);
         });
-        tool_color = create<ToolOption>("Color", [this](){
+        tool_erase = create<ToolOption>("Erase", [this](){
             current_tool = Tool::BrushColor;
-            select(tool_color);
+            select(tool_erase);
         });
+        tool_food->color = sf::Color(200, 255, 200);
+        tool_erase->color = sf::Color(255, 200, 200);
         // Add items
-        addItem(tool_create);
-        addItem(tool_delete);
-        addItem(tool_color);
+        addItem(tool_wall);
+        addItem(tool_food);
+        addItem(tool_erase);
         // Default selection
-        select(tool_create);
+        select(tool_wall);
     }
     
     void reset()
     {
-        tool_create->reset();
-        tool_delete->reset();
-        tool_color->reset();
+        tool_wall->reset();
+        tool_food->reset();
+        tool_erase->reset();
     }
     
     void select(SPtr<ToolOption> option)

@@ -5,9 +5,9 @@
 #include "color_saver.hpp"
 #include "GUI/utils.hpp"
 #include "set_color_button.hpp"
-#include "GUI/empty_item.hpp"
 #include "GUI/named_container.hpp"
 #include "tool_selector.hpp"
+#include "editor/colony_creator/colony_creator.hpp"
 #include "simulation/world/world.hpp"
 #include "render/renderer.hpp"
 #include "simulation/config.hpp"
@@ -56,9 +56,10 @@ struct EditorScene : public GUI::Scene
         toolbox = create<Toolbox>(sf::Vector2f(350.0f, to<float>(window_size.y)));
         tool_selector = create<ToolSelector>();
 
-        auto container = create<GUI::NamedContainer>("Tools", GUI::Container::Orientation::Horizontal);
-        container->addItem(tool_selector);
-        toolbox->addItem(container);
+        toolbox->addItem(tool_selector);
+
+        auto colonies = create<ColonyCreator>();
+        toolbox->addItem(colonies);
 
         addItem(renderer);
         addItem(toolbox, "Toolbox");

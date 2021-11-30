@@ -20,7 +20,7 @@ struct Toolbox : public GUI::Container
     {
         sf::RectangleShape background(size);
         background.setPosition(position);
-        background.setFillColor(sf::Color(100, 100, 100, 120));
+        background.setFillColor(sf::Color(100, 100, 100, 200));
         GUI::Item::draw(target, background);
     }
 };

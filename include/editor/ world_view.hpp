@@ -24,14 +24,18 @@ struct WorldView : GUI::Item
         addKeyPressedCallback(sf::Keyboard::R, [&](sfev::CstEv e){renderer.vp_handler.reset();});
     }
 
-    void onClick(sf::Vector2f relative_click_position, sf::Mouse::Button) override
+    void onClick(sf::Vector2f relative_click_position, sf::Mouse::Button button) override
     {
-        renderer.vp_handler.click(relative_click_position);
+        if (button == sf::Mouse::Left) {
+            renderer.vp_handler.click(relative_click_position);
+        }
     }
 
-    void onUnclick(sf::Mouse::Button) override
+    void onUnclick(sf::Mouse::Button button) override
     {
-        renderer.vp_handler.unclick();
+        if (button == sf::Mouse::Left) {
+            renderer.vp_handler.unclick();
+        }
     }
 
     void onMouseMove(sf::Vector2f new_mouse_position) override

@@ -8,6 +8,7 @@ namespace GUI
 
 struct NamedContainer : public Container
 {
+    SPtr<Container> header;
     SPtr<TextLabel> label;
     SPtr<Container> root;
     
@@ -15,19 +16,25 @@ struct NamedContainer : public Container
         : Container(Container::Orientation::Vertical)
     {
         padding = 7.0f;
-        spacing = 0.0f;
+        spacing = 5.0f;
         size_type.y = Size::FitContent;
-        
+
+        header = create<Container>(Container::Orientation::Horizontal);
+        header->padding = 0.0f;
+        header->spacing = 0.0f;
+        header->size_type.y = Size::FitContent;
+
         label = create<TextLabel>(name, 14);
         label->setColor(sf::Color(100, 100, 100));
         label->setHeight(20.0f);
+        label->size_type.x = GUI::Size::Auto;
         label->setAlignement(Alignement::Left);
+        header->addItem(label);
         
         root = create<Container>(orientation);
-        root->size_type.y = Size::FitContent;
         root->padding = 0.0f;
         
-        Container::addItem(label);
+        Container::addItem(header);
         Container::addItem(root);
     }
     

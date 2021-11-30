@@ -14,12 +14,12 @@ struct Container : public Item
     };
     
     Orientation orientation;
-    float spacing = 10.0f;
+    float spacing = 8.0f;
     CoordAccessor<float> coord_1_accessor;
     CoordAccessor<float> coord_2_accessor;
     CoordAccessor<Size> size_type_coord_1_accessor;
     CoordAccessor<Size> size_type_coord_2_accessor;
-    
+
     Container(Orientation orientation_, sf::Vector2f size_ = {}, sf::Vector2f position_ = {})
         : Item(size_, position_)
         , orientation(orientation_)
@@ -28,6 +28,7 @@ struct Container : public Item
         coord_2_accessor = (orientation == Orientation::Horizontal) ? getY<float> : getX<float>;
         size_type_coord_1_accessor = (orientation == Orientation::Horizontal) ? getX<Size> : getY<Size>;
         size_type_coord_2_accessor = (orientation == Orientation::Horizontal) ? getY<Size> : getX<Size>;
+        padding = 8.0f;
     }
     
     void addItem(ItemPtr item, const std::string& name = "")
@@ -37,6 +38,17 @@ struct Container : public Item
             updateItems();
         });
         updateItems();
+    }
+
+    void removeItem(SPtr<Item> item)
+    {
+        for (auto sub = sub_items.begin(); sub != sub_items.end(); ++sub) {
+            if (*sub == item) {
+                sub_items.erase(sub);
+                updateItems();
+                return;
+            }
+        }
     }
     
     void onSizeChange() override
@@ -126,7 +138,7 @@ struct Container : public Item
         // Check for item size type
         for (ItemPtr item : sub_items) {
             const bool is_fixed = getCoord1(item->size_type) != Size::Auto;
-            remaining_size -= getCoord1(item->size) * is_fixed;
+            remaining_size -= getCoord1(item->size) * to<float>(is_fixed);
             items_auto_count -= is_fixed;
         }
         // Compute auto sized item new size

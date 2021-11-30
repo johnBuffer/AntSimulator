@@ -49,6 +49,11 @@ struct Button : public DefaultButton
         label->setSize(size);
     }
 
+    void onPositionChange() override
+    {
+        label->setPosition({});
+    }
+
     void render(sf::RenderTarget& target) override
     {
         GUI::Item::draw(target, RoundedRectangle(size, position, angle_radius));
