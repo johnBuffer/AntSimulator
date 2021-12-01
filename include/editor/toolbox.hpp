@@ -1,6 +1,6 @@
 #pragma once
 #include "GUI/button.hpp"
-#include "color_picker.hpp"
+#include "editor/color_picker/color_picker.hpp"
 #include "GUI/container.hpp"
 #include "slider.hpp"
 #include "common/dynamic_blur.hpp"

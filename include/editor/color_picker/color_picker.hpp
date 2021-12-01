@@ -1,6 +1,6 @@
 #pragma once
-#include "GUI/container.hpp"
-
+#include "editor/GUI/container.hpp"
+#include "common/color_utils.hpp"
 
 namespace edtr
 {
@@ -62,9 +62,10 @@ struct ColorVariation : public GUI::Item
     {
         const float ratio_x = 1.0f - mouse_position.x / size.x;
         const float ratio_y = 1.0f - mouse_position.y / size.y;
-        return createColor((to<float>(color.r + (255 - color.r)) * ratio_x) * ratio_y,
-                           (to<float>(color.g + (255 - color.g)) * ratio_x) * ratio_y,
-                           (to<float>(color.b + (255 - color.b)) * ratio_x) * ratio_y);
+
+        return ColorUtils::createColor((to<float>(color.r) + to<float>(255 - color.r) * ratio_x) * ratio_y,
+                                       (to<float>(color.g) + to<float>(255 - color.g) * ratio_x) * ratio_y,
+                                       (to<float>(color.b) + to<float>(255 - color.b) * ratio_x) * ratio_y);
     }
     
     void updateSelectedColor(sf::Vector2f mouse_position)

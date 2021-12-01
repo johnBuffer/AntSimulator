@@ -1,7 +1,7 @@
 #pragma once
 #include "GUI/scene.hpp"
 #include "toolbox.hpp"
-#include "color_picker.hpp"
+#include "editor/color_picker/color_picker.hpp"
 #include "color_saver.hpp"
 #include "GUI/utils.hpp"
 #include "set_color_button.hpp"
@@ -60,6 +60,8 @@ struct EditorScene : public GUI::Scene
 
         auto colonies = create<ColonyCreator>();
         toolbox->addItem(colonies);
+
+        toolbox->addItem(create<ColorPicker>());
 
         addItem(renderer);
         addItem(toolbox, "Toolbox");
