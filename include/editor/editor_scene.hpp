@@ -61,8 +61,6 @@ struct EditorScene : public GUI::Scene
         auto colonies = create<ColonyCreator>();
         toolbox->addItem(colonies);
 
-        toolbox->addItem(create<ColorPicker>());
-
         addItem(renderer);
         addItem(toolbox, "Toolbox");
     }

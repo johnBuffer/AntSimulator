@@ -42,7 +42,13 @@ struct NamedContainer : public Container
     {
         root->addItem(item, name);
     }
-    
+
+    template<typename T>
+    void removeItem(SPtr<T> item)
+    {
+        root->removeItem(item);
+    }
+
     void render(sf::RenderTarget& target) override
     {
         const float angle_radius = 10.0f;

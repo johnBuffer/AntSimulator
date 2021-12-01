@@ -43,7 +43,7 @@ struct Container : public Item
     void removeItem(SPtr<Item> item)
     {
         for (auto sub = sub_items.begin(); sub != sub_items.end(); ++sub) {
-            if (*sub == item) {
+            if (sub->get() == item.get()) {
                 sub_items.erase(sub);
                 updateItems();
                 return;

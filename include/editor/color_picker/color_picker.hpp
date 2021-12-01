@@ -18,11 +18,10 @@ struct ColorVariation : public GUI::Item
         : GUI::Item(size_)
         , color_va(sf::Quads, 8)
         , color(sf::Color::Red)
-        , selected_color(color)
-        , current_color(color)
-        , selection(size.x, 0.0f)
+        , selection(0.0f, 0.0f)
     {
         initializeVA();
+        updateSelectedColor({});
     }
     
     void initializeVA()
@@ -48,7 +47,7 @@ struct ColorVariation : public GUI::Item
     
     void onSizeChange() override
     {
-        selection = sf::Vector2f(size.x, 0.0f);
+        updateSelectedColor({});
         initializeVA();
     }
     
@@ -92,13 +91,13 @@ struct ColorVariation : public GUI::Item
     void render(sf::RenderTarget& target) override
     {
         draw(target, color_va);
-        const float selection_radius = 16.0f;
+        const float selection_radius = 8.0f;
         sf::CircleShape c(selection_radius);
         c.setOrigin(selection_radius, selection_radius);
         c.setPosition(position + selection);
         c.setFillColor(current_color);
         c.setOutlineColor(sf::Color::White);
-        c.setOutlineThickness(8.0f);
+        c.setOutlineThickness(2.0f);
         draw(target, c);
     }
     
@@ -195,7 +194,7 @@ struct ColorPicker : public GUI::Container
         spacing = 0.0f;
         size_type.y = GUI::Size::FitContent;
         // Create sub elemets
-        const float hue_slider_height = 50.0f;
+        const float hue_slider_height = 20.0f;
         color_variation = create<ColorVariation>();
         hue_slider = create<HueSlider>();
         hue_slider->setHeight(hue_slider_height);
@@ -215,7 +214,7 @@ struct ColorPicker : public GUI::Container
     
     void onSizeChange() override
     {
-        setHeight(size.x);
+        //setHeight(size.x);
     }
     
     sf::Color getColor() const

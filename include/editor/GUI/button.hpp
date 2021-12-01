@@ -35,6 +35,7 @@ struct Button : public DefaultButton
 {
     float angle_radius = 5.0f;
     SPtr<TextLabel> label;
+    sf::Color background_color = sf::Color::White;
 
     Button(const std::string& text, ButtonCallBack callback)
         : DefaultButton(callback)
@@ -56,7 +57,9 @@ struct Button : public DefaultButton
 
     void render(sf::RenderTarget& target) override
     {
-        GUI::Item::draw(target, RoundedRectangle(size, position, angle_radius));
+        auto background = RoundedRectangle(size, position, angle_radius);
+        background.setFillColor(background_color);
+        GUI::Item::draw(target, background);
     }
 };
 

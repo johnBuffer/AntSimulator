@@ -18,8 +18,17 @@ struct ColonyCreator : public GUI::NamedContainer
         root->size_type.y = GUI::Size::FitContent;
         auto add_button = create<GUI::Button>("Add", [this](){
             if (this->colonies_count < 8) {
-                this->addItem(create<ColonyTool>());
+                std::cout << "Add " << this->colonies_count << std::endl;
+                auto colony_tool = create<ColonyTool>();
+
+                this->addItem(colony_tool);
                 ++this->colonies_count;
+
+                colony_tool->top_zone->getByName<GUI::Button>("remove")->click_callback = [this, colony_tool](){
+                    this->removeItem(colony_tool);
+                    --this->colonies_count;
+                    std::cout << "Remove " << this->colonies_count << std::endl;
+                };
             }
         });
         add_button->setWidth(32.0f, GUI::Size::Fixed);

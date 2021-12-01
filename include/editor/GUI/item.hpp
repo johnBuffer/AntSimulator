@@ -228,6 +228,12 @@ struct Item
 
     virtual void removeItem(const std::string& item_name)
     {
+        for (auto it = sub_items.begin(); it != sub_items.end(); ++it) {
+            if ((*it)->name == item_name) {
+                sub_items.erase(it);
+                return;
+            }
+        }
     }
     
     template<typename T>
