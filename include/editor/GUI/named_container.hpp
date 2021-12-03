@@ -33,13 +33,16 @@ struct NamedContainer : public Container
         
         root = create<Container>(orientation);
         root->padding = 0.0f;
+        root->size_type.y = GUI::Size::FitContent;
         
         Container::addItem(header);
-        Container::addItem(root);
     }
     
     void addItem(ItemPtr item, const std::string& name = "")
     {
+        if (root->isEmpty()) {
+            GUI::Container::addItem(root);
+        }
         root->addItem(item, name);
     }
 
@@ -47,6 +50,9 @@ struct NamedContainer : public Container
     void removeItem(SPtr<T> item)
     {
         root->removeItem(item);
+        if (root->isEmpty()) {
+            GUI::Container::removeItem(root);
+        }
     }
 
     void render(sf::RenderTarget& target) override

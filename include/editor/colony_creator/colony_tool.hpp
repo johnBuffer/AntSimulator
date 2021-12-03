@@ -44,6 +44,8 @@ struct ColonyTool : GUI::Container
         watch(color_picker, [this](){
             setColor(color_picker->getColor());
         });
+
+        setColor(ColorUtils::getRandomColor());
     }
 
     void setColor(sf::Color color) const

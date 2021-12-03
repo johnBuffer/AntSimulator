@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "common/math.hpp"
+#include "common/number_generator.hpp"
 
 
 struct ColorUtils
@@ -19,4 +20,9 @@ struct ColorUtils
 		const float b = sin(t + 0.66f * 2.0f * Math::PI);
 		return createColor(255 * r * r, 255 * g * g, 255 * b * b);
 	}
+
+    static sf::Color getRandomColor()
+    {
+        return createColor(RNGf::getUnder(255.0f), RNGf::getUnder(255.0f), RNGf::getUnder(255.0f));
+    }
 };

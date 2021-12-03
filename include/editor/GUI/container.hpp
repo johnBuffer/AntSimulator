@@ -1,9 +1,16 @@
 #pragma once
 #include "GUI/item.hpp"
+#include "common/color_utils.hpp"
 
 
 namespace GUI
 {
+
+struct AutoItemSize
+{
+    bool  valid;
+    float value;
+};
 
 struct Container : public Item
 {
@@ -20,6 +27,8 @@ struct Container : public Item
     CoordAccessor<Size> size_type_coord_1_accessor;
     CoordAccessor<Size> size_type_coord_2_accessor;
 
+    sf::Color color;
+
     Container(Orientation orientation_, sf::Vector2f size_ = {}, sf::Vector2f position_ = {})
         : Item(size_, position_)
         , orientation(orientation_)
@@ -29,6 +38,8 @@ struct Container : public Item
         size_type_coord_1_accessor = (orientation == Orientation::Horizontal) ? getX<Size> : getY<Size>;
         size_type_coord_2_accessor = (orientation == Orientation::Horizontal) ? getY<Size> : getX<Size>;
         padding = 8.0f;
+
+        color = ColorUtils::getRandomColor();
     }
     
     void addItem(ItemPtr item, const std::string& name = "")
@@ -45,6 +56,9 @@ struct Container : public Item
         for (auto sub = sub_items.begin(); sub != sub_items.end(); ++sub) {
             if (sub->get() == item.get()) {
                 sub_items.erase(sub);
+                if (item == active_item) {
+                    active_item = nullptr;
+                }
                 updateItems();
                 return;
             }
@@ -93,24 +107,28 @@ struct Container : public Item
     void setItemSize(ItemPtr item, float coord_1_size, float coord_2_size)
     {
     }
+
+    [[nodiscard]]
+    bool isEmpty() const
+    {
+        return sub_items.empty();
+    }
     
     void updateItems()
     {
-        if (sub_items.empty()) {
-            return;
-        }
-
         bool        all_fixed = true;
         float       this_coord_2_size = getCoord2(size);
         float       current_pos = padding;
-        const float coord_1_size = getAutoItemSize();
+
+        const AutoItemSize auto_size = getAutoItemSize();
+
         const float coord_2_size = this_coord_2_size - 2.0f * padding;
         // Iterate over items and update sizes
         for (ItemPtr item : sub_items) {
             // Update item
             sf::Vector2f new_item_size = getItemCoord2Size(item, coord_2_size);
             if (getCoord1(item->size_type) == Size::Auto) {
-                getCoord1(new_item_size) = coord_1_size;
+                getCoord1(new_item_size) = auto_size.value;
                 all_fixed = false;
             }
             item->setPosition(makeVector2(current_pos, padding));
@@ -122,28 +140,35 @@ struct Container : public Item
         // If needed, resize container
         sf::Vector2f new_size = size;
         if (getCoord1(size_type) == Size::FitContent && all_fixed) {
-            getCoord1(new_size) = current_pos - spacing + padding;
+            getCoord1(new_size) = current_pos + padding - spacing * to<float>(!sub_items.empty());
         }
         if (getCoord2(size_type) == Size::FitContent) {
             getCoord2(new_size) = this_coord_2_size;
         }
         setSize(new_size);
+        forceActiveItemUpdate();
     }
-        
-    float getAutoItemSize()
+
+    AutoItemSize getAutoItemSize()
     {
         const uint64_t items_count = sub_items.size();
+        if (items_count == 0) {
+            return {false, 0.0f};
+        }
         uint64_t items_auto_count = items_count;
-        float remaining_size = getCoord1(size) - 2.0f * padding;
+        float remaining_size = getCoord1(size) - 2.0f * padding * to<float>(items_count > 0);
         // Check for item size type
         for (ItemPtr item : sub_items) {
             const bool is_fixed = getCoord1(item->size_type) != Size::Auto;
             remaining_size -= getCoord1(item->size) * to<float>(is_fixed);
             items_auto_count -= is_fixed;
         }
+        if (items_auto_count == 0) {
+            return AutoItemSize{false, 0.0f};
+        }
         // Compute auto sized item new size
         remaining_size -= spacing * to<float>(items_count - 1);
-        return remaining_size / to<float>(items_auto_count);
+        return {true, remaining_size / to<float>(items_auto_count)};
     }
     
     template<typename T>
@@ -154,6 +179,13 @@ struct Container : public Item
         getCoord2(res) = coord_2;
         return res;
     }
+
+//    void render(sf::RenderTarget& target) override
+//    {
+//        GUI::RoundedRectangle back(size, position, 3.0f);
+//        back.setFillColor(color);
+//        GUI::Item::draw(target, back);
+//    }
 };
 
 }

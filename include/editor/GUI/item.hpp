@@ -49,6 +49,7 @@ struct Item
     std::vector<Observer> observers;
     std::vector<Observer> size_observers;
     ItemPtr active_item = nullptr;
+    sf::Vector2f current_mouse_position;
 
     Item() = default;
 
@@ -118,18 +119,18 @@ struct Item
     {
         onPositionChange();
         for (ItemPtr item : sub_items) {
-            item->setOffset(position);
+            item->setOffset(offset + position);
         }
     }
     
-    void updateActiveItem(sf::Vector2f mouse_position)
+    void updateActiveItem()
     {
         if (active_item && active_item->clicking) {
             return;
         }
         for (auto it = sub_items.rbegin(); it != sub_items.rend(); ++it) {
             ItemPtr item = *it;
-            if (item->isUnder(mouse_position) && item->catch_event) {
+            if (item->isUnder(current_mouse_position) && item->catch_event) {
                 if (item != active_item) {
                     exitActiveItem();
                     active_item = item;
@@ -177,12 +178,18 @@ struct Item
     
     void defaultOnMouseMove(sf::Vector2f mouse_position)
     {
-        updateActiveItem(mouse_position);
+        current_mouse_position = mouse_position;
+        updateActiveItem();
         if (active_item) {
             active_item->defaultOnMouseMove(getRelativeMousePosition(active_item, mouse_position));
             return;
         }
         onMouseMove(mouse_position);
+    }
+
+    void forceActiveItemUpdate()
+    {
+        defaultOnMouseMove(current_mouse_position);
     }
     
     void defaultRender(sf::RenderTarget& target)

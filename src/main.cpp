@@ -23,32 +23,15 @@ int main()
 	window.setFramerateLimit(60);
 
     // Main scenes
-    GUI::Scene::Ptr editor = create<edtr::EditorScene>(window);
-    GUI::Scene::Ptr game = edtr::createGameScene(window);
-    GUI::Scene::Ptr current_scene = editor;
-    // Add switches
-    const sf::Vector2f switch_size(120.0f, 40.0f);
-    SPtr<GUI::Button> editor_to_game = create<GUI::Button>("To Game View", [&](){
-        current_scene = game;
-    });
-    editor_to_game->setSize(switch_size);
-    editor->addItem(editor_to_game, "ToGame", GUI::Alignement::Right);
-    SPtr<GUI::Button> game_to_editor = create<GUI::Button>("To Editor View", [&](){
-        current_scene = editor;
-    });
-    game_to_editor->setSize(switch_size);
-    game->getByName<edtr::GameView>("view")->addItem(game_to_editor, "", GUI::Alignement::Right);
+    GUI::Scene::Ptr scene = create<edtr::EditorScene>(window);
 
 	while (window.isOpen()) {
-		current_scene->update();
+        scene->update();
         // Render
         window.clear();
-        current_scene->render();
+        scene->render();
         window.display();
 	}
-
-    current_scene = nullptr;
-    editor = nullptr;
 
 	return 0;
 }
