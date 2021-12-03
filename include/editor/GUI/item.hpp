@@ -349,18 +349,16 @@ struct Item
     
     void exitActiveItem()
     {
+        // We check each time because the active item could have been removed on exit for example
         if (active_item) {
             active_item->exitActiveItem();
         }
-
         if (active_item) {
             active_item->defaultOnUnclick(sf::Mouse::Button::Left);
         }
-
         if (active_item) {
             active_item->onMouseOut();
         }
-        
         active_item = nullptr;
     }
 };
