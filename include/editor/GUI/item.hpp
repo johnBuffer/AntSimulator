@@ -50,6 +50,7 @@ struct Item
     std::vector<Observer> size_observers;
     ItemPtr active_item = nullptr;
     sf::Vector2f current_mouse_position;
+    bool need_force_active_item_update = false;
 
     Item() = default;
 
@@ -125,9 +126,10 @@ struct Item
     
     void updateActiveItem()
     {
-        if (active_item && active_item->clicking) {
+        if (active_item && active_item->clicking && !need_force_active_item_update) {
             return;
         }
+        need_force_active_item_update = false;
         for (auto it = sub_items.rbegin(); it != sub_items.rend(); ++it) {
             ItemPtr item = *it;
             if (item->isUnder(current_mouse_position) && item->catch_event) {
@@ -189,7 +191,9 @@ struct Item
 
     void forceActiveItemUpdate()
     {
+        need_force_active_item_update = true;
         defaultOnMouseMove(current_mouse_position);
+        need_force_active_item_update = false;
     }
     
     void defaultRender(sf::RenderTarget& target)
@@ -347,10 +351,17 @@ struct Item
     {
         if (active_item) {
             active_item->exitActiveItem();
-            active_item->defaultOnUnclick(sf::Mouse::Button::Left);
-            active_item->onMouseOut();
-            active_item = nullptr;
         }
+
+        if (active_item) {
+            active_item->defaultOnUnclick(sf::Mouse::Button::Left);
+        }
+
+        if (active_item) {
+            active_item->onMouseOut();
+        }
+        
+        active_item = nullptr;
     }
 };
 

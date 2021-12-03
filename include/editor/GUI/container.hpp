@@ -56,9 +56,6 @@ struct Container : public Item
         for (auto sub = sub_items.begin(); sub != sub_items.end(); ++sub) {
             if (sub->get() == item.get()) {
                 sub_items.erase(sub);
-                if (item == active_item) {
-                    active_item = nullptr;
-                }
                 updateItems();
                 return;
             }
