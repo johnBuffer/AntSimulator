@@ -11,7 +11,7 @@
 #include "simulation/world/world.hpp"
 #include "render/renderer.hpp"
 #include "simulation/config.hpp"
-#include "editor/ world_view.hpp"
+#include "editor/world_view.hpp"
 
 
 namespace edtr
@@ -21,19 +21,20 @@ struct EditorScene : public GUI::Scene
 {
     using Ptr = std::shared_ptr<EditorScene>;
 
-    World world;
+    Simulation&  simulation;
+    ControlState control_state;
 
-    SPtr<Toolbox> toolbox;
-    SPtr<WorldView> renderer;
-    SPtr<ColorPicker> color_picker;
-    SPtr<ColorSaver> color_saver;
+    SPtr<Toolbox>        toolbox;
+    SPtr<WorldView>      renderer;
+    SPtr<ColorPicker>    color_picker;
+    SPtr<ColorSaver>     color_saver;
     SPtr<SetColorButton> set_color_button;
-    SPtr<ToolSelector> tool_selector;
+    SPtr<ToolSelector>   tool_selector;
 
     explicit
-    EditorScene(sf::RenderWindow& window)
+    EditorScene(sf::RenderWindow& window, Simulation& sim)
         : GUI::Scene(window)
-        , world(Conf::WORLD_WIDTH, Conf::WORLD_HEIGHT)
+        , simulation(sim)
     {
         Conf::loadTextures();
         initialize();
@@ -47,18 +48,16 @@ struct EditorScene : public GUI::Scene
     
     void initialize()
     {
-        MapLoader::loadMap(world, "res/map.png");
-
         const sf::Vector2u window_size = window.getSize();
 
-        renderer = create<WorldView>(toVector2f(window_size), world);
+        renderer = create<WorldView>(toVector2f(window_size), simulation, control_state);
 
         toolbox = create<Toolbox>(sf::Vector2f(350.0f, to<float>(window_size.y)));
         tool_selector = create<ToolSelector>();
 
         toolbox->addItem(tool_selector);
 
-        auto colonies = create<ColonyCreator>();
+        auto colonies = create<ColonyCreator>(simulation, control_state);
         toolbox->addItem(colonies);
 
         addItem(renderer);

@@ -23,7 +23,8 @@ struct DefaultConf
 	static uint32_t ANTS_COUNT;
 	static std::shared_ptr<sf::Texture> ANT_TEXTURE;
 	static std::shared_ptr<sf::Texture> MARKER_TEXTURE;
-	static sf::Color COLONY_COLORS[8];
+    static constexpr uint32_t MAX_COLONIES_COUNT = 8;
+	static sf::Color COLONY_COLORS[MAX_COLONIES_COUNT];
     static uint32_t USE_FULLSCREEN;
 
 	static void loadTextures()

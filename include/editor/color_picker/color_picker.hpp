@@ -21,7 +21,7 @@ struct ColorVariation : public GUI::Item
         , selection(0.0f, 0.0f)
     {
         initializeVA();
-        updateSelectedColor({});
+        updateSelectedColor();
     }
     
     void initializeVA()
@@ -47,7 +47,7 @@ struct ColorVariation : public GUI::Item
     
     void onSizeChange() override
     {
-        updateSelectedColor({});
+        updateSelectedColor();
         initializeVA();
     }
     
@@ -67,17 +67,17 @@ struct ColorVariation : public GUI::Item
                                        (to<float>(color.b) + to<float>(255 - color.b) * ratio_x) * ratio_y);
     }
     
-    void updateSelectedColor(sf::Vector2f mouse_position)
+    void updateSelectedColor()
     {
-        selection = mouse_position;
-        selected_color = getColorAt(mouse_position);
+        selected_color = getColorAt(selection);
         current_color = selected_color;
         notifyChanged();
     }
     
     void onClick(sf::Vector2f mouse_position, sf::Mouse::Button) override
     {
-        updateSelectedColor(mouse_position);
+        selection = mouse_position;
+        updateSelectedColor();
     }
     
     void setColor(sf::Color new_color)
@@ -85,7 +85,7 @@ struct ColorVariation : public GUI::Item
         color = new_color;
         color_va[1].color = color;
         color_va[2].color = color;
-        current_color = getColorAt(selection);
+        updateSelectedColor();
     }
     
     void render(sf::RenderTarget& target) override
@@ -104,7 +104,8 @@ struct ColorVariation : public GUI::Item
     void onMouseMove(sf::Vector2f mouse_position) override
     {
         if (clicking) {
-            updateSelectedColor(mouse_position);
+            selection = mouse_position;
+            updateSelectedColor();
         }
     }
 };

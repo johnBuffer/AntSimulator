@@ -3,15 +3,20 @@
 #include "GUI/button.hpp"
 #include "GUI/rounded_rectangle.hpp"
 #include "editor/color_picker/color_picker.hpp"
+#include "editor/control_state.hpp"
 
 
 struct ColonyTool : GUI::Container
 {
+    Colony& colony;
+    ControlState& control_state;
     SPtr<GUI::Container> top_zone;
     SPtr<edtr::ColorPicker> color_picker;
 
-    ColonyTool()
+    ColonyTool(Colony& colony_, ControlState& control_state_)
         : GUI::Container(Container::Orientation::Vertical)
+        , colony(colony_)
+        , control_state(control_state_)
     {
         padding = 5.0f;
         size_type.y = GUI::Size::FitContent;
@@ -32,6 +37,15 @@ struct ColonyTool : GUI::Container
         to_focus_button->setHeight(20.0f);
         to_focus_button->setWidth(40.0f);
         top_zone->addItem(to_focus_button);
+
+        auto set_position_button = create<GUI::Button>("Set Position", [this](){
+            control_state.view_action = [](sf::Vector2f world_position) {
+                std::cout << "World Pos from set position " << world_position.x << " " << world_position.y << std::endl;
+            };
+        });
+        set_position_button->setHeight(20.0f);
+        set_position_button->setWidth(100.0f);
+        top_zone->addItem(set_position_button);
 
         auto remove_button = create<GUI::Button>("Remove", [](){});
         remove_button->setHeight(20.0f);

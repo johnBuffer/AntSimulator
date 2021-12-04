@@ -27,7 +27,7 @@ struct Simulation
 		, renderer()
 		, ev_manager(window, true)
 	{
-		colonies.reserve(8);
+		colonies.reserve(Conf::MAX_COLONIES_COUNT);
 		initEventCallbacks();
 	}
 
@@ -111,10 +111,10 @@ struct Simulation
 		ev_manager.processEvents();
 	}
 
-	void createColony(float colony_x, float colony_y)
+	Colony& createColony(float colony_x, float colony_y)
 	{
 		// Create the colony object
-		const uint8_t colony_id = to<uint8_t>(colonies.size());
+		const auto colony_id = to<uint8_t>(colonies.size());
 		colonies.emplace_back(colony_x, colony_y, Conf::ANTS_COUNT, colony_id);
 		Colony& colony = colonies.back();
 		colony.ants_color = Conf::COLONY_COLORS[colony.id];
@@ -125,6 +125,7 @@ struct Simulation
 		}
 		// Register it for the renderer
 		renderer.addColony(colony);
+        return colony;
 	}
 
 	void update(float dt)

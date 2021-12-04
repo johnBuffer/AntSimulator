@@ -5,11 +5,11 @@
 #include "simulation/world/distance_field_builder.hpp"
 #include "simulation/simulation.hpp"
 #include "editor/editor_scene.hpp"
-#include "editor/game_scene.hpp"
 
 
 int main()
 {
+    // Load configuration
     if (Conf::loadUserConf()) {
         std::cout << "Configuration file loaded." << std::endl;
     } else {
@@ -21,11 +21,14 @@ int main()
     int32_t window_style = sf::Style::Default;
 	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", window_style, settings);
 	window.setFramerateLimit(60);
-
-    // Main scenes
-    GUI::Scene::Ptr scene = create<edtr::EditorScene>(window);
-
+    // Initialize simulation
+    Simulation simulation(window);
+    simulation.loadMap("res/map.png");
+    // Create editor scene around it
+    GUI::Scene::Ptr scene = create<edtr::EditorScene>(window, simulation);
+    // Main loop
 	while (window.isOpen()) {
+        // Update
         scene->update();
         // Render
         window.clear();
