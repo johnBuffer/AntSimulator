@@ -2,6 +2,7 @@
 #include "GUI/item.hpp"
 #include "render/renderer.hpp"
 #include "editor/control_state.hpp"
+#include "editor/time_control/time_controller.hpp"
 
 
 namespace edtr
@@ -9,8 +10,9 @@ namespace edtr
 
 struct WorldView : GUI::Item
 {
-    Simulation&   simulation;
-    ControlState& control_state;
+    Simulation&           simulation;
+    ControlState&         control_state;
+    TimeController::State current_time_state = TimeController::State::Pause;
 
     explicit
     WorldView(sf::Vector2f size_, Simulation& simulation_, ControlState& control_state_)
@@ -50,6 +52,14 @@ struct WorldView : GUI::Item
     void render(sf::RenderTarget& target) override
     {
         simulation.render(target);
+    }
+
+    void update() override
+    {
+        const float dt = 0.016f;
+        if (current_time_state == TimeController::State::Play || current_time_state == TimeController::State::Speed) {
+            simulation.update(dt);
+        }
     }
 };
 

@@ -38,8 +38,6 @@ struct Container : public Item
         size_type_coord_1_accessor = (orientation == Orientation::Horizontal) ? getX<Size> : getY<Size>;
         size_type_coord_2_accessor = (orientation == Orientation::Horizontal) ? getY<Size> : getX<Size>;
         padding = 8.0f;
-
-        color = ColorUtils::getRandomColor();
     }
     
     void addItem(ItemPtr item, const std::string& name = "")

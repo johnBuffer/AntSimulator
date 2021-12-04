@@ -23,6 +23,7 @@ struct Colony
 	uint8_t id;
 	sf::Color ants_color = sf::Color::White;
 	uint64_t ant_creation_id = 0;
+    bool color_changed = false;
 
 
 	Colony(float x, float y, uint32_t n, uint8_t col_id)
@@ -41,6 +42,14 @@ struct Colony
 			createWorker();
 		}
 	}
+
+    void setPosition(sf::Vector2f new_position)
+    {
+        base.position = new_position;
+        for (Ant& a : ants) {
+            a.position = new_position;
+        }
+    }
 
 	Ant& createWorker()
 	{
@@ -139,4 +148,10 @@ struct Colony
 	{
 		return to<uint32_t>(std::count_if(ants.begin(), ants.end(), [](const Ant& a) { return a.type == Ant::Type::Soldier; }));
 	}
+
+    void setColor(sf::Color color)
+    {
+        ants_color = color;
+        color_changed = true;
+    }
 };

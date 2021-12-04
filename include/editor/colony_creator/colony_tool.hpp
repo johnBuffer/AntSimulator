@@ -39,8 +39,8 @@ struct ColonyTool : GUI::Container
         top_zone->addItem(to_focus_button);
 
         auto set_position_button = create<GUI::Button>("Set Position", [this](){
-            control_state.view_action = [](sf::Vector2f world_position) {
-                std::cout << "World Pos from set position " << world_position.x << " " << world_position.y << std::endl;
+            control_state.view_action = [this](sf::Vector2f world_position) {
+                colony.setPosition(world_position);
             };
         });
         set_position_button->setHeight(20.0f);
@@ -65,6 +65,7 @@ struct ColonyTool : GUI::Container
     void setColor(sf::Color color) const
     {
         top_zone->getByName<GUI::Button>("colony_color_button")->background_color = color;
+        colony.setColor(color);
     }
 
     void createColorPicker()

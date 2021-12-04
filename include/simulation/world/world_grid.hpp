@@ -2,11 +2,11 @@
 #include <vector>
 
 #include "simulation/ant/ant_mode.hpp"
+#include "simulation/config.hpp"
 #include "common/utils.hpp"
 #include "common/grid.hpp"
 
 
-constexpr uint8_t max_colonies_count = 4;
 constexpr float min_intensity = 0.1f;
 
 
@@ -54,11 +54,11 @@ struct ColonyCell
 
 struct WorldCell
 {
-	ColonyCell markers[max_colonies_count];
+	ColonyCell markers[Conf::MAX_COLONIES_COUNT];
 	// Food quantity in the cell
 	uint32_t food;
 	uint32_t wall;
-	// Density of ants a a certain point
+	// Density of ants at a certain point
 	float density;
 	// Dist to wall
 	float wall_dist;
@@ -79,7 +79,7 @@ struct WorldCell
 	void update(float dt)
 	{
 		// Update intensities
-		for (uint8_t i(max_colonies_count); i--;) {
+		for (uint8_t i(Conf::MAX_COLONIES_COUNT); i--;) {
 			markers[i].update(dt);
 		}
 		// Update density
@@ -98,7 +98,7 @@ struct WorldCell
     {
 		AntRef res;
         // Update intensities
-        for (uint8_t i(max_colonies_count); i--;) {
+        for (uint8_t i(Conf::MAX_COLONIES_COUNT); i--;) {
             if (i != team && markers[i].current_ant > -1) {
 				res.active = true;
 				res.ant_id = markers[i].current_ant;
@@ -112,7 +112,7 @@ struct WorldCell
 	bool checkEnemyPresence(uint8_t team)
 	{
 		// Update intensities
-		for (uint8_t i(0); i<max_colonies_count; ++i) {
+		for (uint8_t i(0); i<Conf::MAX_COLONIES_COUNT; ++i) {
 			if (i != team && markers[i].current_ant > -1) {
 				return true;
 			}

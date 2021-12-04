@@ -12,6 +12,7 @@
 #include "render/renderer.hpp"
 #include "simulation/config.hpp"
 #include "editor/world_view.hpp"
+#include "time_control/time_controller.hpp"
 
 
 namespace edtr
@@ -24,12 +25,9 @@ struct EditorScene : public GUI::Scene
     Simulation&  simulation;
     ControlState control_state;
 
-    SPtr<Toolbox>        toolbox;
-    SPtr<WorldView>      renderer;
-    SPtr<ColorPicker>    color_picker;
-    SPtr<ColorSaver>     color_saver;
-    SPtr<SetColorButton> set_color_button;
-    SPtr<ToolSelector>   tool_selector;
+    SPtr<Toolbox>      toolbox;
+    SPtr<WorldView>    renderer;
+    SPtr<ToolSelector> tool_selector;
 
     explicit
     EditorScene(sf::RenderWindow& window, Simulation& sim)
@@ -53,15 +51,26 @@ struct EditorScene : public GUI::Scene
         renderer = create<WorldView>(toVector2f(window_size), simulation, control_state);
 
         toolbox = create<Toolbox>(sf::Vector2f(350.0f, to<float>(window_size.y)));
+        // Add map edition tools
         tool_selector = create<ToolSelector>();
-
         toolbox->addItem(tool_selector);
-
+        // Add colonies edition tools
         auto colonies = create<ColonyCreator>(simulation, control_state);
         toolbox->addItem(colonies);
+        // Add time controls
+        auto time_controls = create<TimeController>();
+        renderer->watch(time_controls, [this, time_controls](){
+            this->renderer->current_time_state = time_controls->current_state;
+            if (time_controls->current_state == TimeController::State::Speed) {
+                this->window.setFramerateLimit(0);
+            } else {
+                this->window.setFramerateLimit(60);
+            }
+        });
 
         addItem(renderer);
         addItem(toolbox, "Toolbox");
+        addItem(time_controls, "", GUI::Alignement::Right);
     }
 };
 

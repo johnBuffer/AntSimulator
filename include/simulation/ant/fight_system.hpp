@@ -41,7 +41,7 @@ struct FightSystem
         }
         // Check for potential enemies
         WorldCell& current_cell = world.map.get(ant.position);
-        for (uint32_t i(max_colonies_count); i--;) {
+        for (uint32_t i(Conf::MAX_COLONIES_COUNT); i--;) {
 			if (i != ant.col_id) {
 				int16_t ant_id = current_cell.markers[i].current_ant;
 				if (ant_id > -1) {

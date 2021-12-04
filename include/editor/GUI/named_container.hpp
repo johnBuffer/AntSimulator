@@ -1,3 +1,4 @@
+#pragma once
 #include "container.hpp"
 #include "text_label.hpp"
 #include "rounded_rectangle.hpp"

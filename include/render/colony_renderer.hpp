@@ -104,21 +104,9 @@ struct ColonyRenderer
 		font.loadFromFile("res/font.ttf");
 		text.setFont(font);
 
+        initializeAntsVA();
 		for (uint64_t i(Conf::ANTS_COUNT-1); i--;) {
 			const uint64_t index = 4 * i;
-			// Ant
-			ants_va[index + 0].color = colony.ants_color;
-			ants_va[index + 1].color = colony.ants_color;
-			ants_va[index + 2].color = colony.ants_color;
-			ants_va[index + 3].color = colony.ants_color;
-			ants_va[index + 0].texCoords = sf::Vector2f(0.0f, 0.0f);
-			ants_va[index + 1].texCoords = sf::Vector2f(370.0f, 0.0f);
-			ants_va[index + 2].texCoords = sf::Vector2f(370.0f, 552.0f);
-			ants_va[index + 3].texCoords = sf::Vector2f(0.0f, 552.0f);
-            ants_va[index + 0].position = sf::Vector2f(0.0f, 0.0f);
-            ants_va[index + 1].position = sf::Vector2f(0.0f, 0.0f);
-            ants_va[index + 2].position = sf::Vector2f(0.0f, 0.0f);
-            ants_va[index + 3].position = sf::Vector2f(0.0f, 0.0f);
 			// Food
 			ants_food_va[index + 0].color = Conf::FOOD_COLOR;
 			ants_food_va[index + 1].color = Conf::FOOD_COLOR;
@@ -142,8 +130,32 @@ struct ColonyRenderer
 		population.population.color = colony.ants_color;
 	}
 
+    void initializeAntsVA()
+    {
+        for (uint64_t i(Conf::ANTS_COUNT-1); i--;) {
+            const uint64_t index = 4 * i;
+            // Ant
+            ants_va[index + 0].color = colony.ants_color;
+            ants_va[index + 1].color = colony.ants_color;
+            ants_va[index + 2].color = colony.ants_color;
+            ants_va[index + 3].color = colony.ants_color;
+            ants_va[index + 0].texCoords = sf::Vector2f(0.0f  , 0.0f);
+            ants_va[index + 1].texCoords = sf::Vector2f(370.0f, 0.0f);
+            ants_va[index + 2].texCoords = sf::Vector2f(370.0f, 552.0f);
+            ants_va[index + 3].texCoords = sf::Vector2f(0.0f  , 552.0f);
+            ants_va[index + 0].position = sf::Vector2f(0.0f   , 0.0f);
+            ants_va[index + 1].position = sf::Vector2f(0.0f   , 0.0f);
+            ants_va[index + 2].position = sf::Vector2f(0.0f   , 0.0f);
+            ants_va[index + 3].position = sf::Vector2f(0.0f   , 0.0f);
+        }
+    }
+
 	void renderAnts(sf::RenderTarget& target, const sf::RenderStates& states)
 	{
+        if (colony.color_changed) {
+            initializeAntsVA();
+            colony.color_changed = false;
+        }
 		uint32_t index = 0;
 		for (const Ant& a : colony.ants) {
 			a.render_in(ants_va, 4 * index);
