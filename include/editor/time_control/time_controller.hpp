@@ -20,7 +20,7 @@ struct TimeController : public GUI::NamedContainer
     SPtr<ToolOption> tool_speed;
 
     TimeController()
-            : GUI::NamedContainer("Tools", Container::Orientation::Horizontal)
+            : GUI::NamedContainer("Time Control", Container::Orientation::Horizontal)
             , current_state(State::Pause)
     {
         setWidth(180.0f);
