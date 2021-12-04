@@ -17,7 +17,7 @@ public:
 		, m_target_value()
 		, m_delta()
 		, m_start_time(std::chrono::steady_clock::now())
-		, m_speed(0.0f)
+		, m_speed(1.0f)
 	{
 		updateDelta();
 	}
@@ -82,8 +82,9 @@ public:
 
 	void setValueInstant(const T& value)
 	{
+        m_start_value   = value;
 		m_current_value = value;
-		m_target_value = value;
+		m_target_value  = value;
 		updateDelta();
 	}
 
@@ -99,7 +100,7 @@ public:
 		updateDelta();
 	}
 
-private:
+public:
 	T m_start_value;
 	T m_target_value;
 	T m_delta;
@@ -135,6 +136,7 @@ private:
 	{
 		m_start_value = m_current_value;
 		m_start_time = std::chrono::steady_clock::now();
+        m_last_access = m_start_time;
 		updateDelta();
 	}
 

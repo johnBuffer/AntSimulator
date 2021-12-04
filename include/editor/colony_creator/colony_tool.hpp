@@ -33,7 +33,9 @@ struct ColonyTool : GUI::Container
         color_button->setWidth(30.0f);
         top_zone->addItem(color_button, "colony_color_button");
 
-        auto to_focus_button = create<GUI::Button>("Focus", [](){});
+        auto to_focus_button = create<GUI::Button>("Focus", [this](){
+            control_state.requestFocus(colony.base.position, 2.0f);
+        });
         to_focus_button->setHeight(20.0f);
         to_focus_button->setWidth(40.0f);
         top_zone->addItem(to_focus_button);

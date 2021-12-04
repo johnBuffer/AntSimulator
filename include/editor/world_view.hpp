@@ -24,13 +24,22 @@ struct WorldView : GUI::Item
 
     void initializeEventCallbacks() override
     {
-        addEventCallback(sf::Event::MouseWheelScrolled, [&](sfev::CstEv e){simulation.renderer.vp_handler.wheelZoom(e.mouseWheelScroll.delta);});
-        addKeyPressedCallback(sf::Keyboard::R, [&](sfev::CstEv e){simulation.renderer.vp_handler.reset();});
+        addEventCallback(sf::Event::MouseWheelScrolled, [&](sfev::CstEv e){
+            simulation.renderer.vp_handler.wheelZoom(e.mouseWheelScroll.delta);
+            control_state.focus_requested = false;
+            control_state.zoom.setValueInstant(simulation.renderer.vp_handler.state.zoom);
+        });
+        addKeyPressedCallback(sf::Keyboard::R, [&](sfev::CstEv e){
+            control_state.focus_requested = true;
+            control_state.zoom = 1.0f;
+            control_state.focus = simulation.renderer.vp_handler.state.center;
+        });
     }
 
     void onClick(sf::Vector2f relative_click_position, sf::Mouse::Button button) override
     {
         if (button == sf::Mouse::Left) {
+            control_state.focus_requested = false;
             simulation.renderer.vp_handler.click(relative_click_position);
         } else if (button == sf::Mouse::Right) {
             control_state.executeViewAction(simulation.renderer.vp_handler.getMouseWorldPosition());
@@ -41,6 +50,8 @@ struct WorldView : GUI::Item
     {
         if (button == sf::Mouse::Left) {
             simulation.renderer.vp_handler.unclick();
+            control_state.focus_requested = false;
+            control_state.focus.setValueInstant(simulation.renderer.vp_handler.state.offset);
         }
     }
 
@@ -51,6 +62,10 @@ struct WorldView : GUI::Item
 
     void render(sf::RenderTarget& target) override
     {
+        if (control_state.focus_requested) {
+            simulation.renderer.vp_handler.setFocus(control_state.focus);
+            simulation.renderer.vp_handler.setZoom(control_state.zoom);
+        }
         simulation.render(target);
     }
 
