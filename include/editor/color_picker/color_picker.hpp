@@ -59,12 +59,9 @@ struct ColorVariation : public GUI::Item
     [[nodiscard]]
     sf::Color getColorAt(sf::Vector2f mouse_position) const
     {
-        const float ratio_x = 1.0f - mouse_position.x / size.x;
-        const float ratio_y = 1.0f - mouse_position.y / size.y;
-
-        return ColorUtils::createColor((to<float>(color.r) + to<float>(255 - color.r) * ratio_x) * ratio_y,
-                                       (to<float>(color.g) + to<float>(255 - color.g) * ratio_x) * ratio_y,
-                                       (to<float>(color.b) + to<float>(255 - color.b) * ratio_x) * ratio_y);
+        return ColorUtils::createColor((to<float>(color.r) + to<float>(255 - color.r) * selection.x) * selection.y,
+                                       (to<float>(color.g) + to<float>(255 - color.g) * selection.x) * selection.y,
+                                       (to<float>(color.b) + to<float>(255 - color.b) * selection.x) * selection.y);
     }
     
     void updateSelectedColor()
@@ -76,7 +73,14 @@ struct ColorVariation : public GUI::Item
     
     void onClick(sf::Vector2f mouse_position, sf::Mouse::Button) override
     {
-        selection = mouse_position;
+        updateSelection(mouse_position);
+    }
+
+    void updateSelection(sf::Vector2f mouse_position)
+    {
+        const float ratio_x = 1.0f - mouse_position.x / size.x;
+        const float ratio_y = 1.0f - mouse_position.y / size.y;
+        selection = {ratio_x, ratio_y};
         updateSelectedColor();
     }
     
@@ -94,7 +98,7 @@ struct ColorVariation : public GUI::Item
         const float selection_radius = 8.0f;
         sf::CircleShape c(selection_radius);
         c.setOrigin(selection_radius, selection_radius);
-        c.setPosition(position + selection);
+        c.setPosition(position + sf::Vector2f(size.x * (1.0f - selection.x), size.y * (1.0f - selection.y)));
         c.setFillColor(current_color);
         c.setOutlineColor(sf::Color::White);
         c.setOutlineThickness(2.0f);
@@ -104,8 +108,7 @@ struct ColorVariation : public GUI::Item
     void onMouseMove(sf::Vector2f mouse_position) override
     {
         if (clicking) {
-            selection = mouse_position;
-            updateSelectedColor();
+            updateSelection(mouse_position);
         }
     }
 };
@@ -143,11 +146,15 @@ struct HueSlider : public GUI::Item
     {
         updateVA();
     }
-    
-    void updateSelectedColor(sf::Vector2f mouse_position)
+
+    void updateSelectedColorMouse(sf::Vector2f mouse_position)
     {
-        const float hue_length = size.x / to<float>(colors.size() - 1);
-        const float color_div = mouse_position.x / hue_length;
+        updateSelectedColor(mouse_position.x / size.x);
+    }
+    
+    void updateSelectedColor(float ratio_x)
+    {
+        const float color_div = ratio_x * to<float>(colors.size() - 1);
         const auto color_index = to<uint32_t>(color_div);
         const sf::Color color_1 = colors[color_index];
         const sf::Color color_2 = colors[color_index + 1];
@@ -160,13 +167,13 @@ struct HueSlider : public GUI::Item
     
     void onClick(sf::Vector2f mouse_position, sf::Mouse::Button) override
     {
-        updateSelectedColor(mouse_position);
+        updateSelectedColorMouse(mouse_position);
     }
     
     void onMouseMove(sf::Vector2f mouse_position) override
     {
         if (clicking) {
-            updateSelectedColor(mouse_position);
+            updateSelectedColorMouse(mouse_position);
         }
     }
     
@@ -194,7 +201,7 @@ struct ColorPicker : public GUI::Container
         padding = 0.0f;
         spacing = 0.0f;
         size_type.y = GUI::Size::FitContent;
-        // Create sub elemets
+        // Create sub elements
         const float hue_slider_height = 20.0f;
         color_variation = create<ColorVariation>();
         hue_slider = create<HueSlider>();
@@ -217,15 +224,18 @@ struct ColorPicker : public GUI::Container
     {
         //setHeight(size.x);
     }
-    
+
+    [[nodiscard]]
     sf::Color getColor() const
     {
         return color_variation->selected_color;
     }
-    
-    void setColor(sf::Color new_color)
+
+    void setRandomColor() const
     {
-        
+        hue_slider->updateSelectedColor(RNGf::getUnder(1.0f));
+        color_variation->selection = {RNGf::getUnder(0.5f), RNGf::getRange(0.5f, 1.0f)};
+        color_variation->updateSelectedColor();
     }
 };
 

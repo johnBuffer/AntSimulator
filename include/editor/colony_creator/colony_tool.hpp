@@ -64,7 +64,7 @@ struct ColonyTool : GUI::Container
             setColor(color_picker->getColor());
         });
 
-        setColor(ColorUtils::getRandomColor());
+        color_picker->setRandomColor();
     }
 
     void onClick(sf::Vector2f, sf::Mouse::Button) override
