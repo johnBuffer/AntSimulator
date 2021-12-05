@@ -87,19 +87,18 @@ struct PopulationChart
 
 struct ColonyRenderer
 {
-	sf::Font font;
-	sf::Text text;
+	sf::Font         font;
+	sf::Text         text;
+	sf::VertexArray  ants_va;
+	sf::VertexArray  ants_food_va;
+	PopulationChart  population;
+	civ::Ref<Colony> colony_ref;
 
-	sf::VertexArray ants_va;
-	sf::VertexArray ants_food_va;
-
-	PopulationChart population;
-	Colony& colony;
-
-	ColonyRenderer(Colony& colony)
+    explicit
+	ColonyRenderer(civ::Ref<Colony> colony)
 		: ants_va(sf::Quads, 4 * Conf::ANTS_COUNT)
 		, ants_food_va(sf::Quads, 4 * Conf::ANTS_COUNT)
-		, colony(colony)
+		, colony_ref(colony)
 	{
 		font.loadFromFile("res/font.ttf");
 		text.setFont(font);
@@ -126,12 +125,13 @@ struct ColonyRenderer
 		const sf::Vector2f size(400.0f, 100.0f);
 		const float colonies_count = 2.0f;
 		const float start_x = (Conf::WIN_WIDTH - size.x * colonies_count - (colonies_count - 1.0f) * margin) * 0.5f;
-		population.configure({start_x + (size.x + margin) * colony.id, margin}, size);
-		population.population.color = colony.ants_color;
+		population.configure({start_x + (size.x + margin) * colony_ref->id, margin}, size);
+		population.population.color = colony_ref->ants_color;
 	}
 
     void initializeAntsVA()
     {
+        const Colony& colony = *colony_ref;
         for (uint64_t i(Conf::ANTS_COUNT-1); i--;) {
             const uint64_t index = 4 * i;
             // Ant
@@ -152,6 +152,7 @@ struct ColonyRenderer
 
 	void renderAnts(sf::RenderTarget& target, const sf::RenderStates& states)
 	{
+        Colony& colony = *colony_ref;
         if (colony.color_changed) {
             initializeAntsVA();
             colony.color_changed = false;
@@ -186,12 +187,14 @@ struct ColonyRenderer
 
 	void updatePopulation(float dt)
 	{
-		population.updateData(colony, dt);
+		population.updateData(*colony_ref, dt);
 	}
 
 	void render(sf::RenderTarget& target, const sf::RenderStates& states)
 	{
-		const float size = colony.base.radius;
+        Colony& colony = *colony_ref;
+
+        const float size = colony.base.radius;
 		sf::CircleShape circle(size);
 		circle.setOrigin(size, size);
 		circle.setPosition(colony.base.position);

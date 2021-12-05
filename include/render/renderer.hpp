@@ -24,7 +24,7 @@ struct Renderer
 		render_ants = !render_ants;
 	}
 
-	void addColony(Colony& colony)
+	void addColony(civ::Ref<Colony>& colony)
 	{
 		colonies.emplace_back(colony);
 	}

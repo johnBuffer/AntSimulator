@@ -4,7 +4,7 @@
 #include "simulation/config.hpp"
 #include "simulation/world/world_grid.hpp"
 #include "common/utils.hpp"
-
+#include <iostream>
 
 struct WorldRenderer : public AsyncRenderer
 {
@@ -12,7 +12,7 @@ struct WorldRenderer : public AsyncRenderer
 	bool draw_markers       = false;
 	bool draw_density       = false;
 	bool draw_to_enemies    = false;
-	int32_t selected_colony = -1;
+	int64_t selected_colony = -1;
 
 	WorldRenderer(Grid<WorldCell>& grid_, DoubleObject<sf::VertexArray>& target)
 		: AsyncRenderer(target)

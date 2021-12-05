@@ -12,21 +12,23 @@
 
 struct Colony
 {
-	ColonyBase base;
-	uint32_t max_ants_count;
+	ColonyBase       base;
+	uint32_t         max_ants_count;
 	civ::Vector<Ant> ants;
-	Cooldown ants_creation_cooldown;
-	float food_acc;
-	RMean<float> food_acc_mean;
-	Cooldown pop_diff_update;
-	RDiff<int64_t> pop_diff;
-	uint8_t id;
-	sf::Color ants_color = sf::Color::White;
-	uint64_t ant_creation_id = 0;
-    bool color_changed = false;
+	Cooldown         ants_creation_cooldown;
+	float            food_acc;
+	RMean<float>     food_acc_mean;
+	Cooldown         pop_diff_update;
+	RDiff<int64_t>   pop_diff;
+	uint8_t          id;
+	sf::Color        ants_color = sf::Color::White;
+	uint64_t         ant_creation_id = 0;
+    bool             color_changed = false;
 
 
-	Colony(float x, float y, uint32_t n, uint8_t col_id)
+    Colony() = default;
+
+	Colony(float x, float y, uint32_t n)
 		: base(sf::Vector2f(x, y), 20.0f)
 		, max_ants_count(n)
 		, ants_creation_cooldown(0.125f)
@@ -34,14 +36,20 @@ struct Colony
 		, food_acc_mean(100)
 		, pop_diff_update(1.0f)
 		, pop_diff(60)
-		, id(col_id)
+		, id(0)
 	{
-		base.food = 0.0f;
-		uint32_t ants_count = 16;
-		for (uint32_t i(ants_count); i--;) {
-			createWorker();
-		}
+
 	}
+
+    void initialize(uint8_t colony_id)
+    {
+        id = colony_id;
+        base.food = 0.0f;
+        uint32_t ants_count = 16;
+        for (uint32_t i(ants_count); i--;) {
+            createWorker();
+        }
+    }
 
     void setPosition(sf::Vector2f new_position)
     {

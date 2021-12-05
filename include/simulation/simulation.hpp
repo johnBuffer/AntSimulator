@@ -12,7 +12,7 @@
 
 struct Simulation
 {
-	std::vector<Colony> colonies;
+	civ::Vector<Colony> colonies;
 	World world;
 	// Render
 	Renderer renderer;
@@ -27,70 +27,11 @@ struct Simulation
 		, renderer()
 		, ev_manager(window, true)
 	{
-		colonies.reserve(Conf::MAX_COLONIES_COUNT);
-		initEventCallbacks();
 	}
 
 	void loadMap(const std::string& map_filename)
 	{
 		MapLoader::loadMap(world, map_filename);
-	}
-
-	void initEventCallbacks()
-	{
-		ev_manager.addMousePressedCallback(sf::Mouse::Right, [&](sfev::CstEv) {
-			selectColony();
-			world.renderer.draw_to_enemies = false;
-		});
-
-		ev_manager.addMousePressedCallback(sf::Mouse::Middle, [&](sfev::CstEv) {
-			selectColony();
-			world.renderer.draw_to_enemies = true;
-		});
-
-		ev_manager.addEventCallback(sf::Event::Closed, [this](sfev::CstEv) {
-			ev_manager.getWindow().close();
-		});
-
-		ev_manager.addKeyPressedCallback(sf::Keyboard::Escape, [this](sfev::CstEv) {
-			ev_manager.getWindow().close();
-		});
-
-		ev_manager.addKeyPressedCallback(sf::Keyboard::P, [this](sfev::CstEv) {
-			ev_state.pause = !ev_state.pause;
-		});
-
-		ev_manager.addKeyPressedCallback(sf::Keyboard::A, [this](sfev::CstEv) {
-			renderer.toggleRenderAnts();
-		});
-
-		ev_manager.addKeyPressedCallback(sf::Keyboard::S, [this](sfev::CstEv) {
-			ev_state.fullspeed = !ev_state.fullspeed;
-			ev_manager.getWindow().setFramerateLimit(60 * (!ev_state.fullspeed));
-		});
-        
-        // Viewport Handler controls
-        ev_manager.addMousePressedCallback(sf::Mouse::Left, [&](sfev::CstEv) {
-            ev_state.clicking = true;
-            renderer.vp_handler.click(ev_manager.getFloatMousePosition());
-        });
-
-        ev_manager.addMouseReleasedCallback(sf::Mouse::Left, [&](sfev::CstEv) {
-            ev_state.clicking = false;
-            renderer.vp_handler.unclick();
-        });
-
-        ev_manager.addEventCallback(sf::Event::MouseMoved, [&](sfev::CstEv) {
-            renderer.vp_handler.setMousePosition(ev_manager.getFloatMousePosition());
-        });
-        
-        ev_manager.addKeyPressedCallback(sf::Keyboard::R, [this](sfev::CstEv) {
-            renderer.vp_handler.reset();
-        });
-        
-        ev_manager.addEventCallback(sf::Event::MouseWheelScrolled, [&](sfev::CstEv e) {
-            renderer.vp_handler.wheelZoom(e.mouseWheelScroll.delta);
-        });
 	}
 
 	void selectColony()
@@ -111,12 +52,13 @@ struct Simulation
 		ev_manager.processEvents();
 	}
 
-	Colony& createColony(float colony_x, float colony_y)
+	civ::Ref<Colony> createColony(float colony_x, float colony_y)
 	{
 		// Create the colony object
-		const auto colony_id = to<uint8_t>(colonies.size());
-		colonies.emplace_back(colony_x, colony_y, Conf::ANTS_COUNT, colony_id);
-		Colony& colony = colonies.back();
+		const civ::ID colony_id = colonies.emplace_back(colony_x, colony_y, Conf::ANTS_COUNT);
+		auto colony_ref = colonies.getRef(colony_id);
+        Colony& colony = *colony_ref;
+        colony.initialize(to<uint8_t>(colony_id));
 		colony.ants_color = Conf::COLONY_COLORS[colony.id];
 		// Create colony markers
 		for (uint32_t i(0); i < 64; ++i) {
@@ -124,8 +66,8 @@ struct Simulation
 			world.addMarker(colony.base.position + 16.0f * sf::Vector2f(cos(angle), sin(angle)), Mode::ToHome, 10.0f, true);
 		}
 		// Register it for the renderer
-		renderer.addColony(colony);
-        return colony;
+		renderer.addColony(colony_ref);
+        return colony_ref;
 	}
 
 	void update(float dt)
@@ -170,4 +112,16 @@ struct Simulation
 	{
 		renderer.render(world, target);
 	}
+
+    void removeColony(uint8_t colony_id)
+    {
+        colonies.erase(colony_id);
+        for (auto it = renderer.colonies.begin(); it != renderer.colonies.end(); ++it) {
+            if (it->colony_ref.getID() == colony_id) {
+                renderer.colonies.erase(it);
+                break;
+            }
+        }
+        world.clearMarkers(colony_id);
+    }
 };

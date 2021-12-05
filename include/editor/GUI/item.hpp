@@ -160,8 +160,10 @@ struct Item
         // Check for click falls in a sub item
         if (active_item) {
             active_item->defaultOnClick(getRelativeMousePosition(active_item, mouse_position), button);
-            if (active_item->click_caught) {
-                return;
+            if (active_item) {
+                if (active_item->click_caught) {
+                    return;
+                }
             }
         }
         // If click hasn't been intercepted execute callback

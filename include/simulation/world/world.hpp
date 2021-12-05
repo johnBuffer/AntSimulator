@@ -42,7 +42,7 @@ struct World
 		map.addMarker(pos, type, intensity, colony_id, permanent);
 	}
 
-	void addMarkerRepellent(sf::Vector2f pos, uint8_t colony_id, float amount)
+	void addMarkerRepellent(sf::Vector2f pos, uint64_t colony_id, float amount)
 	{
 		map.get(pos).markers[colony_id].repellent += amount;
 	}
@@ -77,4 +77,15 @@ struct World
 			map.addFood(pos, quantity);
 		}
 	}
+
+    void clearMarkers(uint8_t colony_id)
+    {
+        for (auto& cell : map.cells) {
+            auto& markers = cell.markers[colony_id];
+            markers.intensity[0] = 0.0f;
+            markers.intensity[1] = 0.0f;
+            markers.intensity[2] = 0.0f;
+            cell.density = 0.0f;
+        }
+    }
 };

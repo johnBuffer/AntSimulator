@@ -8,15 +8,15 @@
 
 struct ColonyTool : GUI::Container
 {
-    Colony& colony;
+    civ::Ref<Colony> colony;
     ControlState& control_state;
     SPtr<GUI::Container> top_zone;
     SPtr<edtr::ColorPicker> color_picker;
 
     bool selected = false;
-    std::function<void(int32_t)> on_select = [](int32_t){};
+    std::function<void(int8_t)> on_select = [](int8_t){};
 
-    ColonyTool(Colony& colony_, ControlState& control_state_)
+    ColonyTool(civ::Ref<Colony>& colony_, ControlState& control_state_)
         : GUI::Container(Container::Orientation::Vertical)
         , colony(colony_)
         , control_state(control_state_)
@@ -37,7 +37,7 @@ struct ColonyTool : GUI::Container
         top_zone->addItem(color_button, "colony_color_button");
 
         auto to_focus_button = create<GUI::Button>("Focus", [this](){
-            control_state.requestFocus(colony.base.position, 2.0f);
+            control_state.requestFocus(colony->base.position, 2.0f);
         });
         to_focus_button->setHeight(20.0f);
         to_focus_button->setWidth(40.0f);
@@ -45,7 +45,7 @@ struct ColonyTool : GUI::Container
 
         auto set_position_button = create<GUI::Button>("Set Position", [this](){
             control_state.view_action = [this](sf::Vector2f world_position) {
-                colony.setPosition(world_position);
+                colony->setPosition(world_position);
             };
         });
         set_position_button->setHeight(20.0f);
@@ -69,13 +69,13 @@ struct ColonyTool : GUI::Container
 
     void onClick(sf::Vector2f, sf::Mouse::Button) override
     {
-        on_select(colony.id);
+        on_select(colony->id);
     }
 
-    void setColor(sf::Color color) const
+    void setColor(sf::Color color)
     {
         top_zone->getByName<GUI::Button>("colony_color_button")->background_color = color;
-        colony.setColor(color);
+        colony->setColor(color);
     }
 
     void createColorPicker()

@@ -33,9 +33,9 @@ struct ColonyCreator : public GUI::NamedContainer
     void createColony()
     {
         if (this->colonies_count < Conf::MAX_COLONIES_COUNT) {
-            Colony& new_colony = simulation.createColony(50.0f, 50.0f);
+            auto new_colony = simulation.createColony(50.0f, 50.0f);
             auto colony_tool = create<ColonyTool>(new_colony, control_state);
-            colony_tool->on_select = [this](int32_t id){
+            colony_tool->on_select = [this](int8_t id){
                 select(id);
             };
             // Add the new item to this
@@ -44,6 +44,7 @@ struct ColonyCreator : public GUI::NamedContainer
 
             // Set the correct callback for the remove button
             colony_tool->top_zone->getByName<GUI::Button>("remove")->click_callback = [this, colony_tool](){
+                simulation.removeColony(colony_tool->colony->id);
                 this->removeItem(colony_tool);
                 --this->colonies_count;
             };
@@ -62,7 +63,7 @@ struct ColonyCreator : public GUI::NamedContainer
         for (const auto& item : root->sub_items) {
             auto tool = std::dynamic_pointer_cast<ColonyTool>(item);
             if (tool) {
-                tool->selected = tool->colony.id == selected;
+                tool->selected = tool->colony->id == selected;
             }
         }
     }

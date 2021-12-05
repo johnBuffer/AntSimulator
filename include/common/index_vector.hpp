@@ -5,52 +5,63 @@
 namespace civ
 {
 
+using ID = uint64_t;
+
 template<typename T>
 struct Ref;
 
+template<typename T>
+struct PRef;
 
 struct Slot
 {
-    uint64_t id;
-    uint64_t data_id;
+    ID id;
+    ID data_id;
 };
 
 
 template<typename T>
 struct ObjectSlot
 {
-    ObjectSlot(uint64_t id_, T* object_)
+    ObjectSlot(ID id_, T* object_)
         : id(id_)
         , object(object_)
     {}
 
-    uint64_t id;
+    ID id;
     T* object;
+};
+
+
+struct GenericProvider
+{
+    virtual void* get(civ::ID id) = 0;
+    virtual bool  isValid(civ::ID, uint64_t validity_id) const = 0;
 };
 
 
 template<typename T>
 struct ObjectSlotConst
 {
-    ObjectSlotConst(uint64_t id_, const T* object_)
+    ObjectSlotConst(ID id_, const T* object_)
         : id(id_)
         , object(object_)
     {}
 
-    uint64_t id;
+    ID    id;
     const T* object;
 };
 
 
 struct SlotMetadata
 {
-    uint64_t rid;
-    uint64_t op_id;
+    ID rid;
+    ID op_id;
 };
 
 
 template<typename T>
-struct Vector
+struct Vector : public GenericProvider
 {
     Vector()
         : data_size(0)
@@ -58,46 +69,59 @@ struct Vector
     {}
     // Data ADD / REMOVE
     template<typename... Args>
-    uint64_t emplace_back(Args&&... args);
-    uint64_t push_back(const T& obj);
-    void erase(uint64_t id);
+    ID                 emplace_back(Args&&... args);
+    ID                 push_back(const T& obj);
+    void               erase(ID id);
+    template<typename TPredicate>
+    void               remove_if(TPredicate&& f);
     // Data access by ID
-    T& operator[](uint64_t id);
-    const T& operator[](uint64_t id) const;
+    T&                 operator[](ID id);
+    const T&           operator[](ID id) const;
     // Returns a standalone object allowing access to the underlying data
-    Ref<T> getRef(uint64_t id);
+    Ref<T>             getRef(ID id);
+    template<typename U>
+    PRef<U>            getPRef(ID id);
     // Returns the data at a specific place in the data vector (not an ID)
-    T& getDataAt(uint64_t i);
+    T&                 getDataAt(uint64_t i);
     // Check if the data behind the pointer is the same
-    bool isValid(uint64_t id, uint64_t validity) const;
-    // Returns the ith object and id
-    ObjectSlot<T> getSlotAt(uint64_t i);
+    bool               isValid(ID id, ID validity) const override;
+    uint64_t           getOperationID(ID id) const;
+    // Returns the ith object and global_id
+    ObjectSlot<T>      getSlotAt(uint64_t i);
     ObjectSlotConst<T> getSlotAt(uint64_t i) const;
     // Iterators
-    typename std::vector<T>::iterator begin();
-    typename std::vector<T>::iterator end();
+    typename std::vector<T>::iterator       begin();
+    typename std::vector<T>::iterator       end();
     typename std::vector<T>::const_iterator begin() const;
     typename std::vector<T>::const_iterator end() const;
-    // Number of objects in the array
+    // Number of objects in the provider
+    [[nodiscard]]
     uint64_t size() const;
 
 public:
-    std::vector<T> data;
-    std::vector<uint64_t> ids;
+    std::vector<T>            data;
+    std::vector<uint64_t>     ids;
     std::vector<SlotMetadata> metadata;
-    uint64_t data_size;
-    uint64_t op_count;
+    uint64_t                  data_size;
+    uint64_t                  op_count;
 
-    bool isFull() const;
-    // Returns the ID of the ith element of the data array
-    uint64_t getID(uint64_t i) const;
+    [[nodiscard]]
+    bool          isFull() const;
+    // Returns the ID of the ith element of the data provider
+    [[nodiscard]]
+    ID            getID(uint64_t i) const;
     // Returns the data emplacement of an ID
-    uint64_t getDataID(uint64_t id) const;
-    Slot createNewSlot();
-    Slot getFreeSlot();
-    Slot getSlot();
-    SlotMetadata& getMetadataAt(uint64_t id);
-    const T& getAt(uint64_t id) const;
+    [[nodiscard]]
+    uint64_t      getDataID(ID id) const;
+    Slot          createNewSlot();
+    Slot          getFreeSlot();
+    Slot          getSlot();
+    SlotMetadata& getMetadataAt(ID id);
+    const T&      getAt(ID id) const;
+    [[nodiscard]]
+    void*         get(civ::ID id) override;
+
+    template<class U> friend struct PRef;
 };
 
 template<typename T>
@@ -105,7 +129,7 @@ template<typename ...Args>
 inline uint64_t Vector<T>::emplace_back(Args&& ...args)
 {
     const Slot slot = getSlot();
-    new(&data[slot.data_id]) T(args...);
+    new(&data[slot.data_id]) T(std::forward<Args>(args)...);
     return slot.id;
 }
 
@@ -118,26 +142,30 @@ inline uint64_t Vector<T>::push_back(const T& obj)
 }
 
 template<typename T>
-inline void Vector<T>::erase(uint64_t id)
+inline void Vector<T>::erase(ID id)
 {
+    // Retrieve the object position in data
+    const uint64_t data_index = ids[id];
+    // Check if the object has been already erased
+    if (data_index >= data_size) { return; }
+    // Swap the object at the end
     --data_size;
-    const uint64_t current_data_id = ids[id];
-    const uint64_t last_obj_id = metadata[data_size].rid;
-    std::swap(data[data_size], data[current_data_id]);
-    std::swap(metadata[data_size], metadata[current_data_id]);
-    std::swap(ids[last_obj_id], ids[id]);
+    const uint64_t last_id = metadata[data_size].rid;
+    std::swap(data[data_size], data[data_index]);
+    std::swap(metadata[data_size], metadata[data_index]);
+    std::swap(ids[last_id], ids[id]);
     // Invalidate the operation ID
     metadata[data_size].op_id = ++op_count;
 }
 
 template<typename T>
-inline T& Vector<T>::operator[](uint64_t id)
+inline T& Vector<T>::operator[](ID id)
 {
     return const_cast<T&>(getAt(id));
 }
 
 template<typename T>
-inline const T& Vector<T>::operator[](uint64_t id) const
+inline const T& Vector<T>::operator[](ID id) const
 {
     return getAt(id);
 }
@@ -155,9 +183,15 @@ inline ObjectSlotConst<T> Vector<T>::getSlotAt(uint64_t i) const
 }
 
 template<typename T>
-inline Ref<T> Vector<T>::getRef(uint64_t id)
+inline Ref<T> Vector<T>::getRef(ID id)
 {
     return Ref<T>(id, this, metadata[ids[id]].op_id);
+}
+
+template<typename T>
+template<typename U>
+PRef<U> Vector<T>::getPRef(ID id) {
+    return PRef<U>{id, *this, metadata[ids[id]].op_id};
 }
 
 template<typename T>
@@ -234,27 +268,53 @@ inline Slot Vector<T>::getSlot()
 }
 
 template<typename T>
-inline SlotMetadata& Vector<T>::getMetadataAt(uint64_t id)
+inline SlotMetadata& Vector<T>::getMetadataAt(ID id)
 {
     return metadata[getDataID(id)];
 }
 
 template<typename T>
-inline uint64_t Vector<T>::getDataID(uint64_t id) const
+inline uint64_t Vector<T>::getDataID(ID id) const
 {
     return ids[id];
 }
 
 template<typename T>
-inline const T& Vector<T>::getAt(uint64_t id) const
+inline const T& Vector<T>::getAt(ID id) const
 {
     return data[getDataID(id)];
 }
 
 template<typename T>
-inline bool Vector<T>::isValid(uint64_t id, uint64_t validity) const
+inline bool Vector<T>::isValid(ID id, ID validity) const
 {
     return validity == metadata[getDataID(id)].op_id;
+}
+
+template<typename T>
+inline uint64_t Vector<T>::getOperationID(ID id) const
+{
+    return metadata[getDataID(id)].op_id;
+}
+
+template<typename T>
+template<typename TPredicate>
+void Vector<T>::remove_if(TPredicate&& f)
+{
+    for (uint64_t data_index{ 0 }; data_index < data_size;) {
+        if (f(data[data_index])) {
+            erase(metadata[data_index].rid);
+        }
+        else {
+            ++data_index;
+        }
+    }
+}
+
+template<typename T>
+void *Vector<T>::get(civ::ID id)
+{
+    return static_cast<void*>(&data[ids[id]]);
 }
 
 
@@ -267,7 +327,7 @@ struct Ref
         , validity_id(0)
     {}
 
-    Ref(uint64_t id_, Vector<T>* a, uint64_t vid)
+    Ref(ID id_, Vector<T>* a, ID vid)
         : id(id_)
         , array(a)
         , validity_id(vid)
@@ -283,15 +343,97 @@ struct Ref
         return (*array)[id];
     }
 
+    const T& operator*() const
+    {
+        return (*array)[id];
+    }
+
+    civ::ID getID() const
+    {
+        return id;
+    }
+
+    explicit
     operator bool() const
     {
         return array && array->isValid(id, validity_id);
     }
 
 private:
-    uint64_t id;
+    ID         id;
     Vector<T>* array;
-    uint64_t validity_id;
+    ID         validity_id;
+};
+
+
+template<typename T>
+struct PRef
+{
+    using ProviderCallback = T*(*)(ID, GenericProvider*);
+
+    PRef()
+        : id(0)
+        , provider_callback(nullptr)
+        , provider(nullptr)
+        , validity_id(0)
+    {}
+
+    template<typename U>
+    PRef(ID index, Vector<U>& a, ID vid)
+        : id(index)
+        , provider_callback{PRef<T>::get<U>}
+        , provider(&a)
+        , validity_id(vid)
+    {}
+
+    template<typename U>
+    PRef(const PRef<U>& other)
+        : id(other.index)
+        , provider_callback{PRef<T>::get<U>}
+        , provider(other.provider)
+        , validity_id(other.validity_id)
+    {}
+
+    template<typename U>
+    static T* get(ID index, GenericProvider* provider)
+    {
+        return static_cast<T*>(static_cast<U*>(provider->get(index)));
+    }
+
+    T* operator->()
+    {
+        return provider_callback(id, provider);
+    }
+
+    T& operator*()
+    {
+        return *provider_callback(id, provider);
+    }
+
+    const T& operator*() const
+    {
+        return *provider_callback(id, provider);
+    }
+
+    civ::ID getID() const
+    {
+        return id;
+    }
+
+    explicit
+    operator bool() const
+    {
+        return provider && provider->isValid(id, validity_id);
+    }
+
+private:
+    ID                  id;
+    ProviderCallback    provider_callback;
+    GenericProvider*    provider;
+    uint64_t            validity_id;
+
+    template<class U> friend struct PRef;
+    template<class U> friend struct Vector;
 };
 
 }

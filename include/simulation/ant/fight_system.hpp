@@ -1,16 +1,17 @@
 #include "simulation/colony/colony.hpp"
+#include "common/index_vector.hpp"
 
 
 struct FightSystem
 {
-    void checkForFights(std::vector<Colony>& colonies, World& world)
+    void checkForFights(civ::Vector<Colony>& colonies, World& world)
     {
         for (Colony& c : colonies) {
             checkForFights(c, colonies, world);
         }
     }
 
-    void checkForFights(Colony& colony, std::vector<Colony>& colonies, World& world)
+    void checkForFights(Colony& colony, civ::Vector<Colony>& colonies, World& world)
 	{
 		for (Ant& a : colony.ants) {
             // Check if the ant has an active fight request
@@ -33,7 +34,7 @@ struct FightSystem
         }
 	}
 
-    void checkForFight(Ant& ant, std::vector<Colony>& colonies, World& world)
+    void checkForFight(Ant& ant, civ::Vector<Colony>& colonies, World& world)
     {
         // Only soldiers can initiate fights
         if (ant.type == Ant::Type::Worker && ant.fight_mode == FightMode::NoFight) {
