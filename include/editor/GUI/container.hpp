@@ -126,7 +126,7 @@ struct Container : public Item
                 getCoord1(new_item_size) = auto_size.value;
                 all_fixed = false;
             }
-            item->setPosition(makeVector2(current_pos, padding));
+            item->setPosition(makeVector2(current_pos, padding + (coord_2_size - getCoord2(item->size)) * 0.5f));
             item->setSize(new_item_size);
             // Update container state
             this_coord_2_size = std::max(this_coord_2_size, getCoord2(new_item_size) + 2.0f * padding);

@@ -42,6 +42,7 @@ struct Item
     float padding = 20.0f;
     bool clicking = false;
     bool catch_event = true;
+    bool click_caught = false;
     sfev::EventMap event_callbacks;
     sf::Vector2<Size> size_type = sf::Vector2<Size>(Size::Auto, Size::Auto);
     // Sub Items
@@ -61,7 +62,7 @@ struct Item
         , name(name_)
     {}
     
-    virtual void onClick(sf::Vector2f click_position, sf::Mouse::Button button) {}
+    virtual void onClick(sf::Vector2f click_position, sf::Mouse::Button button) {click_caught = false;}
     virtual void onUnclick(sf::Mouse::Button button) {}
     virtual void onMouseMove(sf::Vector2f new_mouse_position) {}
     virtual void onSizeChange() {}
@@ -154,12 +155,14 @@ struct Item
     
     void defaultOnClick(sf::Vector2f mouse_position, sf::Mouse::Button button)
     {
+        click_caught = true;
         clicking = true;
         // Check for click falls in a sub item
         if (active_item) {
-            active_item->defaultOnClick(getRelativeMousePosition(active_item, mouse_position),
-                                        button);
-            return;
+            active_item->defaultOnClick(getRelativeMousePosition(active_item, mouse_position), button);
+            if (active_item->click_caught) {
+                return;
+            }
         }
         // If click hasn't been intercepted execute callback
         onClick(mouse_position, button);

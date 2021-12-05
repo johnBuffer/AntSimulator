@@ -9,10 +9,10 @@
 struct WorldRenderer : public AsyncRenderer
 {
 	const Grid<WorldCell>& grid;
-	bool draw_markers = true;
-	bool draw_density = false;
-	bool draw_to_enemies = false;
-	int8_t selected_colony = -1;
+	bool draw_markers       = false;
+	bool draw_density       = false;
+	bool draw_to_enemies    = false;
+	int32_t selected_colony = -1;
 
 	WorldRenderer(Grid<WorldCell>& grid_, DoubleObject<sf::VertexArray>& target)
 		: AsyncRenderer(target)
@@ -65,27 +65,29 @@ struct WorldRenderer : public AsyncRenderer
 							va[4 * i + 2].texCoords = sf::Vector2f(100.0f - offset, 100.0f - offset);
 							va[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
 						}
-						else if (colony_cell.repellent) {
-							color = sf::Color::Blue;
-							va[4 * i + 0].texCoords = sf::Vector2f(offset, offset);
-							va[4 * i + 1].texCoords = sf::Vector2f(100.0f - offset, offset);
-							va[4 * i + 2].texCoords = sf::Vector2f(100.0f - offset, 100.0f - offset);
-							va[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
-						}
-						else {
-							const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * float(colony_cell.intensity[0]);
-							const sf::Vector3f intensity_2_color = intensity_factor * to_food_color * float(colony_cell.intensity[1]);
-							const sf::Vector3f mixed_color(
-								intensity_1_color.x + intensity_2_color.x,
-								intensity_1_color.y + intensity_2_color.y,
-								intensity_1_color.z + intensity_2_color.z
-							);
-							color = vec3ToColor(mixed_color);
-							va[4 * i + 0].texCoords = sf::Vector2f(offset, offset);
-							va[4 * i + 1].texCoords = sf::Vector2f(100.0f - offset, offset);
-							va[4 * i + 2].texCoords = sf::Vector2f(100.0f - offset, 100.0f - offset);
-							va[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
-						}
+                        else if (draw_markers) {
+                            if (colony_cell.repellent) {
+                                color = sf::Color::Blue;
+                                va[4 * i + 0].texCoords = sf::Vector2f(offset, offset);
+                                va[4 * i + 1].texCoords = sf::Vector2f(100.0f - offset, offset);
+                                va[4 * i + 2].texCoords = sf::Vector2f(100.0f - offset, 100.0f - offset);
+                                va[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
+                            }
+                            else {
+                                const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * float(colony_cell.intensity[0]);
+                                const sf::Vector3f intensity_2_color = intensity_factor * to_food_color * float(colony_cell.intensity[1]);
+                                const sf::Vector3f mixed_color(
+                                        intensity_1_color.x + intensity_2_color.x,
+                                        intensity_1_color.y + intensity_2_color.y,
+                                        intensity_1_color.z + intensity_2_color.z
+                                );
+                                color = vec3ToColor(mixed_color);
+                                va[4 * i + 0].texCoords = sf::Vector2f(offset, offset);
+                                va[4 * i + 1].texCoords = sf::Vector2f(100.0f - offset, offset);
+                                va[4 * i + 2].texCoords = sf::Vector2f(100.0f - offset, 100.0f - offset);
+                                va[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
+                            }
+                        }
 					}
 				}
 				else if (cell.food) {

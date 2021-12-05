@@ -100,7 +100,7 @@ public:
 		updateDelta();
 	}
 
-public:
+private:
 	T m_start_value;
 	T m_target_value;
 	T m_delta;

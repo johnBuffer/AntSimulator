@@ -7,8 +7,8 @@
 struct ControlState
 {
     using ViewAction = std::function<void(sf::Vector2f)>;
-    using Action = std::function<void(void)>;
-
+    using Action     = std::function<void(void)>;
+    // Actions
     Action     action      = nullptr;
     ViewAction view_action = nullptr;
     // Special commands
@@ -16,9 +16,7 @@ struct ControlState
     trn::Transition<sf::Vector2f> focus;
     trn::Transition<float> zoom = 1.0f;
 
-    ControlState()
-    {
-    }
+    ControlState() = default;
 
     void executeViewAction(sf::Vector2f mouse_world_position)
     {

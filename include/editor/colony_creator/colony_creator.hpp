@@ -13,6 +13,7 @@ struct ColonyCreator : public GUI::NamedContainer
     Simulation&   simulation;
     ControlState& control_state;
     uint32_t      colonies_count = 0;
+    uint8_t       last_selected = -1;
 
     explicit
     ColonyCreator(Simulation& sim, ControlState& control_state_)
@@ -20,7 +21,6 @@ struct ColonyCreator : public GUI::NamedContainer
         , simulation(sim)
         , control_state(control_state_)
     {
-        padding = 5.0f;
         root->size_type.y = GUI::Size::FitContent;
         auto add_button = create<GUI::Button>("Add", [this](){
             this->createColony();
@@ -35,7 +35,9 @@ struct ColonyCreator : public GUI::NamedContainer
         if (this->colonies_count < Conf::MAX_COLONIES_COUNT) {
             Colony& new_colony = simulation.createColony(50.0f, 50.0f);
             auto colony_tool = create<ColonyTool>(new_colony, control_state);
-
+            colony_tool->on_select = [this](int32_t id){
+                select(id);
+            };
             // Add the new item to this
             this->addItem(colony_tool);
             ++this->colonies_count;
@@ -45,6 +47,23 @@ struct ColonyCreator : public GUI::NamedContainer
                 this->removeItem(colony_tool);
                 --this->colonies_count;
             };
+        }
+    }
+
+    void select(int32_t id)
+    {
+        int32_t selected = -1;
+        if (id != last_selected) {
+            selected = id;
+        }
+        last_selected = selected;
+        this->simulation.world.renderer.selected_colony = selected;
+
+        for (const auto& item : root->sub_items) {
+            auto tool = std::dynamic_pointer_cast<ColonyTool>(item);
+            if (tool) {
+                tool->selected = tool->colony.id == selected;
+            }
         }
     }
 };

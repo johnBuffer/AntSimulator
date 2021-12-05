@@ -17,7 +17,8 @@ struct Scene
     sf::Vector2f       mouse_position;
 
     Item root;
-    
+
+    explicit
     Scene(sf::RenderWindow& window_)
         : window(window_)
         , event_manager(window_, false)
@@ -25,6 +26,12 @@ struct Scene
     {
         const auto size = window_.getSize();
         initializeEventsCallbacks();
+    }
+
+    template<typename T, typename TCallback>
+    void watch(SPtr<T> item, const TCallback&& callback)
+    {
+        item->observers.push_back({nullptr, callback});
     }
     
     void initializeEventsCallbacks()

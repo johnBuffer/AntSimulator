@@ -13,6 +13,7 @@
 #include "simulation/config.hpp"
 #include "editor/world_view.hpp"
 #include "time_control/time_controller.hpp"
+#include "display_options/display_options.hpp"
 
 
 namespace edtr
@@ -25,9 +26,10 @@ struct EditorScene : public GUI::Scene
     Simulation&  simulation;
     ControlState control_state;
 
-    SPtr<Toolbox>      toolbox;
-    SPtr<WorldView>    renderer;
-    SPtr<ToolSelector> tool_selector;
+    SPtr<Toolbox>       toolbox;
+    SPtr<WorldView>     renderer;
+    SPtr<ToolSelector>  tool_selector;
+    SPtr<DisplayOption> display_controls;
 
     explicit
     EditorScene(sf::RenderWindow& window, Simulation& sim)
@@ -51,6 +53,12 @@ struct EditorScene : public GUI::Scene
         renderer = create<WorldView>(toVector2f(window_size), simulation, control_state);
 
         toolbox = create<Toolbox>(sf::Vector2f(350.0f, to<float>(window_size.y)));
+        // Add display options
+        display_controls = create<DisplayOption>(control_state);
+        watch(display_controls, [this](){
+            updateRenderOptions();
+        });
+        toolbox->addItem(display_controls);
         // Add map edition tools
         tool_selector = create<ToolSelector>();
         toolbox->addItem(tool_selector);
@@ -71,6 +79,13 @@ struct EditorScene : public GUI::Scene
         addItem(renderer);
         addItem(toolbox, "Toolbox");
         addItem(time_controls, "", GUI::Alignement::Right);
+    }
+
+    void updateRenderOptions() const
+    {
+        renderer->simulation.renderer.render_ants = display_controls->draw_ants;
+        renderer->simulation.world.renderer.draw_markers = display_controls->draw_markers;
+        renderer->simulation.world.renderer.draw_density = display_controls->draw_density;
     }
 };
 

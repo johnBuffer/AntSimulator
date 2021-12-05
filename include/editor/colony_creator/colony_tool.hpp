@@ -13,6 +13,9 @@ struct ColonyTool : GUI::Container
     SPtr<GUI::Container> top_zone;
     SPtr<edtr::ColorPicker> color_picker;
 
+    bool selected = false;
+    std::function<void(int32_t)> on_select = [](int32_t){};
+
     ColonyTool(Colony& colony_, ControlState& control_state_)
         : GUI::Container(Container::Orientation::Vertical)
         , colony(colony_)
@@ -64,6 +67,11 @@ struct ColonyTool : GUI::Container
         setColor(ColorUtils::getRandomColor());
     }
 
+    void onClick(sf::Vector2f, sf::Mouse::Button) override
+    {
+        on_select(colony.id);
+    }
+
     void setColor(sf::Color color) const
     {
         top_zone->getByName<GUI::Button>("colony_color_button")->background_color = color;
@@ -87,7 +95,8 @@ struct ColonyTool : GUI::Container
     void render(sf::RenderTarget& target) override
     {
         auto background = GUI::RoundedRectangle(size, position, 5.0f);
-        background.setFillColor(sf::Color(200, 200, 200));
+        const uint8_t background_color = selected ? 180 : 200;
+        background.setFillColor(sf::Color(background_color, background_color, background_color));
         GUI::Item::draw(target, background);
     }
 };

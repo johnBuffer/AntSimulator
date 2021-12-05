@@ -24,9 +24,7 @@ struct TimeController : public GUI::NamedContainer
             , current_state(State::Pause)
     {
         setWidth(180.0f);
-
-        padding = 5.0f;
-
+        
         root->setHeight(30.0f, GUI::Size::Fixed);
         tool_pause = create<ToolOption>("Pause", [this](){
             current_state = State::Pause;

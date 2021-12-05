@@ -25,6 +25,7 @@ struct TextLabel : public Item
         text.setFillColor(sf::Color::Black);
         text.setCharacterSize(char_size);
         setText(label);
+        setHeight(padding + text.getGlobalBounds().height);
         updatePosition();
     }
     
