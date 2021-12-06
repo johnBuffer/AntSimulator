@@ -21,6 +21,8 @@ struct WorldView : GUI::Item
         , control_state(control_state_)
     {
         simulation.renderer.vp_handler.reset();
+        control_state.focus.setValueInstant(simulation.renderer.vp_handler.state.offset);
+        control_state.zoom.setValueInstant(simulation.renderer.vp_handler.state.zoom);
     }
 
     void initializeEventCallbacks() override
