@@ -85,6 +85,7 @@ struct World
             markers.intensity[0] = 0.0f;
             markers.intensity[1] = 0.0f;
             markers.intensity[2] = 0.0f;
+            markers.permanent = false;
             cell.density = 0.0f;
         }
     }

@@ -43,11 +43,11 @@ struct GridContainer : public Item
         }
     }
     
-    void addItem(ItemPtr item, const std::string& name = "")
+    void addItem(ItemPtr item, const std::string& item_name = "")
     {
         // Compute item grid coords
         const uint64_t items_count = sub_items.size();
-        Item::addItem(item, name, Alignement::None);
+        Item::addItem(item, item_name, Alignement::None);
         updateItem(item, items_count);
     }
     

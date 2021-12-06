@@ -61,10 +61,7 @@ struct Simulation
         colony.initialize(to<uint8_t>(colony_id));
 		colony.ants_color = Conf::COLONY_COLORS[colony.id];
 		// Create colony markers
-		for (uint32_t i(0); i < 64; ++i) {
-			float angle = float(i) / 64.0f * (2.0f * PI);
-			world.addMarker(colony.base.position + 16.0f * sf::Vector2f(cos(angle), sin(angle)), Mode::ToHome, 10.0f, true);
-		}
+        createColonyMarkers(colony);
 		// Register it for the renderer
 		renderer.addColony(colony_ref);
         return colony_ref;
@@ -78,6 +75,11 @@ struct Simulation
 			// Update world cells (markers, density, walls)
 			world.update(dt);
 			// First perform position update and grid registration
+            for (Colony& colony : colonies) {
+                if (colony.position_changed) {
+                    updateColonyPosition(colony);
+                }
+            }
 			for (Colony& colony : colonies) {
 				colony.genericAntsUpdate(dt, world);
 			}
@@ -108,6 +110,22 @@ struct Simulation
         }
     }
 
+    void updateColonyPosition(Colony& colony)
+    {
+        colony.position_changed = false;
+        world.clearMarkers(colony.id);
+        // Create colony markers
+        createColonyMarkers(colony);
+    }
+
+    void createColonyMarkers(Colony& colony)
+    {
+        for (uint32_t i(0); i < 64; ++i) {
+            float angle = float(i) / 64.0f * (2.0f * PI);
+            world.addMarker(colony.base.position + 0.9f * colony.base.radius * sf::Vector2f(cos(angle), sin(angle)), Mode::ToHome, 10.0f, true);
+        }
+    }
+
 	void render(sf::RenderTarget& target)
 	{
 		renderer.render(world, target);
@@ -115,13 +133,11 @@ struct Simulation
 
     void removeColony(uint8_t colony_id)
     {
-        colonies.erase(colony_id);
-        for (auto it = renderer.colonies.begin(); it != renderer.colonies.end(); ++it) {
-            if (it->colony_ref.getID() == colony_id) {
-                renderer.colonies.erase(it);
-                break;
-            }
+        for (Colony& c : colonies) {
+            c.stopFightsWith(colony_id);
         }
+        colonies.erase(colony_id);
+        renderer.colonies.erase(colony_id);
         world.clearMarkers(colony_id);
     }
 };

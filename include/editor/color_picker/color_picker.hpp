@@ -57,7 +57,7 @@ struct ColorVariation : public GUI::Item
     }
 
     [[nodiscard]]
-    sf::Color getColorAt(sf::Vector2f mouse_position) const
+    sf::Color getColorAt() const
     {
         return ColorUtils::createColor((to<float>(color.r) + to<float>(255 - color.r) * selection.x) * selection.y,
                                        (to<float>(color.g) + to<float>(255 - color.g) * selection.x) * selection.y,
@@ -66,7 +66,7 @@ struct ColorVariation : public GUI::Item
     
     void updateSelectedColor()
     {
-        selected_color = getColorAt(selection);
+        selected_color = getColorAt();
         current_color = selected_color;
         notifyChanged();
     }

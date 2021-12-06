@@ -94,6 +94,8 @@ struct ColonyRenderer
 	PopulationChart  population;
 	civ::Ref<Colony> colony_ref;
 
+    ColonyRenderer() = default;
+
     explicit
 	ColonyRenderer(civ::Ref<Colony> colony)
 		: ants_va(sf::Quads, 4 * Conf::ANTS_COUNT)

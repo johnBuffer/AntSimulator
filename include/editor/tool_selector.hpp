@@ -30,14 +30,14 @@ struct ToolOption : public GUI::Button
     
     void render(sf::RenderTarget& target) override
     {
-        const float angle_radius = 5.0f;
+        const float tool_angle_radius = 5.0f;
         const sf::Vector2f current_padding = sf::Vector2f(select_padding, select_padding);
         const sf::Vector2f inner_size = size - 2.0f * current_padding;
         const sf::Vector2f inner_offset = 0.5f * (size - inner_size);
         
-        GUI::RoundedRectangle background(size, position, angle_radius);
+        GUI::RoundedRectangle background(size, position, tool_angle_radius);
         background.setFillColor(sf::Color(200, 200, 200));
-        GUI::RoundedRectangle color_rect(inner_size, position + inner_offset, angle_radius - select_padding);
+        GUI::RoundedRectangle color_rect(inner_size, position + inner_offset, tool_angle_radius - select_padding);
         color_rect.setFillColor(color);
         draw(target, background);
         draw(target, color_rect);

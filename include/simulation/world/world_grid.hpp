@@ -42,7 +42,7 @@ struct ColonyCell
 		current_ant = -1;
         fighting = false;
 		// Update toFood and toHome
-		intensity[0] -= permanent ? dt : 0.0f;
+		intensity[0] -= permanent ? 0.0f : dt;
 		intensity[1] -= dt;
 		intensity[2] -= dt;
 		// Update repellents

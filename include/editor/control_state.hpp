@@ -25,7 +25,7 @@ struct ControlState
         }
     }
 
-    void executeAction(sf::Vector2f mouse_world_position)
+    void executeAction(sf::Vector2f)
     {
         if (action) {
             action();

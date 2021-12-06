@@ -13,7 +13,7 @@ struct ColonyCreator : public GUI::NamedContainer
     Simulation&   simulation;
     ControlState& control_state;
     uint32_t      colonies_count = 0;
-    uint8_t       last_selected = -1;
+    int32_t       last_selected = -1;
 
     explicit
     ColonyCreator(Simulation& sim, ControlState& control_state_)

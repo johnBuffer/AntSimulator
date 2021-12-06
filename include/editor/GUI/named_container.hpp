@@ -39,12 +39,12 @@ struct NamedContainer : public Container
         Container::addItem(header);
     }
     
-    void addItem(ItemPtr item, const std::string& name = "")
+    void addItem(ItemPtr item, const std::string& item_name = "")
     {
         if (root->isEmpty()) {
             GUI::Container::addItem(root);
         }
-        root->addItem(item, name);
+        root->addItem(item, item_name);
     }
 
     template<typename T>

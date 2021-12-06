@@ -72,10 +72,10 @@ struct ColonyTool : GUI::Container
         on_select(colony->id);
     }
 
-    void setColor(sf::Color color)
+    void setColor(sf::Color new_color)
     {
-        top_zone->getByName<GUI::Button>("colony_color_button")->background_color = color;
-        colony->setColor(color);
+        top_zone->getByName<GUI::Button>("colony_color_button")->background_color = new_color;
+        colony->setColor(new_color);
     }
 
     void createColorPicker()

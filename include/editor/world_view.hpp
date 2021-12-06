@@ -29,7 +29,7 @@ struct WorldView : GUI::Item
             control_state.focus_requested = false;
             control_state.zoom.setValueInstant(simulation.renderer.vp_handler.state.zoom);
         });
-        addKeyPressedCallback(sf::Keyboard::R, [&](sfev::CstEv e){
+        addKeyPressedCallback(sf::Keyboard::R, [&](sfev::CstEv){
             control_state.focus_requested = true;
             control_state.zoom = 1.0f;
             control_state.focus = simulation.renderer.vp_handler.state.center;

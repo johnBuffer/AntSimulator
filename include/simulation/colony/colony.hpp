@@ -24,6 +24,7 @@ struct Colony
 	sf::Color        ants_color = sf::Color::White;
 	uint64_t         ant_creation_id = 0;
     bool             color_changed = false;
+    bool             position_changed = false;
 
 
     Colony() = default;
@@ -53,6 +54,7 @@ struct Colony
 
     void setPosition(sf::Vector2f new_position)
     {
+        position_changed = true;
         base.position = new_position;
         for (Ant& a : ants) {
             a.position = new_position;
@@ -87,12 +89,14 @@ struct Colony
 		}
 	}
 
+    [[nodiscard]]
 	bool mustCreateSoldier() const
 	{
 		const uint32_t soldiers_creation_discard = 5;
 		return base.enemies_found_count && (ant_creation_id % soldiers_creation_discard == 0);
 	}
 
+    [[nodiscard]]
 	bool isNotFull() const
 	{
 		return ants.size() < max_ants_count;
@@ -161,5 +165,17 @@ struct Colony
     {
         ants_color = color;
         color_changed = true;
+    }
+
+    void stopFightsWith(uint8_t colony_id)
+    {
+        for (Ant& a : ants) {
+            if (a.target) {
+                a.fight_mode = FightMode::NoFight;
+                if (a.target->col_id == colony_id) {
+                    a.target = {};
+                }
+            }
+        }
     }
 };

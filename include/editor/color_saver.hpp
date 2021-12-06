@@ -113,9 +113,9 @@ struct ColorButton : public GUI::DefaultButton
         GUI::Item::draw(target, GUI::RoundedRectangle(size, position, angle_radius));
     }
     
-    void setColor(sf::Color color)
+    void setColor(sf::Color new_color)
     {
-        sample->color = color;
+        sample->color = new_color;
     }
 };
 

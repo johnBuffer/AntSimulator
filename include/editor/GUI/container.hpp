@@ -40,9 +40,9 @@ struct Container : public Item
         padding = 8.0f;
     }
     
-    void addItem(ItemPtr item, const std::string& name = "")
+    void addItem(ItemPtr item, const std::string& item_name = "")
     {
-        Item::addItem(item, name);
+        Item::addItem(item, item_name);
         watchSize(item, [this, item](){
             updateItems();
         });
@@ -97,10 +97,6 @@ struct Container : public Item
             getCoord2(new_size) = coord_2_size;
         }
         return new_size;
-    }
-    
-    void setItemSize(ItemPtr item, float coord_1_size, float coord_2_size)
-    {
     }
 
     [[nodiscard]]

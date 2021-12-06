@@ -11,12 +11,11 @@ struct Renderer
 {
 	bool render_ants = true;
 	ViewportHandler vp_handler;
-	std::vector<ColonyRenderer> colonies;
+	civ::Vector<ColonyRenderer> colonies;
 	
 	Renderer()
 		: vp_handler({ to<float>(Conf::WIN_WIDTH), to<float>(Conf::WIN_HEIGHT) })
 	{
-		colonies.reserve(8);
 	}
 
 	void toggleRenderAnts()

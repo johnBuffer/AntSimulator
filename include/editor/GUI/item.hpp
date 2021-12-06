@@ -62,14 +62,14 @@ struct Item
         , name(name_)
     {}
     
-    virtual void onClick(sf::Vector2f click_position, sf::Mouse::Button button) {click_caught = false;}
-    virtual void onUnclick(sf::Mouse::Button button) {}
-    virtual void onMouseMove(sf::Vector2f new_mouse_position) {}
+    virtual void onClick(sf::Vector2f, sf::Mouse::Button) {click_caught = false;}
+    virtual void onUnclick(sf::Mouse::Button) {}
+    virtual void onMouseMove(sf::Vector2f) {}
     virtual void onSizeChange() {}
     virtual void onPositionChange() {}
     virtual void onMouseIn() {}
     virtual void onMouseOut() {}
-    virtual void render(sf::RenderTarget& target) {}
+    virtual void render(sf::RenderTarget&) {}
     virtual void initializeEventCallbacks() {}
     virtual void update() {}
     
@@ -227,12 +227,12 @@ struct Item
         return sf::FloatRect(position, size).contains(pos);
     }
     
-    void addItem(ItemPtr item, const std::string& name = "", Alignement alignement = Alignement::None)
+    void addItem(ItemPtr item, const std::string& item_name = "", Alignement alignement = Alignement::None)
     {
         sub_items.push_back(item);
         item->offset = offset + position;
         item->initializeEventCallbacks();
-        item->name = name;
+        item->name = item_name;
         switch (alignement) {
             case Alignement::Right:
                 item->setPosition(sf::Vector2f(size.x - item->size.x, 0.0f) + sf::Vector2f(-padding, padding));
