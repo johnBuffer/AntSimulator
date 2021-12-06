@@ -61,17 +61,17 @@ struct ToolSelector : public GUI::NamedContainer
     SPtr<ToolOption> tool_erase;
     
     ToolSelector()
-        : GUI::NamedContainer("Tools", Container::Orientation::Horizontal)
+        : GUI::NamedContainer("Brushes", Container::Orientation::Horizontal)
         , current_tool(Tool::BrushCreate)
     {
         padding = 5.0f;
 
         root->setHeight(30.0f, GUI::Size::Fixed);
-        tool_wall = create<ToolOption>("Add Wall", [this](){
+        tool_wall = create<ToolOption>("Wall", [this](){
             current_tool = Tool::BrushCreate;
             select(tool_wall);
         });
-        tool_food = create<ToolOption>("Add Food", [this](){
+        tool_food = create<ToolOption>("Food", [this](){
             current_tool = Tool::BrushDelete;
             select(tool_food);
         });
@@ -99,7 +99,9 @@ struct ToolSelector : public GUI::NamedContainer
     void select(SPtr<ToolOption> option)
     {
         reset();
-        option->select();
+        if (option) {
+            option->select();
+        }
         notifyChanged();
     }
 };

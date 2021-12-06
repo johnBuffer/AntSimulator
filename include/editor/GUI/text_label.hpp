@@ -11,21 +11,22 @@ struct TextLabel : public Item
     sf::Font font;
     sf::Text text;
     uint32_t char_size;
+    bool auto_update = true;
     
-    Alignement alignement;
+    Alignement alignment;
     
     TextLabel(const std::string& label_, uint32_t char_size_, sf::Vector2f size_ = {}, sf::Vector2f position_ = {})
         : Item(position_, size_)
         , label(label_)
         , char_size(char_size_)
-        , alignement(Alignement::Center)
+        , alignment(Alignement::Center)
     {
+        padding = 1.0f;
         font.loadFromFile("res/font.ttf");
         text.setFont(font);
         text.setFillColor(sf::Color::Black);
         text.setCharacterSize(char_size);
         setText(label);
-        setHeight(padding + text.getGlobalBounds().height);
         updatePosition();
     }
     
@@ -49,19 +50,28 @@ struct TextLabel : public Item
     {
         text.setString(str);
         updateOrigin();
+        if (auto_update) {
+            updateSize();
+        }
     }
     
-    void setAlignement(Alignement new_alignement)
+    void setAlignment(Alignement new_alignment)
     {
-        alignement = new_alignement;
+        alignment = new_alignment;
         updateOrigin();
         updateTextPosition();
+    }
+
+    void updateSize()
+    {
+        setHeight(2.0f * padding + text.getGlobalBounds().height);
+        setWidth(2.0f * padding + text.getGlobalBounds().width);
     }
     
     void updateOrigin()
     {
         const auto text_bounds = text.getGlobalBounds();
-        switch (alignement) {
+        switch (alignment) {
             case Alignement::Center:
                 text.setOrigin(text_bounds.width * 0.5f - size.x * 0.5f, text_bounds.height - size.y * 0.5f);
                 break;
@@ -83,6 +93,9 @@ struct TextLabel : public Item
     
     void render(sf::RenderTarget& target) override
     {
+//        auto r = sf::RectangleShape(size);
+//        r.setPosition(position);
+//        GUI::Item::draw(target, r);
         GUI::Item::draw(target, text);
     }
 };

@@ -16,8 +16,9 @@ struct Slider : public GUI::Item
         , min_value(min_value_)
         , max_value(max_value_)
     {
-        const float slider_height = 40.0f;
+        const float slider_height = 20.0f;
         setHeight(slider_height);
+        padding = 3.0f;
     }
     
     float getValue() const
@@ -56,7 +57,7 @@ struct Slider : public GUI::Item
         bar.setOrigin(0.0f, bar_height * 0.5f);
         bar.setPosition(position + sf::Vector2f(padding, size.y * 0.5f));
         // Cursor
-        const float cursor_radius = 20.0f;
+        const float cursor_radius = 5.0f;
         sf::CircleShape cursor(cursor_radius);
         cursor.setOrigin(cursor_radius, cursor_radius);
         cursor.setOutlineThickness(2.0f);
@@ -80,8 +81,9 @@ struct SliderLabel : public GUI::Container
         size_type.y = GUI::Size::FitContent;
         
         slider = create<Slider>(max_value_, min_value_);
-        label = create<GUI::TextLabel>("", 32);
-        label->setWidth(40.0f);
+        label = create<GUI::TextLabel>("", 16);
+        label->setWidth(20.0f);
+        label->auto_update = false;
         
         addItem(label);
         addItem(slider);
@@ -105,7 +107,7 @@ struct SliderLabel : public GUI::Container
     
     void render(sf::RenderTarget& target) override
     {
-        const float angle_radius = 10.0f;
+        const float angle_radius = 5.0f;
         GUI::Item::draw(target, GUI::RoundedRectangle(size, position, angle_radius));
     }
 };

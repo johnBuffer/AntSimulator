@@ -27,6 +27,7 @@ struct ColonyCreator : public GUI::NamedContainer
         });
         add_button->setWidth(32.0f, GUI::Size::Fixed);
         add_button->setHeight(20.0f, GUI::Size::Fixed);
+        header->addItem(create<GUI::EmptyItem>());
         header->addItem(add_button);
     }
 

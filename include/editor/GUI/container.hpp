@@ -171,6 +171,11 @@ struct Container : public Item
         return res;
     }
 
+    void fitContent()
+    {
+        size_type = {Size::FitContent, Size::FitContent};
+    }
+
 //    void render(sf::RenderTarget& target) override
 //    {
 //        GUI::RoundedRectangle back(size, position, 3.0f);

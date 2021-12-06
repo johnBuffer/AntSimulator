@@ -2,6 +2,7 @@
 #include "container.hpp"
 #include "text_label.hpp"
 #include "rounded_rectangle.hpp"
+#include "empty_item.hpp"
 
 
 namespace GUI
@@ -28,15 +29,23 @@ struct NamedContainer : public Container
         label = create<TextLabel>(name, 14);
         label->setColor(sf::Color(100, 100, 100));
         label->setHeight(20.0f);
-        label->size_type.x = GUI::Size::Auto;
-        label->setAlignement(Alignement::Left);
+        label->setAlignment(Alignement::Left);
+
         header->addItem(label);
-        
+
         root = create<Container>(orientation);
         root->padding = 0.0f;
         root->size_type.y = GUI::Size::FitContent;
         
         Container::addItem(header);
+    }
+
+    void fitLabel()
+    {
+        this->header->setWidth(label->size.x);
+        watchSize(label, [this](){
+            this->header->setWidth(label->size.x);
+        });
     }
     
     void addItem(ItemPtr item, const std::string& item_name = "")
@@ -63,6 +72,12 @@ struct NamedContainer : public Container
         const uint8_t background_intensity = 220;
         background.setFillColor(sf::Color(background_intensity, background_intensity, background_intensity));
         GUI::Item::draw(target, background);
+    }
+
+    void fitContent()
+    {
+        GUI::Container::fitContent();
+        root->fitContent();
     }
 };
 

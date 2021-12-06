@@ -38,6 +38,8 @@ struct EditorScene : public GUI::Scene
     {
         Conf::loadTextures();
         initialize();
+
+        root.padding = 0.0f;
     }
 
     ~EditorScene()
@@ -59,15 +61,35 @@ struct EditorScene : public GUI::Scene
             updateRenderOptions();
         });
         toolbox->addItem(display_controls);
+
         // Add map edition tools
+        auto tools = create<GUI::NamedContainer>("Tools", GUI::Container::Orientation::Vertical);
+        toolbox->addItem(tools);
+
         tool_selector = create<ToolSelector>();
-        toolbox->addItem(tool_selector);
+        tools->addItem(tool_selector);
+        auto brush_size = create<GUI::NamedContainer>("Brush Size", GUI::Container::Orientation::Vertical);
+        brush_size->addItem(create<SliderLabel>(10.0f));
+        tools->addItem(brush_size);
+
         // Add colonies edition tools
         auto colonies = create<ColonyCreator>(simulation, control_state);
         toolbox->addItem(colonies);
+
         // Add time controls
+        auto global_controls = create<GUI::Container>(GUI::Container::Orientation::Horizontal);
+        global_controls->fitContent();
+        global_controls->padding = 0.0f;
+
+        auto edit_mode = create<GUI::NamedContainer>("Edit Mode");
+        edit_mode->fitContent();
+        edit_mode->fitLabel();
+        edit_mode->addItem(create<GUI::Toggle>());
+
+        global_controls->addItem(edit_mode);
+
         auto time_controls = create<TimeController>();
-        renderer->watch(time_controls, [this, time_controls](){
+        watch(time_controls, [this, time_controls](){
             this->renderer->current_time_state = time_controls->current_state;
             if (time_controls->current_state == TimeController::State::Speed) {
                 this->window.setFramerateLimit(0);
@@ -75,10 +97,11 @@ struct EditorScene : public GUI::Scene
                 this->window.setFramerateLimit(60);
             }
         });
+        global_controls->addItem(time_controls);
 
         addItem(renderer);
         addItem(toolbox, "Toolbox");
-        addItem(time_controls, "", GUI::Alignement::Right);
+        addItem(global_controls, "", GUI::Alignement::Right);
     }
 
     void updateRenderOptions() const
