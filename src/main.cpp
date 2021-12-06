@@ -38,11 +38,3 @@ int main()
 
 	return 0;
 }
-
-#if defined(_WIN32)
-#include <windows.h>
-int APIENTRY WinMain(HINSTANCE, HINSTANCE, PSTR, int)
-{
-  return main();
-}
-#endif

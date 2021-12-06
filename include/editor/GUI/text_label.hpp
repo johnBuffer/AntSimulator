@@ -11,7 +11,7 @@ struct TextLabel : public Item
     sf::Font font;
     sf::Text text;
     uint32_t char_size;
-    bool auto_update = true;
+    bool auto_size_update = true;
     
     Alignement alignment;
     
@@ -50,7 +50,7 @@ struct TextLabel : public Item
     {
         text.setString(str);
         updateOrigin();
-        if (auto_update) {
+        if (auto_size_update) {
             updateSize();
         }
     }

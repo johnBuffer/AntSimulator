@@ -9,9 +9,6 @@ endif()
 find_package(SFML 2 REQUIRED COMPONENTS graphics system window)
 find_package(Threads REQUIRED)
 
-if(WIN32)
-   set(WIN32_GUI WIN32)
-endif()
 
 set(SFML_LIBS sfml-graphics sfml-system sfml-window)
 

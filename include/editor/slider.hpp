@@ -83,7 +83,7 @@ struct SliderLabel : public GUI::Container
         slider = create<Slider>(max_value_, min_value_);
         label = create<GUI::TextLabel>("", 16);
         label->setWidth(20.0f);
-        label->auto_update = false;
+        label->auto_size_update = false;
         
         addItem(label);
         addItem(slider);
