@@ -20,6 +20,7 @@ struct WorldView : GUI::Item
         , simulation(simulation_)
         , control_state(control_state_)
     {
+        simulation.renderer.vp_handler.reset();
     }
 
     void initializeEventCallbacks() override
