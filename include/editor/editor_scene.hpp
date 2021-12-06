@@ -84,20 +84,31 @@ struct EditorScene : public GUI::Scene
         auto edit_mode = create<GUI::NamedContainer>("Edit Mode");
         edit_mode->fitContent();
         edit_mode->fitLabel();
-        edit_mode->addItem(create<GUI::Toggle>());
+        auto edit_toggle = create<GUI::Toggle>();
+
+        edit_mode->addItem(edit_toggle);
 
         global_controls->addItem(edit_mode);
 
         auto time_controls = create<TimeController>();
-        watch(time_controls, [this, time_controls](){
+        watch(time_controls, [this, time_controls, edit_toggle](){
             this->renderer->current_time_state = time_controls->current_state;
             if (time_controls->current_state == TimeController::State::Speed) {
                 this->window.setFramerateLimit(0);
             } else {
+                if (time_controls->current_state == TimeController::State::Play) {
+                    edit_toggle->setState(false);
+                }
                 this->window.setFramerateLimit(60);
             }
         });
         global_controls->addItem(time_controls);
+
+        watch(edit_toggle, [edit_toggle, time_controls](){
+            if (edit_toggle->state) {
+                time_controls->select(time_controls->tool_pause);
+            }
+        });
 
         addItem(renderer);
         addItem(toolbox, "Toolbox");

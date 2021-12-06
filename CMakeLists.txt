@@ -9,7 +9,6 @@ endif()
 find_package(SFML 2 REQUIRED COMPONENTS graphics system window)
 find_package(Threads REQUIRED)
 
-
 set(SFML_LIBS sfml-graphics sfml-system sfml-window)
 
 file(GLOB SOURCES src/*.cpp)
