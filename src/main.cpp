@@ -31,7 +31,7 @@ int main()
         // Update
         scene->update();
         // Render
-        window.clear();
+        window.clear(sf::Color(100, 100, 100));
         scene->render();
         window.display();
 	}

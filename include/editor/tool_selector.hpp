@@ -118,53 +118,20 @@ struct ToolSelector : public GUI::NamedContainer
         notifyChanged();
     }
 
-    void addFood(sf::Vector2f mouse_position)
+    template<typename TCallback>
+    void applyBrush(sf::Vector2f mouse_position, TCallback&& callback)
     {
         const auto x = to<int32_t>(mouse_position.x) / simulation.world.map.cell_size;
         const auto y = to<int32_t>(mouse_position.y) / simulation.world.map.cell_size;
 
         const int32_t min_x = std::max(1, x - brush_size);
-        const int32_t max_x = std::min(to<int32_t>(simulation.world.size.x - 2), x + brush_size + 1);
+        const int32_t max_x = std::min(to<int32_t>(simulation.world.map.width - 1), x + brush_size + 1);
         const int32_t min_y = std::max(1, y - brush_size);
-        const int32_t max_y = std::min(to<int32_t>(simulation.world.size.y - 2), y + brush_size + 1);
+        const int32_t max_y = std::min(to<int32_t>(simulation.world.map.height - 1), y + brush_size + 1);
 
         for (int32_t px(min_x); px < max_x; ++px) {
             for (int32_t py(min_y); py < max_y; ++py) {
-                simulation.world.addFoodAt(sf::Vector2i{px, py}, 1);
-            }
-        }
-    }
-
-    void addWall(sf::Vector2f mouse_position)
-    {
-        const auto x = to<int32_t>(mouse_position.x) / simulation.world.map.cell_size;
-        const auto y = to<int32_t>(mouse_position.y) / simulation.world.map.cell_size;
-
-        const int32_t min_x = std::max(1, x - brush_size);
-        const int32_t max_x = std::min(to<int32_t>(simulation.world.size.x - 2), x + brush_size + 1);
-        const int32_t min_y = std::max(1, y - brush_size);
-        const int32_t max_y = std::min(to<int32_t>(simulation.world.size.y - 2), y + brush_size + 1);
-
-        for (int32_t px(min_x); px < max_x; ++px) {
-            for (int32_t py(min_y); py < max_y; ++py) {
-                simulation.world.addWall(sf::Vector2i{px, py});
-            }
-        }
-    }
-
-    void erase(sf::Vector2f mouse_position)
-    {
-        const auto x = to<int32_t>(mouse_position.x) / simulation.world.map.cell_size;
-        const auto y = to<int32_t>(mouse_position.y) / simulation.world.map.cell_size;
-
-        const int32_t min_x = std::max(1, x - brush_size);
-        const int32_t max_x = std::min(to<int32_t>(simulation.world.size.x - 2), x + brush_size + 1);
-        const int32_t min_y = std::max(1, y - brush_size);
-        const int32_t max_y = std::min(to<int32_t>(simulation.world.size.y - 2), y + brush_size + 1);
-
-        for (int32_t px(min_x); px < max_x; ++px) {
-            for (int32_t py(min_y); py < max_y; ++py) {
-                simulation.world.map.clearCell({px, py});
+                callback(px, py);
             }
         }
     }
@@ -175,7 +142,9 @@ struct ToolSelector : public GUI::NamedContainer
             switch (current_tool) {
                 case Tool::BrushWall:
                     control_state.view_action = [this](sf::Vector2f mouse_position) {
-                        addWall(mouse_position);
+                        applyBrush(mouse_position, [this](int32_t x, int32_t y){
+                            simulation.world.addWall(sf::Vector2i{x, y});
+                        });
                     };
                     control_state.view_action_end = [this]() {
                         simulation.distance_field_builder.requestUpdate();
@@ -183,12 +152,16 @@ struct ToolSelector : public GUI::NamedContainer
                     break;
                 case Tool::BrushFood:
                     control_state.view_action = [this](sf::Vector2f mouse_position) {
-                        addFood(mouse_position);
+                        applyBrush(mouse_position, [this](int32_t x, int32_t y){
+                            simulation.world.addFoodAt(sf::Vector2i{x, y}, 1);
+                        });
                     };
                     break;
                 case Tool::BrushDelete:
                     control_state.view_action = [this](sf::Vector2f mouse_position) {
-                        erase(mouse_position);
+                        applyBrush(mouse_position, [this](int32_t x, int32_t y){
+                            simulation.world.map.clearCell(sf::Vector2i{x, y});
+                        });
                         simulation.distance_field_builder.requestUpdate();
                     };
                     control_state.view_action_end = [this]() {

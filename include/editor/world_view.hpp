@@ -78,6 +78,17 @@ struct WorldView : GUI::Item
             simulation.renderer.vp_handler.setZoom(control_state.zoom);
         }
         simulation.render(target);
+        if (control_state.show_brush_preview) {
+            const int32_t cell_size = simulation.world.map.cell_size;
+            const float side_size = (2.0f * control_state.brush_radius + 1) * cell_size;
+            sf::RectangleShape brush_preview({side_size, side_size});
+            brush_preview.setFillColor(sf::Color(100, 100, 100, 100));
+            brush_preview.setOrigin(side_size * 0.5f, side_size * 0.5f);
+            const sf::Vector2f current_position = simulation.renderer.vp_handler.getMouseWorldPosition();
+            brush_preview.setPosition(to<float>(int(current_position.x / to<float>(cell_size)) * cell_size) + 2.0f,
+                                      to<float>(int(current_position.y / to<float>(cell_size)) * cell_size) + 2.0f);
+            target.draw(brush_preview, simulation.renderer.vp_handler.getRenderState());
+        }
     }
 
     void update() override
