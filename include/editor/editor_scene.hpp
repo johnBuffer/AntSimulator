@@ -69,7 +69,12 @@ struct EditorScene : public GUI::Scene
         tool_selector = create<ToolSelector>(control_state, simulation);
         tools->addItem(tool_selector);
         auto brush_size = create<GUI::NamedContainer>("Brush Size", GUI::Container::Orientation::Vertical);
-        brush_size->addItem(create<SliderLabel>(10.0f));
+        auto slider = create<SliderLabel>(10.0f);
+        watch(slider, [this, slider](){
+            this->tool_selector->brush_size = to<int32_t>(slider->getValue());
+        });
+        this->tool_selector->brush_size = to<int32_t>(slider->getValue());
+        brush_size->addItem(slider);
         tools->addItem(brush_size);
 
         // Add colonies edition tools
