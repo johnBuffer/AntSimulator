@@ -234,6 +234,13 @@ struct WorldGrid : public Grid<WorldCell>
 		return get(pos).pick();
 	}
 
+    void clearCell(sf::Vector2i cell_coord)
+    {
+        auto& cell = get(cell_coord);
+        cell.wall = 0;
+        cell.food = 0;
+    }
+
 	HitPoint getFirstHit(sf::Vector2f p, sf::Vector2f d, float max_dist)
 	{
 		HitPoint intersection;

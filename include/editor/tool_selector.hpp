@@ -3,6 +3,7 @@
 #include "GUI/button.hpp"
 #include "control_state.hpp"
 #include "simulation/simulation.hpp"
+#include <future>
 
 
 namespace edtr
@@ -51,9 +52,9 @@ struct ToolSelector : public GUI::NamedContainer
 {
     enum class Tool
     {
-        BrushCreate,
-        BrushDelete,
-        BrushColor
+        BrushWall,
+        BrushFood,
+        BrushDelete
     };
 
     Tool current_tool;
@@ -62,6 +63,7 @@ struct ToolSelector : public GUI::NamedContainer
     SPtr<ToolOption> tool_food;
     SPtr<ToolOption> tool_erase;
 
+    bool          edit_mode = false;
     Simulation&   simulation;
     ControlState& control_state;
 
@@ -70,7 +72,7 @@ struct ToolSelector : public GUI::NamedContainer
     explicit
     ToolSelector(ControlState& control_state_, Simulation& simulation_)
         : GUI::NamedContainer("Brushes", Container::Orientation::Horizontal)
-        , current_tool(Tool::BrushCreate)
+        , current_tool(Tool::BrushWall)
         , control_state(control_state_)
         , simulation(simulation_)
     {
@@ -78,15 +80,15 @@ struct ToolSelector : public GUI::NamedContainer
 
         root->setHeight(30.0f, GUI::Size::Fixed);
         tool_wall = create<ToolOption>("Wall", [this](){
-            current_tool = Tool::BrushCreate;
+            current_tool = Tool::BrushWall;
             select(tool_wall);
         });
         tool_food = create<ToolOption>("Food", [this](){
-            current_tool = Tool::BrushDelete;
+            current_tool = Tool::BrushFood;
             select(tool_food);
         });
         tool_erase = create<ToolOption>("Erase", [this](){
-            current_tool = Tool::BrushColor;
+            current_tool = Tool::BrushDelete;
             select(tool_erase);
         });
         tool_food->color = sf::Color(200, 255, 200);
@@ -111,6 +113,7 @@ struct ToolSelector : public GUI::NamedContainer
         reset();
         if (option) {
             option->select();
+            setCallback();
         }
         notifyChanged();
     }
@@ -132,16 +135,84 @@ struct ToolSelector : public GUI::NamedContainer
         }
     }
 
+    void addWall(sf::Vector2f mouse_position)
+    {
+        const auto x = to<int32_t>(mouse_position.x) / simulation.world.map.cell_size;
+        const auto y = to<int32_t>(mouse_position.y) / simulation.world.map.cell_size;
+
+        const int32_t min_x = std::max(1, x - brush_size);
+        const int32_t max_x = std::min(to<int32_t>(simulation.world.size.x - 2), x + brush_size + 1);
+        const int32_t min_y = std::max(1, y - brush_size);
+        const int32_t max_y = std::min(to<int32_t>(simulation.world.size.y - 2), y + brush_size + 1);
+
+        for (int32_t px(min_x); px < max_x; ++px) {
+            for (int32_t py(min_y); py < max_y; ++py) {
+                simulation.world.addWall(sf::Vector2i{px, py});
+            }
+        }
+    }
+
+    void erase(sf::Vector2f mouse_position)
+    {
+        const auto x = to<int32_t>(mouse_position.x) / simulation.world.map.cell_size;
+        const auto y = to<int32_t>(mouse_position.y) / simulation.world.map.cell_size;
+
+        const int32_t min_x = std::max(1, x - brush_size);
+        const int32_t max_x = std::min(to<int32_t>(simulation.world.size.x - 2), x + brush_size + 1);
+        const int32_t min_y = std::max(1, y - brush_size);
+        const int32_t max_y = std::min(to<int32_t>(simulation.world.size.y - 2), y + brush_size + 1);
+
+        for (int32_t px(min_x); px < max_x; ++px) {
+            for (int32_t py(min_y); py < max_y; ++py) {
+                simulation.world.map.clearCell({px, py});
+            }
+        }
+    }
+
     void setCallback()
     {
-        control_state.view_action = [this](sf::Vector2f mouse_position){
-            addFood(mouse_position);
-        };
+        if (edit_mode) {
+            switch (current_tool) {
+                case Tool::BrushWall:
+                    control_state.view_action = [this](sf::Vector2f mouse_position) {
+                        addWall(mouse_position);
+                    };
+                    control_state.view_action_end = [this]() {
+                        simulation.distance_field_builder.requestUpdate();
+                    };
+                    break;
+                case Tool::BrushFood:
+                    control_state.view_action = [this](sf::Vector2f mouse_position) {
+                        addFood(mouse_position);
+                    };
+                    break;
+                case Tool::BrushDelete:
+                    control_state.view_action = [this](sf::Vector2f mouse_position) {
+                        erase(mouse_position);
+                        simulation.distance_field_builder.requestUpdate();
+                    };
+                    control_state.view_action_end = [this]() {
+                        simulation.distance_field_builder.requestUpdate();
+                    };
+                    break;
+            }
+        }
+    }
+
+    void setEditMode(bool b)
+    {
+        edit_mode = b;
+        if (b) {
+            setCallback();
+        } else {
+            resetCallback();
+        }
     }
 
     void resetCallback()
     {
-        control_state.view_action = nullptr;
+        control_state.view_action     = nullptr;
+        control_state.view_action_end = nullptr;
     }
 };
 

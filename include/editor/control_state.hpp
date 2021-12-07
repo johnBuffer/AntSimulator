@@ -9,8 +9,9 @@ struct ControlState
     using ViewAction = std::function<void(sf::Vector2f)>;
     using Action     = std::function<void(void)>;
     // Actions
-    Action     action      = nullptr;
-    ViewAction view_action = nullptr;
+    Action     action          = nullptr;
+    ViewAction view_action     = nullptr;
+    Action     view_action_end = nullptr;
     // Special commands
     bool focus_requested = false;
     trn::Transition<sf::Vector2f> focus;
@@ -22,6 +23,13 @@ struct ControlState
     {
         if (view_action) {
             view_action(mouse_world_position);
+        }
+    }
+
+    void executeViewActionEnd()
+    {
+        if (view_action_end) {
+            view_action_end();
         }
     }
 

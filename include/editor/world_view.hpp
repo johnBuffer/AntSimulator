@@ -59,6 +59,7 @@ struct WorldView : GUI::Item
             control_state.focus.setValueInstant(simulation.renderer.vp_handler.state.offset);
         } else if (button == sf::Mouse::Button::Right) {
             action_button_click = false;
+            control_state.executeViewActionEnd();
         }
     }
 

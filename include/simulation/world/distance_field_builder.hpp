@@ -21,8 +21,7 @@ struct DistanceFieldBuilder
 
 	static float getMinDist(int32_t x, int32_t y, WorldGrid& grid, bool dist_to_wall, int32_t max_iteration)
 	{
-		const sf::Vector2f cell_pos(to<float>(x), to<float>(y));
-		float min_dist = to<float>(max_iteration);
+		auto min_dist = to<float>(max_iteration);
 		for (int32_t dx(-max_iteration); dx <= max_iteration; ++dx) {
 			for (int32_t dy(-max_iteration); dy <= max_iteration; ++dy) {
 				const WorldCell* cell = grid.getSafe(sf::Vector2i(x + dx, y + dy));

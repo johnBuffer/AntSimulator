@@ -105,11 +105,9 @@ struct EditorScene : public GUI::Scene
         global_controls->addItem(time_controls);
 
         watch(edit_toggle, [this, edit_toggle, time_controls](){
+            this->tool_selector->setEditMode(edit_toggle->state);
             if (edit_toggle->state) {
                 time_controls->select(TimeController::State::Pause);
-                this->tool_selector->setCallback();
-            } else {
-                this->tool_selector->resetCallback();
             }
         });
 

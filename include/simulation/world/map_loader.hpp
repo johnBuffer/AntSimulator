@@ -26,7 +26,6 @@ struct MapLoader
 				}
 			}
 		}
-		DistanceFieldBuilder::computeDistance(world.map);
 	}
 };
 

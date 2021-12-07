@@ -8,6 +8,7 @@
 #include "render/renderer.hpp"
 #include "simulation/world/map_loader.hpp"
 #include "simulation/ant/fight_system.hpp"
+#include "world/async_distance_field_builder.hpp"
 
 
 struct Simulation
@@ -16,22 +17,23 @@ struct Simulation
 	World world;
 	// Render
 	Renderer renderer;
-	sfev::EventManager ev_manager;
 	EventSate ev_state;
 	FightSystem fight_system;
 	sf::Clock clock;
+    AsyncDistanceFieldBuilder distance_field_builder;
 
     explicit
 	Simulation(sf::Window& window)
 		: world(Conf::WORLD_WIDTH, Conf::WORLD_HEIGHT)
 		, renderer()
-		, ev_manager(window, true)
+        , distance_field_builder(world.map)
 	{
 	}
 
 	void loadMap(const std::string& map_filename)
 	{
 		MapLoader::loadMap(world, map_filename);
+        distance_field_builder.requestUpdate();
 	}
 
 	void selectColony()
@@ -45,11 +47,6 @@ struct Simulation
 			}
 		}
 		world.renderer.selected_colony = -1;
-	}
-
-	void processEvents()
-	{
-		ev_manager.processEvents();
 	}
 
 	civ::Ref<Colony> createColony(float colony_x, float colony_y)

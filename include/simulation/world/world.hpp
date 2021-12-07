@@ -49,10 +49,15 @@ struct World
 
 	void addWall(const sf::Vector2f& position)
 	{
-		if (map.checkCoords(position)) {
-			map.get(position).wall = 1;
-		}
+		addWall(sf::Vector2i{to<int32_t>(position.x) / map.cell_size, to<int32_t>(position.y) / map.cell_size});
 	}
+
+    void addWall(const sf::Vector2i& position)
+    {
+        if (map.checkCoords(position)) {
+            map.get(position).wall = 1;
+        }
+    }
 
 	void removeWall(const sf::Vector2f& position)
 	{
