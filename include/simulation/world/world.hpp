@@ -55,6 +55,7 @@ struct World
     void addWall(const sf::Vector2i& position)
     {
         if (map.checkCoords(position)) {
+            map.get(position).food = 0;
             map.get(position).wall = 1;
         }
     }

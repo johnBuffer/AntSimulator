@@ -130,7 +130,7 @@ struct ToolSelector : public GUI::NamedContainer
 
         for (int32_t px(min_x); px < max_x; ++px) {
             for (int32_t py(min_y); py < max_y; ++py) {
-                simulation.world.addFoodAt(sf::Vector2i{px, py}, 10);
+                simulation.world.addFoodAt(sf::Vector2i{px, py}, 1);
             }
         }
     }

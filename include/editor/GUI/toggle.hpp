@@ -13,6 +13,8 @@ struct Toggle : public Button
     bool state = false;
     trn::Transition<sf::Vector2f> toggle_position;
     trn::Transition<sf::Vector3f> toggle_color;
+    sf::Vector3f color_on  = {180.0f, 240.0f, 180.0f};
+    sf::Vector3f color_off = {180.0f, 180.0f, 180.0f};
 
     float padding = 3.0f;
 
@@ -62,8 +64,6 @@ struct Toggle : public Button
 
     void updateColor(bool instant = false)
     {
-        const sf::Vector3f color_on{180.0f, 240.0f, 180.0f};
-        const sf::Vector3f color_off{180.0f, 180.0f, 180.0f};
         if (instant) {
             toggle_color.setValueInstant(state ? color_on : color_off);
         } else {

@@ -113,8 +113,10 @@ struct Item
     
     void setPosition(sf::Vector2f new_position)
     {
-        position = new_position;
-        updatePosition();
+        if (new_position != position) {
+            position = new_position;
+            updatePosition();
+        }
     }
     
     void updatePosition()

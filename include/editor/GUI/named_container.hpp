@@ -13,6 +13,8 @@ struct NamedContainer : public Container
     SPtr<Container> header;
     SPtr<TextLabel> label;
     SPtr<Container> root;
+
+    bool show_root = true;
     
     NamedContainer(const std::string& name, Container::Orientation orientation = Container::Orientation::Vertical)
         : Container(Container::Orientation::Vertical)
@@ -40,6 +42,20 @@ struct NamedContainer : public Container
         Container::addItem(header);
     }
 
+    void hideRoot()
+    {
+        show_root = false;
+        GUI::Container::removeItem(root);
+    }
+
+    void showRoot()
+    {
+        if (!show_root) {
+            show_root = true;
+            GUI::Container::addItem(root);
+        }
+    }
+
     void fitLabel()
     {
         this->header->setWidth(label->size.x);
@@ -50,7 +66,7 @@ struct NamedContainer : public Container
     
     void addItem(ItemPtr item, const std::string& item_name = "")
     {
-        if (root->isEmpty()) {
+        if (root->isEmpty() && show_root) {
             GUI::Container::addItem(root);
         }
         root->addItem(item, item_name);

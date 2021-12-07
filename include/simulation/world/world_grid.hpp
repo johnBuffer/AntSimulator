@@ -224,6 +224,7 @@ struct WorldGrid : public Grid<WorldCell>
 		}
 	}
 
+    [[nodiscard]]
 	bool isOnFood(sf::Vector2f pos) const
 	{
 		return getCst(pos).food;

@@ -63,7 +63,21 @@ struct EditorScene : public GUI::Scene
         toolbox->addItem(display_controls);
 
         // Add map edition tools
-        auto tools = create<GUI::NamedContainer>("Tools", GUI::Container::Orientation::Vertical);
+        auto tools = create<GUI::NamedContainer>("Edit Map", GUI::Container::Orientation::Vertical);
+        tools->header->addItem(create<GUI::EmptyItem>());
+        auto tools_toggle = create<GUI::Toggle>();
+        tools_toggle->color_on = {240, 180, 0};
+        tools_toggle->setState(true);
+        tools->watch(tools_toggle, [this, tools_toggle, tools](){
+            if (tools_toggle->state) {
+                tools->showRoot();
+                this->tool_selector->setEditMode(tools_toggle->state);
+            } else {
+                tools->hideRoot();
+                this->tool_selector->resetCallback();
+            }
+        });
+        tools->header->addItem(tools_toggle);
         toolbox->addItem(tools);
 
         tool_selector = create<ToolSelector>(control_state, simulation);
@@ -82,43 +96,19 @@ struct EditorScene : public GUI::Scene
         toolbox->addItem(colonies);
 
         // Add time controls
-        auto global_controls = create<GUI::Container>(GUI::Container::Orientation::Horizontal);
-        global_controls->fitContent();
-        global_controls->padding = 0.0f;
-
-        auto edit_mode = create<GUI::NamedContainer>("Edit Mode");
-        edit_mode->fitContent();
-        edit_mode->fitLabel();
-        auto edit_toggle = create<GUI::Toggle>();
-
-        edit_mode->addItem(edit_toggle);
-
-        global_controls->addItem(edit_mode);
-
         auto time_controls = create<TimeController>();
-        watch(time_controls, [this, time_controls, edit_toggle](){
+        watch(time_controls, [this, time_controls](){
             this->renderer->current_time_state = time_controls->current_state;
             if (time_controls->current_state == TimeController::State::Speed) {
                 this->window.setFramerateLimit(0);
             } else {
-                if (time_controls->current_state == TimeController::State::Play) {
-                    edit_toggle->setState(false);
-                }
                 this->window.setFramerateLimit(60);
-            }
-        });
-        global_controls->addItem(time_controls);
-
-        watch(edit_toggle, [this, edit_toggle, time_controls](){
-            this->tool_selector->setEditMode(edit_toggle->state);
-            if (edit_toggle->state) {
-                time_controls->select(TimeController::State::Pause);
             }
         });
 
         addItem(renderer);
         addItem(toolbox, "Toolbox");
-        addItem(global_controls, "", GUI::Alignement::Right);
+        addItem(time_controls, "", GUI::Alignement::Right);
     }
 
     void updateRenderOptions() const
