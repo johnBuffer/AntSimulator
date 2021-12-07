@@ -71,12 +71,16 @@ struct World
 
 	void addFoodAt(float x, float y, uint32_t quantity)
 	{
-		const sf::Vector2f pos(x, y);
-		if (map.checkCoords(pos)) {
-			addMarker(pos, Mode::ToFood, 1.0f, true);
-			map.addFood(pos, quantity);
-		}
+        addFoodAt(sf::Vector2i{to<int32_t>(x) / map.cell_size, to<int32_t>(y) / map.cell_size}, quantity);
 	}
+
+    void addFoodAt(sf::Vector2i pos, uint32_t quantity)
+    {
+        if (map.checkCoords(pos)) {
+            map.addMarker(pos, Mode::ToFood, 1.0f, true);
+            map.addFood(pos, quantity);
+        }
+    }
 
     void clearMarkers(uint8_t colony_id)
     {

@@ -12,7 +12,8 @@ struct WorldView : GUI::Item
 {
     Simulation&           simulation;
     ControlState&         control_state;
-    TimeController::State current_time_state = TimeController::State::Pause;
+    TimeController::State current_time_state  = TimeController::State::Pause;
+    bool                  action_button_click = false;
 
     explicit
     WorldView(sf::Vector2f size_, Simulation& simulation_, ControlState& control_state_)
@@ -45,6 +46,7 @@ struct WorldView : GUI::Item
             control_state.focus_requested = false;
             simulation.renderer.vp_handler.click(relative_click_position);
         } else if (button == sf::Mouse::Right) {
+            action_button_click = true;
             control_state.executeViewAction(simulation.renderer.vp_handler.getMouseWorldPosition());
         }
     }
@@ -55,12 +57,17 @@ struct WorldView : GUI::Item
             simulation.renderer.vp_handler.unclick();
             control_state.focus_requested = false;
             control_state.focus.setValueInstant(simulation.renderer.vp_handler.state.offset);
+        } else if (button == sf::Mouse::Button::Right) {
+            action_button_click = false;
         }
     }
 
     void onMouseMove(sf::Vector2f new_mouse_position) override
     {
         simulation.renderer.vp_handler.setMousePosition(new_mouse_position);
+        if (action_button_click) {
+            control_state.executeViewAction(simulation.renderer.vp_handler.getMouseWorldPosition());
+        }
     }
 
     void render(sf::RenderTarget& target) override

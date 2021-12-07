@@ -185,20 +185,30 @@ struct WorldGrid : public Grid<WorldCell>
 
 	void addMarker(sf::Vector2f pos, Mode type, float intensity, uint8_t colony_id, bool permanent = false)
 	{
-		ColonyCell& cell = get(pos).markers[colony_id];
-		const uint32_t mode_index = to<uint32_t>(type);
-		// Overwrite intensity if different colony
-		cell.intensity[mode_index] = std::max(cell.intensity[mode_index], intensity);
-		cell.permanent |= permanent;
+        addMarker(sf::Vector2i{to<int32_t>(pos.x) / cell_size, to<int32_t>(pos.y) / cell_size}, type, intensity, colony_id, permanent);
 	}
+
+    void addMarker(sf::Vector2i pos, Mode type, float intensity, uint8_t colony_id, bool permanent = false)
+    {
+        ColonyCell& cell = get(pos).markers[colony_id];
+        const auto mode_index = to<uint32_t>(type);
+        // Overwrite intensity if different colony
+        cell.intensity[mode_index] = std::max(cell.intensity[mode_index], intensity);
+        cell.permanent |= permanent;
+    }
 
 	void addFood(sf::Vector2f pos, uint32_t quantity)
 	{
-		WorldCell& cell = get(pos);
-		if (!cell.wall) {
-			cell.food += quantity;
-		}
+        addFood(sf::Vector2i(to<int32_t>(pos.x), to<int32_t>(pos.y)), quantity);
 	}
+
+    void addFood(sf::Vector2i pos, uint32_t quantity)
+    {
+        WorldCell& cell = get(pos);
+        if (!cell.wall) {
+            cell.food += quantity;
+        }
+    }
 
 	void remove(sf::Vector2f pos, Mode type, uint8_t colony_id)
 	{

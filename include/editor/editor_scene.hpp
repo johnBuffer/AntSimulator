@@ -66,7 +66,7 @@ struct EditorScene : public GUI::Scene
         auto tools = create<GUI::NamedContainer>("Tools", GUI::Container::Orientation::Vertical);
         toolbox->addItem(tools);
 
-        tool_selector = create<ToolSelector>();
+        tool_selector = create<ToolSelector>(control_state, simulation);
         tools->addItem(tool_selector);
         auto brush_size = create<GUI::NamedContainer>("Brush Size", GUI::Container::Orientation::Vertical);
         brush_size->addItem(create<SliderLabel>(10.0f));
@@ -104,9 +104,12 @@ struct EditorScene : public GUI::Scene
         });
         global_controls->addItem(time_controls);
 
-        watch(edit_toggle, [edit_toggle, time_controls](){
+        watch(edit_toggle, [this, edit_toggle, time_controls](){
             if (edit_toggle->state) {
-                time_controls->select(time_controls->tool_pause);
+                time_controls->select(TimeController::State::Pause);
+                this->tool_selector->setCallback();
+            } else {
+                this->tool_selector->resetCallback();
             }
         });
 

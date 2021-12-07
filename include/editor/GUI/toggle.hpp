@@ -95,7 +95,6 @@ struct NamedToggle : public Container
         : Container(Container::Orientation::Vertical)
     {
         padding = 0.0f;
-        spacing = 0.0f;
         size_type.y = Size::FitContent;
         Container::addItem(create<TextLabel>(name, 12));
         toggle = create<Toggle>();

@@ -1,6 +1,8 @@
 #pragma once
 #include "GUI/container.hpp"
 #include "GUI/button.hpp"
+#include "control_state.hpp"
+#include "simulation/simulation.hpp"
 
 
 namespace edtr
@@ -53,16 +55,24 @@ struct ToolSelector : public GUI::NamedContainer
         BrushDelete,
         BrushColor
     };
-    
+
     Tool current_tool;
-    
+
     SPtr<ToolOption> tool_wall;
     SPtr<ToolOption> tool_food;
     SPtr<ToolOption> tool_erase;
-    
-    ToolSelector()
+
+    Simulation&   simulation;
+    ControlState& control_state;
+
+    int32_t brush_size = 3;
+
+    explicit
+    ToolSelector(ControlState& control_state_, Simulation& simulation_)
         : GUI::NamedContainer("Brushes", Container::Orientation::Horizontal)
         , current_tool(Tool::BrushCreate)
+        , control_state(control_state_)
+        , simulation(simulation_)
     {
         padding = 5.0f;
 
@@ -89,20 +99,49 @@ struct ToolSelector : public GUI::NamedContainer
         select(tool_wall);
     }
     
-    void reset()
+    void reset() const
     {
         tool_wall->reset();
         tool_food->reset();
         tool_erase->reset();
     }
     
-    void select(SPtr<ToolOption> option)
+    void select(const SPtr<ToolOption>& option)
     {
         reset();
         if (option) {
             option->select();
         }
         notifyChanged();
+    }
+
+    void addFood(sf::Vector2f mouse_position)
+    {
+        const auto x = to<int32_t>(mouse_position.x) / simulation.world.map.cell_size;
+        const auto y = to<int32_t>(mouse_position.y) / simulation.world.map.cell_size;
+
+        const int32_t min_x = std::max(1, x - brush_size);
+        const int32_t max_x = std::min(to<int32_t>(simulation.world.size.x - 2), x + brush_size + 1);
+        const int32_t min_y = std::max(1, y - brush_size);
+        const int32_t max_y = std::min(to<int32_t>(simulation.world.size.y - 2), y + brush_size + 1);
+
+        for (int32_t px(min_x); px < max_x; ++px) {
+            for (int32_t py(min_y); py < max_y; ++py) {
+                simulation.world.addFoodAt(sf::Vector2i{px, py}, 10);
+            }
+        }
+    }
+
+    void setCallback()
+    {
+        control_state.view_action = [this](sf::Vector2f mouse_position){
+            addFood(mouse_position);
+        };
+    }
+
+    void resetCallback()
+    {
+        control_state.view_action = nullptr;
     }
 };
 

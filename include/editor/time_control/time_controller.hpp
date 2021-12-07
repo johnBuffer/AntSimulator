@@ -28,15 +28,15 @@ struct TimeController : public GUI::NamedContainer
         root->setHeight(30.0f, GUI::Size::Fixed);
         tool_pause = create<ToolOption>("Pause", [this](){
             current_state = State::Pause;
-            select(tool_pause);
+            select(State::Pause);
         });
         tool_play = create<ToolOption>("Play", [this](){
             current_state = State::Play;
-            select(tool_play);
+            select(State::Play);
         });
         tool_speed = create<ToolOption>("Speed", [this](){
             current_state = State::Speed;
-            select(tool_speed);
+            select(State::Speed);
         });
 
         // Add items
@@ -44,7 +44,7 @@ struct TimeController : public GUI::NamedContainer
         addItem(tool_play);
         addItem(tool_speed);
         // Default selection
-        select(tool_pause);
+        select(State::Pause);
     }
 
     void reset()
@@ -54,10 +54,21 @@ struct TimeController : public GUI::NamedContainer
         tool_speed->reset();
     }
 
-    void select(SPtr<ToolOption> option)
+    void select(State option)
     {
         reset();
-        option->select();
+        current_state = option;
+        switch (option) {
+            case State::Pause:
+                tool_pause->select();
+                break;
+            case State::Play:
+                tool_play->select();
+                break;
+            case State::Speed:
+                tool_speed->select();
+                break;
+        }
         notifyChanged();
     }
 };
