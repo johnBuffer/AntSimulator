@@ -36,19 +36,6 @@ struct Simulation
         distance_field_builder.requestUpdate();
 	}
 
-	void selectColony()
-	{
-		for (const Colony& c : colonies) {
-			const sf::Vector2f world_mouse_pos = renderer.vp_handler.getMouseWorldPosition();
-			const float length = getLength(world_mouse_pos - c.base.position);
-			if (length < c.base.radius) {
-				world.renderer.selected_colony = c.id;
-				return;
-			}
-		}
-		world.renderer.selected_colony = -1;
-	}
-
 	civ::Ref<Colony> createColony(float colony_x, float colony_y)
 	{
 		// Create the colony object
@@ -56,11 +43,11 @@ struct Simulation
 		auto colony_ref = colonies.getRef(colony_id);
         Colony& colony = *colony_ref;
         colony.initialize(to<uint8_t>(colony_id));
-		colony.ants_color = Conf::COLONY_COLORS[colony.id];
 		// Create colony markers
         createColonyMarkers(colony);
 		// Register it for the renderer
 		renderer.addColony(colony_ref);
+        world.renderer.colonies_color.emplace_back();
         return colony_ref;
 	}
 
@@ -73,6 +60,9 @@ struct Simulation
 			world.update(dt);
 			// First perform position update and grid registration
             for (Colony& colony : colonies) {
+                if (colony.color_changed) {
+                    world.renderer.colonies_color[colony.id] = colony.ants_color;
+                }
                 if (colony.position_changed) {
                     updateColonyPosition(colony);
                 }
@@ -135,6 +125,7 @@ struct Simulation
         }
         colonies.erase(colony_id);
         renderer.colonies.erase(colony_id);
+        world.renderer.colonies_color.erase(colony_id);
         world.clearMarkers(colony_id);
     }
 };

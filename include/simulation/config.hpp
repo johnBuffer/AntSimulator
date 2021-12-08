@@ -23,7 +23,7 @@ struct DefaultConf
 	static uint32_t ANTS_COUNT;
 	static std::shared_ptr<sf::Texture> ANT_TEXTURE;
 	static std::shared_ptr<sf::Texture> MARKER_TEXTURE;
-    static constexpr uint32_t MAX_COLONIES_COUNT = 8;
+    static constexpr uint32_t MAX_COLONIES_COUNT = 4;
 	static sf::Color COLONY_COLORS[MAX_COLONIES_COUNT];
     static uint32_t USE_FULLSCREEN;
 
@@ -113,7 +113,7 @@ std::shared_ptr<sf::Texture> DefaultConf<T>::ANT_TEXTURE;
 template<typename T>
 std::shared_ptr<sf::Texture> DefaultConf<T>::MARKER_TEXTURE;
 template<typename T>
-sf::Color DefaultConf<T>::COLONY_COLORS[8] = {sf::Color::Red, sf::Color::Blue, sf::Color::Yellow, sf::Color(50, 255, 255)};
+sf::Color DefaultConf<T>::COLONY_COLORS[MAX_COLONIES_COUNT] = {sf::Color::Red, sf::Color::Blue, sf::Color::Yellow, sf::Color(50, 255, 255)};
 
 template<typename T>
 uint32_t DefaultConf<T>::USE_FULLSCREEN = 1;

@@ -153,7 +153,7 @@ struct ToolSelector : public GUI::NamedContainer
                 case Tool::BrushFood:
                     control_state.view_action = [this](sf::Vector2f mouse_position) {
                         applyBrush(mouse_position, [this](int32_t x, int32_t y){
-                            simulation.world.addFoodAt(sf::Vector2i{x, y}, 1);
+                            simulation.world.addFoodAt(sf::Vector2i{x, y}, 2);
                         });
                     };
                     break;

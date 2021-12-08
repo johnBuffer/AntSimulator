@@ -1,7 +1,7 @@
 #pragma once
-#include "GUI/container.hpp"
-#include "GUI/button.hpp"
-#include "GUI/rounded_rectangle.hpp"
+#include "editor/GUI/container.hpp"
+#include "editor/GUI/button.hpp"
+#include "editor/GUI/rounded_rectangle.hpp"
 #include "editor/color_picker/color_picker.hpp"
 #include "editor/control_state.hpp"
 
