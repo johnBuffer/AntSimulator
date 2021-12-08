@@ -119,8 +119,8 @@ struct WorldRenderer : public AsyncRenderer
             va[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
         }
         else {
-            const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * float(cell.intensity[0]);
-            const sf::Vector3f intensity_2_color = intensity_factor * to_food_color * float(cell.intensity[1]);
+            const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * cell.intensity[0];
+            const sf::Vector3f intensity_2_color = intensity_factor * to_food_color * cell.intensity[1];
             const sf::Vector3f mixed_color(
                     intensity_1_color.x + intensity_2_color.x,
                     intensity_1_color.y + intensity_2_color.y,
