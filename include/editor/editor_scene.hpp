@@ -54,7 +54,7 @@ struct EditorScene : public GUI::Scene
 
         renderer = create<WorldView>(toVector2f(window_size), simulation, control_state);
 
-        toolbox = create<Toolbox>(sf::Vector2f(350.0f, to<float>(window_size.y)));
+        toolbox = create<Toolbox>(sf::Vector2f{350.0f, to<float>(window_size.y)}, sf::Vector2f{root.padding, root.padding});
         // Add display options
         display_controls = create<DisplayOption>(control_state);
         watch(display_controls, [this](){
@@ -79,7 +79,6 @@ struct EditorScene : public GUI::Scene
                 this->tool_selector->resetCallback();
             }
         });
-        //tools_toggle->setState(false);
 
         tools->header->addItem(tools_toggle);
         toolbox->addItem(tools);
@@ -103,7 +102,7 @@ struct EditorScene : public GUI::Scene
         auto time_controls = create<TimeController>();
         watch(time_controls, [this, time_controls](){
             this->renderer->current_time_state = time_controls->current_state;
-            if (time_controls->current_state == TimeController::State::Speed) {
+            if (time_controls->tool_speed->getState()) {
                 this->window.setFramerateLimit(0);
             } else {
                 this->window.setFramerateLimit(60);

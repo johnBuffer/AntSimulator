@@ -14,6 +14,8 @@ struct NamedContainer : public Container
     SPtr<TextLabel> label;
     SPtr<Container> root;
 
+    uint8_t background_intensity = 220;
+
     bool show_root = true;
     
     NamedContainer(const std::string& name, Container::Orientation orientation = Container::Orientation::Vertical)
@@ -85,8 +87,7 @@ struct NamedContainer : public Container
     {
         const float angle_radius = 10.0f;
         RoundedRectangle background(size, position, angle_radius);
-        const uint8_t background_intensity = 220;
-        background.setFillColor(sf::Color(background_intensity, background_intensity, background_intensity));
+        background.setFillColor({background_intensity, background_intensity, background_intensity});
         GUI::Item::draw(target, background);
     }
 

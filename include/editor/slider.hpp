@@ -108,7 +108,9 @@ struct SliderLabel : public GUI::Container
     void render(sf::RenderTarget& target) override
     {
         const float angle_radius = 5.0f;
-        GUI::Item::draw(target, GUI::RoundedRectangle(size, position, angle_radius));
+        GUI::RoundedRectangle background(size, position, angle_radius);
+        background.setFillColor({200, 200, 200});
+        GUI::Item::draw(target, background);
     }
 };
 

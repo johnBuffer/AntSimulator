@@ -94,7 +94,7 @@ struct WorldView : GUI::Item
     void update() override
     {
         const float dt = 0.016f;
-        if (current_time_state == TimeController::State::Play || current_time_state == TimeController::State::Speed) {
+        if (current_time_state == TimeController::State::Play) {
             simulation.update(dt);
         }
     }
