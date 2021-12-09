@@ -1,6 +1,6 @@
 #pragma once
 #include <functional>
-#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics.hpp>
 #include "editor/transition.hpp"
 
 
@@ -8,10 +8,15 @@ struct ControlState
 {
     using ViewAction = std::function<void(sf::Vector2f)>;
     using Action     = std::function<void(void)>;
+    using DrawAction = std::function<void(sf::RenderTarget&, const ViewportHandler&)>;
+
     // Actions
-    Action     action          = nullptr;
-    ViewAction view_action     = nullptr;
-    Action     view_action_end = nullptr;
+    Action     action                       = nullptr;
+    ViewAction view_action                  = nullptr;
+    Action     view_action_end              = nullptr;
+    DrawAction draw_action                  = nullptr;
+    std::function<void()> request_edits_off = nullptr;
+
     // Special commands
     bool focus_requested                = false;
     trn::Transition<sf::Vector2f> focus;
@@ -19,8 +24,6 @@ struct ControlState
     // Preview callback
     bool show_brush_preview = false;
     float brush_radius      = 0.0f;
-
-    std::function<void()> request_edits_off = nullptr;
 
     ControlState() = default;
 
@@ -45,6 +48,13 @@ struct ControlState
         }
     }
 
+    void executeDrawAction(sf::RenderTarget& target, const ViewportHandler& vp_handler)
+    {
+        if (draw_action) {
+            draw_action(target, vp_handler);
+        }
+    }
+
     void requestFocus(sf::Vector2f position, float zoom_level = 1.0f)
     {
         focus_requested = true;
@@ -57,5 +67,12 @@ struct ControlState
         if (request_edits_off) {
             request_edits_off();
         }
+    }
+
+    void resetCallbacks()
+    {
+        view_action     = nullptr;
+        draw_action     = nullptr;
+        view_action_end = nullptr;
     }
 };

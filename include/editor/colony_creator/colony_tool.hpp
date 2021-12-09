@@ -45,8 +45,19 @@ struct ColonyTool : GUI::Container
 
         auto set_position_button = create<GUI::Button>("Set Position", [this](){
             control_state.requestEditModeOff();
+            // Preview callbacks
+            control_state.draw_action = [this](sf::RenderTarget& target, const ViewportHandler& vp_handler) {
+                sf::CircleShape c(colony->base.radius);
+                c.setOrigin(c.getRadius(), c.getRadius());
+                c.setPosition(vp_handler.getMouseWorldPosition());
+                const sf::Color colony_color = colony->ants_color;
+                c.setFillColor({colony_color.r, colony_color.g, colony_color.b, 100});
+                target.draw(c, vp_handler.getRenderState());
+            };
             control_state.view_action = [this](sf::Vector2f world_position) {
                 colony->setPosition(world_position);
+                control_state.draw_action = nullptr;
+                control_state.view_action = nullptr;
             };
         });
         set_position_button->setHeight(20.0f);

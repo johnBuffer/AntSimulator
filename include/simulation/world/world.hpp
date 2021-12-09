@@ -53,8 +53,12 @@ struct World
     void addWall(const sf::Vector2i& position)
     {
         if (map.checkCoords(position)) {
-            map.get(position).food = 0;
-            map.get(position).wall = 1;
+			WorldCell& cell = map.get(position);
+            cell.food = 0;
+            cell.wall = 1;
+			for (auto& markers : cell.markers) {
+				clearMarkersOfCell(markers);
+			}
         }
     }
 
@@ -89,13 +93,17 @@ struct World
     void clearMarkers(uint8_t colony_id)
     {
         for (auto& cell : map.cells) {
-            auto& markers = cell.markers[colony_id];
-            markers.intensity[0] = 0.0f;
-            markers.intensity[1] = 0.0f;
-            markers.intensity[2] = 0.0f;
-			markers.repellent    = 0.0f;
-            markers.permanent    = false;
-            cell.density         = 0.0f;
+			clearMarkersOfCell(cell.markers[colony_id]);
+            cell.density = 0.0f;
         }
     }
+
+	static void clearMarkersOfCell(ColonyCell& cell)
+	{
+		cell.intensity[0] = 0.0f;
+		cell.intensity[1] = 0.0f;
+		cell.intensity[2] = 0.0f;
+		cell.repellent    = 0.0f;
+		cell.permanent    = false;
+	}
 };
