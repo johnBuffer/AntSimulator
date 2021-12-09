@@ -50,6 +50,7 @@ struct WorldView : GUI::Item
             control_state.executeViewAction(simulation.renderer.vp_handler.getMouseWorldPosition());
         } else if (button == sf::Mouse::Middle) {
             control_state.resetCallbacks();
+            control_state.requestEditModeOff();
         }
     }
 

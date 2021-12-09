@@ -2,7 +2,7 @@
 #include <SFML/Graphics.hpp>
 
 
-struct Graphic
+struct Graphic : public sf::Drawable
 {
 	mutable sf::VertexArray va;
 	std::vector<float> values;
@@ -59,7 +59,7 @@ struct Graphic
 		max_value = std::max(max_value, value);
 	}
 
-	void render(sf::RenderTarget& target) const
+	void draw(sf::RenderTarget& target, sf::RenderStates states) const override
 	{
 		const uint64_t size = values.size();
 		const float bw = width / float(size);
@@ -74,7 +74,7 @@ struct Graphic
 			va[2 * i + 1].color = color;
 		}
 
-		target.draw(va);
+		target.draw(va, states);
 	}
 };
 

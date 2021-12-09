@@ -16,14 +16,12 @@ struct Colony
 	uint32_t         max_ants_count;
 	civ::Vector<Ant> ants;
 	Cooldown         ants_creation_cooldown;
-	float            food_acc;
-	RMean<float>     food_acc_mean;
 	Cooldown         pop_diff_update;
 	RDiff<int64_t>   pop_diff;
 	uint8_t          id;
-	sf::Color        ants_color = sf::Color::White;
-	uint64_t         ant_creation_id = 0;
-    bool             color_changed = false;
+	sf::Color        ants_color       = sf::Color::White;
+	uint64_t         ant_creation_id  = 0;
+    bool             color_changed    = false;
     bool             position_changed = false;
 
 
@@ -33,8 +31,6 @@ struct Colony
 		: base(sf::Vector2f(x, y), 20.0f)
 		, max_ants_count(n)
 		, ants_creation_cooldown(0.125f)
-		, food_acc(0.0f)
-		, food_acc_mean(100)
 		, pop_diff_update(1.0f)
 		, pop_diff(60)
 		, id(0)

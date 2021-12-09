@@ -16,6 +16,8 @@ struct Toggle : public Button
     sf::Vector3f color_on  = {180.0f, 240.0f, 180.0f};
     sf::Vector3f color_off = {180.0f, 180.0f, 180.0f};
 
+    std::function<void(bool)> on_state_changed = nullptr;
+
     float padding = 3.0f;
 
     Toggle()
@@ -43,7 +45,10 @@ struct Toggle : public Button
         state = s;
         updateTogglePosition();
         updateColor();
-        this->notifyChanged();
+        notifyChanged();
+        if (on_state_changed) {
+            on_state_changed(s);
+        }
     }
 
     void onPositionChange() override
@@ -84,6 +89,12 @@ struct Toggle : public Button
         toggle.setFillColor(vec3ToColor(toggle_color.as()));
         GUI::Item::draw(target, toggle);
     }
+
+    template<typename TCallback>
+    void onStateChange(const TCallback&& callback)
+    {
+        on_state_changed = callback;
+    }
 };
 
 struct NamedToggle : public Container
@@ -114,6 +125,12 @@ struct NamedToggle : public Container
     void setState(bool state) const
     {
         toggle->setState(state);
+    }
+
+    template<typename TCallback>
+    void onStateChange(const TCallback&& callback)
+    {
+        toggle->on_state_changed = callback;
     }
 };
 

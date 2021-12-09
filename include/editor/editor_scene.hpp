@@ -66,10 +66,10 @@ struct EditorScene : public GUI::Scene
         auto tools = create<GUI::NamedContainer>("Edit Map", GUI::Container::Orientation::Vertical);
         tools->header->addItem(create<GUI::EmptyItem>());
         tools->hideRoot();
+        tools->root->spacing = 0.0f;
         auto tools_toggle = create<GUI::Toggle>();
         tools_toggle->color_on = {240, 180, 0};
         tools->watch(tools_toggle, [this, tools_toggle, tools](){
-            control_state.show_brush_preview = tools_toggle->state;
             if (tools_toggle->state) {
                 tools->showRoot();
                 this->tool_selector->setEditMode(tools_toggle->state);
@@ -101,6 +101,7 @@ struct EditorScene : public GUI::Scene
         auto time_controls = create<TimeController>();
         watch(time_controls, [this, time_controls](){
             this->renderer->current_time_state = time_controls->current_state;
+            this->control_state.updating = time_controls->current_state == TimeController::State::Play;
             if (time_controls->tool_speed->getState()) {
                 this->window.setFramerateLimit(0);
             } else {

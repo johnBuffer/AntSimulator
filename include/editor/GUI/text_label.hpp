@@ -24,8 +24,8 @@ struct TextLabel : public Item
         padding = 1.0f;
         font.loadFromFile("res/font.ttf");
         text.setFont(font);
-        text.setFillColor(sf::Color::Black);
         text.setCharacterSize(char_size);
+        setColor({100, 100, 100});
         setText(label);
         updatePosition();
     }

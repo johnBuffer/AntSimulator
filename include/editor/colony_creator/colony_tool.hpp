@@ -4,6 +4,8 @@
 #include "editor/GUI/rounded_rectangle.hpp"
 #include "editor/color_picker/color_picker.hpp"
 #include "editor/control_state.hpp"
+#include "common/color_utils.hpp"
+#include "colony_stats.hpp"
 
 
 struct ColonyTool : GUI::Container
@@ -12,6 +14,8 @@ struct ColonyTool : GUI::Container
     ControlState& control_state;
     SPtr<GUI::Container> top_zone;
     SPtr<edtr::ColorPicker> color_picker;
+    SPtr<ColonyStats> colony_stats;
+    sf::Color background_color = {210, 210, 210};
 
     bool selected = false;
     std::function<void(int8_t)> on_select = [](int8_t){};
@@ -21,9 +25,10 @@ struct ColonyTool : GUI::Container
         , colony(colony_)
         , control_state(control_state_)
     {
+        // Container configuration
         padding = 5.0f;
         size_type.y = GUI::Size::FitContent;
-
+        // Add the buttons (for color picking, position, focus and remove)
         top_zone = create<GUI::Container>(GUI::Container::Orientation::Horizontal);
         top_zone->size_type.y = GUI::Size::FitContent;
         top_zone->padding = 0.0f;
@@ -67,7 +72,19 @@ struct ColonyTool : GUI::Container
         auto remove_button = create<GUI::Button>("Remove", [](){});
         remove_button->setHeight(20.0f);
         remove_button->setWidth(60.0f);
+        remove_button->background_color = sf::Color(250, 200, 200);
         top_zone->addItem(remove_button, "remove");
+
+        auto stats_toggle = create<GUI::NamedToggle>("Stats");
+        top_zone->addItem(stats_toggle);
+        stats_toggle->onStateChange([this](bool s){
+            if (s) {
+                GUI::Container::addItem(colony_stats);
+            } else {
+                GUI::Container::removeItem(colony_stats);
+                colony_stats->setPosition({});
+            }
+        });
 
         // Create color picker
         color_picker = create<edtr::ColorPicker>();
@@ -77,6 +94,7 @@ struct ColonyTool : GUI::Container
         });
 
         color_picker->setRandomColor();
+        colony_stats = create<ColonyStats>(colony, control_state);
     }
 
     void onClick(sf::Vector2f, sf::Mouse::Button) override
@@ -107,8 +125,8 @@ struct ColonyTool : GUI::Container
     void render(sf::RenderTarget& target) override
     {
         auto background = GUI::RoundedRectangle(size, position, 5.0f);
-        const uint8_t background_color = selected ? 180 : 200;
-        background.setFillColor(sf::Color(background_color, background_color, background_color));
+        const uint8_t select = selected ? 30 : 0;
+        background.setFillColor(sf::Color(background_color.r - select, background_color.g - select, background_color.b - select));
         GUI::Item::draw(target, background);
     }
 };

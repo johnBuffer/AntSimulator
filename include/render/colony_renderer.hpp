@@ -80,7 +80,7 @@ struct PopulationChart
 
 		target.draw(text);
 
-		population.render(target);
+		//population.render(target);
 	}
 };
 

@@ -16,13 +16,12 @@ struct ControlState
     Action     view_action_end              = nullptr;
     DrawAction draw_action                  = nullptr;
     std::function<void()> request_edits_off = nullptr;
-
     // Special commands
-    bool focus_requested                = false;
+    bool                          focus_requested = false;
+    trn::Transition<float>        zoom            = 1.0f;
     trn::Transition<sf::Vector2f> focus;
-    trn::Transition<float>        zoom  = 1.0f;
+    bool                          updating        = false;
     // Preview callback
-    bool show_brush_preview = false;
     float brush_radius      = 0.0f;
 
     ControlState() = default;
