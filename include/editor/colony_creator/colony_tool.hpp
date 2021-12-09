@@ -44,6 +44,7 @@ struct ColonyTool : GUI::Container
         top_zone->addItem(to_focus_button);
 
         auto set_position_button = create<GUI::Button>("Set Position", [this](){
+            control_state.requestEditModeOff();
             control_state.view_action = [this](sf::Vector2f world_position) {
                 colony->setPosition(world_position);
             };

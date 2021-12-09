@@ -70,7 +70,6 @@ struct EditorScene : public GUI::Scene
         tools_toggle->color_on = {240, 180, 0};
         tools->watch(tools_toggle, [this, tools_toggle, tools](){
             control_state.show_brush_preview = tools_toggle->state;
-
             if (tools_toggle->state) {
                 tools->showRoot();
                 this->tool_selector->setEditMode(tools_toggle->state);
@@ -108,6 +107,10 @@ struct EditorScene : public GUI::Scene
                 this->window.setFramerateLimit(60);
             }
         });
+
+        control_state.request_edits_off = [tools_toggle]{
+            tools_toggle->setState(false);
+        };
 
         addItem(renderer);
         addItem(toolbox, "Toolbox");

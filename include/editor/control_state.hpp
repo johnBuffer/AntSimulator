@@ -20,6 +20,8 @@ struct ControlState
     bool show_brush_preview = false;
     float brush_radius      = 0.0f;
 
+    std::function<void()> request_edits_off = nullptr;
+
     ControlState() = default;
 
     void executeViewAction(sf::Vector2f mouse_world_position)
@@ -48,5 +50,12 @@ struct ControlState
         focus_requested = true;
         focus           = position;
         zoom            = zoom_level;
+    }
+
+    void requestEditModeOff()
+    {
+        if (request_edits_off) {
+            request_edits_off();
+        }
     }
 };
