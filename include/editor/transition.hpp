@@ -129,7 +129,7 @@ private:
 	static float ratio(float t)
 	{
 		const float width(5.0f);
-		return 1.0f / (1.0f + std::expf(-(width*(2.0f*t - 1.0f))));
+		return 1.0f / (1.0f + expf(-(width*(2.0f*t - 1.0f))));
 	}
 
 	void restart()
