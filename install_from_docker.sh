@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 docker build -t ant-simulator:latest .
 docker create -it --name dummy ant-simulator:latest bash
