@@ -1,5 +1,5 @@
 #pragma once
-#include "GUI/item.hpp"
+#include "editor/GUI/item.hpp"
 
 
 namespace GUI
