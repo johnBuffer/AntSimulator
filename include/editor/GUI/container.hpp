@@ -1,5 +1,5 @@
 #pragma once
-#include "GUI/item.hpp"
+#include "item.hpp"
 #include "common/color_utils.hpp"
 
 

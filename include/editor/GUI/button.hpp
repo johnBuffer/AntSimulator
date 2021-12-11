@@ -1,8 +1,8 @@
 
 #pragma once
-#include "GUI/item.hpp"
+#include "item.hpp"
 #include "rounded_rectangle.hpp"
-#include "transition.hpp"
+#include "../transition.hpp"
 #include "text_label.hpp"
 
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "GUI/item.hpp"
+#include "item.hpp"
 #include "utils.hpp"
 #include <common/event_manager.hpp>
 #include <vector>
