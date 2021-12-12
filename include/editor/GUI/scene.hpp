@@ -24,7 +24,6 @@ struct Scene
         , event_manager(window_, false)
         , root(toVector2f(window_.getSize()))
     {
-        const auto size = window_.getSize();
         initializeEventsCallbacks();
     }
 
@@ -41,6 +40,18 @@ struct Scene
         event_manager.addEventCallback(sf::Event::MouseButtonReleased, [&](const sf::Event& e) {unclick(e);});
         event_manager.addEventCallback(sf::Event::MouseMoved, [&](const sf::Event& e) {mouseMove(e.mouseMove.x, e.mouseMove.y);});
         event_manager.addEventCallback(sf::Event::KeyPressed, [&](const sf::Event& e) {processKeyPressed(e);});
+        event_manager.addEventCallback(sf::Event::Resized, [this](sfev::CstEv){resize();});
+    }
+
+    virtual void onSizeChange() {}
+
+    void resize()
+    {
+        const auto size = window.getSize();
+        const sf::Vector2f new_size{to<float>(size.x), to<float>(size.y)};
+        root.setSize(new_size);
+        window.setView(sf::View(new_size * 0.5f, new_size));
+        onSizeChange();
     }
     
     void processKeyPressed(const sf::Event& e)
@@ -76,7 +87,7 @@ struct Scene
         root.defaultUpdate();
     }
     
-    void addItem(GUI::ItemPtr item, const std::string& name = "", Alignement alignement = Alignement::None)
+    void addItem(GUI::ItemPtr item, const std::string& name = "", Alignment alignement = Alignment::None)
     {
         root.addItem(item, name, alignement);
     }

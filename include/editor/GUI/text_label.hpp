@@ -13,13 +13,13 @@ struct TextLabel : public Item
     uint32_t char_size;
     bool auto_size_update = true;
     
-    Alignement alignment;
+    Alignment alignment;
     
     TextLabel(const std::string& label_, uint32_t char_size_, sf::Vector2f size_ = {}, sf::Vector2f position_ = {})
         : Item(position_, size_)
         , label(label_)
         , char_size(char_size_)
-        , alignment(Alignement::Center)
+        , alignment(Alignment::Center)
     {
         padding = 1.0f;
         font.loadFromFile("res/font.ttf");
@@ -55,7 +55,7 @@ struct TextLabel : public Item
         }
     }
     
-    void setAlignment(Alignement new_alignment)
+    void setAlignment(Alignment new_alignment)
     {
         alignment = new_alignment;
         updateOrigin();
@@ -72,13 +72,13 @@ struct TextLabel : public Item
     {
         const auto text_bounds = text.getGlobalBounds();
         switch (alignment) {
-            case Alignement::Center:
+            case Alignment::Center:
                 text.setOrigin(text_bounds.width * 0.5f - size.x * 0.5f, text_bounds.height - size.y * 0.5f);
                 break;
-            case Alignement::Left:
+            case Alignment::Left:
                 text.setOrigin({});
                 break;
-            case Alignement::Right:
+            case Alignment::Right:
                 text.setOrigin(text_bounds.width - size.x, 0.0f);
                 break;
             default:

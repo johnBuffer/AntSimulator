@@ -47,7 +47,7 @@ struct GridContainer : public Item
     {
         // Compute item grid coords
         const uint64_t items_count = sub_items.size();
-        Item::addItem(item, item_name, Alignement::None);
+        Item::addItem(item, item_name, Alignment::None);
         updateItem(item, items_count);
     }
     

@@ -7,7 +7,7 @@
 namespace GUI
 {
 
-enum class Alignement
+enum class Alignment
 {
     None,
     Left,
@@ -52,6 +52,7 @@ struct Item
     ItemPtr active_item = nullptr;
     sf::Vector2f current_mouse_position;
     bool need_force_active_item_update = false;
+    Alignment alignment = Alignment::None;
 
     Item() = default;
 
@@ -76,6 +77,12 @@ struct Item
     void defaultOnSizeChange(bool ignore_size_changed = false)
     {
         onSizeChange();
+        for (auto& item : sub_items) {
+            if (item->alignment == Alignment::Right) {
+                item->position.x = size.x - padding - item->size.x;
+                item->updatePosition();
+            }
+        }
         if (!ignore_size_changed) {
             for (Observer& obs : size_observers) {
                 obs.callback();
@@ -229,14 +236,15 @@ struct Item
         return sf::FloatRect(position, size).contains(pos);
     }
     
-    void addItem(ItemPtr item, const std::string& item_name = "", Alignement alignement = Alignement::None)
+    void addItem(ItemPtr item, const std::string& item_name = "", Alignment alignment_ = Alignment::None)
     {
         sub_items.push_back(item);
-        item->offset = offset + position;
+        item->offset    = offset + position;
+        item->name      = item_name;
+        item->alignment = alignment_;
         item->initializeEventCallbacks();
-        item->name = item_name;
-        switch (alignement) {
-            case Alignement::Right:
+        switch (alignment_) {
+            case Alignment::Right:
                 item->setPosition(sf::Vector2f(size.x - item->size.x, 0.0f) + sf::Vector2f(-padding, padding));
                 break;
             default:

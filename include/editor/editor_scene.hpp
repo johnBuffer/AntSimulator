@@ -36,10 +36,10 @@ struct EditorScene : public GUI::Scene
         : GUI::Scene(window)
         , simulation(sim)
     {
+        root.padding = 20.0f;
+
         Conf::loadTextures();
         initialize();
-
-        root.padding = 0.0f;
     }
 
     ~EditorScene()
@@ -113,7 +113,7 @@ struct EditorScene : public GUI::Scene
 
         addItem(renderer);
         addItem(toolbox, "Toolbox");
-        addItem(time_controls, "", GUI::Alignement::Right);
+        addItem(time_controls, "", GUI::Alignment::Right);
     }
 
     void updateRenderOptions() const
@@ -125,9 +125,14 @@ struct EditorScene : public GUI::Scene
 
     void setBrushSize(float size)
     {
-        const int32_t brush_size   = to<int32_t>(size);
+        const auto brush_size      = to<int32_t>(size);
         tool_selector->brush_size  = brush_size;
         control_state.brush_radius = to<float>(brush_size);
+    }
+
+    void onSizeChange() override
+    {
+        renderer->setSize(root.size);
     }
 };
 

@@ -33,7 +33,7 @@ struct NamedContainer : public Container
         label = create<TextLabel>(name, 14);
         label->setColor(sf::Color(100, 100, 100));
         label->setHeight(20.0f);
-        label->setAlignment(Alignement::Left);
+        label->setAlignment(Alignment::Left);
 
         header->addItem(label);
 
