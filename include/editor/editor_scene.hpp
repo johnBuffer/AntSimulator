@@ -92,11 +92,9 @@ struct EditorScene : public GUI::Scene
         setBrushSize(slider->getValue());
         brush_size->addItem(slider);
         tools->addItem(brush_size);
-
         // Add colonies edition tools
         auto colonies = create<ColonyCreator>(simulation, control_state);
         toolbox->addItem(colonies);
-
         // Add time controls
         auto time_controls = create<TimeController>();
         watch(time_controls, [this, time_controls](){
