@@ -34,6 +34,7 @@ struct Observer
 
 struct Item
 {
+    static constexpr float SCALE = 2.0f;
     // Attributes
     sf::Vector2f size;
     sf::Vector2f offset;
@@ -227,6 +228,7 @@ struct Item
     void draw(sf::RenderTarget& target, const sf::Drawable& drawable, const sf::RenderStates& states)
     {
         sf::RenderStates default_states = states;
+        default_states.transform.scale(2.0f, 2.0f);
         default_states.transform.translate(offset);
         target.draw(drawable, default_states);
     }

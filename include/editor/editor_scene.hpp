@@ -101,7 +101,7 @@ struct EditorScene : public GUI::Scene
             this->renderer->current_time_state = time_controls->current_state;
             this->control_state.updating = time_controls->current_state == TimeController::State::Play;
             if (time_controls->tool_speed->getState()) {
-                this->window.setFramerateLimit(0);
+                this->window.setFramerateLimit(400);
             } else {
                 this->window.setFramerateLimit(60);
             }
@@ -133,6 +133,8 @@ struct EditorScene : public GUI::Scene
     void onSizeChange() override
     {
         renderer->setSize(root.size);
+        simulation.renderer.vp_handler.wheelZoom(0);
+        renderer->simulation.renderer.vp_handler.state.center = root.size;
     }
 };
 
