@@ -22,7 +22,7 @@ struct Scene
     Scene(sf::RenderWindow& window_)
         : window(window_)
         , event_manager(window_, false)
-        , root(toVector2f(window_.getSize()) / Item::SCALE)
+        , root(toVector2f(window_.getSize()) / Conf::GUI_SCALE)
     {
         initializeEventsCallbacks();
     }
@@ -49,7 +49,7 @@ struct Scene
     {
         const auto size = window.getSize();
         const sf::Vector2f new_size{to<float>(size.x), to<float>(size.y)};
-        root.setSize(new_size / Item::SCALE);
+        root.setSize(new_size / Conf::GUI_SCALE);
         window.setView(sf::View(new_size * 0.5f, new_size));
         onSizeChange();
     }
@@ -73,7 +73,7 @@ struct Scene
     
     void dispatchClick(const sf::Event& e)
     {
-        root.defaultOnClick(mouse_position / Item::SCALE, e.mouseButton.button);
+        root.defaultOnClick(mouse_position / Conf::GUI_SCALE, e.mouseButton.button);
     }
     
     void unclick(const sf::Event& e)
@@ -105,7 +105,7 @@ struct Scene
     
     void mouseMove(int32_t x, int32_t y)
     {
-        mouse_position = sf::Vector2f(to<float>(x), to<float>(y)) / Item::SCALE;
+        mouse_position = sf::Vector2f(to<float>(x), to<float>(y)) / Conf::GUI_SCALE;
         root.defaultOnMouseMove(mouse_position);
     }
 };

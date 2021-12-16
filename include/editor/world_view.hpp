@@ -44,7 +44,7 @@ struct WorldView : GUI::Item
     {
         if (button == sf::Mouse::Left) {
             control_state.focus_requested = false;
-            simulation.renderer.vp_handler.click(relative_click_position * Item::SCALE);
+            simulation.renderer.vp_handler.click(relative_click_position * Conf::GUI_SCALE);
         } else if (button == sf::Mouse::Right) {
             action_button_click = true;
             control_state.executeViewAction(simulation.renderer.vp_handler.getMouseWorldPosition());
@@ -68,7 +68,7 @@ struct WorldView : GUI::Item
 
     void onMouseMove(sf::Vector2f new_mouse_position) override
     {
-        simulation.renderer.vp_handler.setMousePosition(new_mouse_position * Item::SCALE);
+        simulation.renderer.vp_handler.setMousePosition(new_mouse_position * Conf::GUI_SCALE);
         if (action_button_click) {
             control_state.executeViewAction(simulation.renderer.vp_handler.getMouseWorldPosition());
         }

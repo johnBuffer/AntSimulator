@@ -26,6 +26,7 @@ struct DefaultConf
     static constexpr uint32_t MAX_COLONIES_COUNT = 4;
 	static sf::Color COLONY_COLORS[MAX_COLONIES_COUNT];
     static uint32_t USE_FULLSCREEN;
+    static float GUI_SCALE;
 
 	static void loadTextures()
 	{
@@ -65,6 +66,9 @@ struct DefaultConf
                         DefaultConf<T>::USE_FULLSCREEN = std::atoi(line_c);
                         break;
                     case 3:
+                        DefaultConf<T>::GUI_SCALE = std::atof(line_c);
+                        break;
+                    case 4:
                         DefaultConf<T>::ANTS_COUNT = std::atoi(line_c);
                         break;
                     default:
@@ -117,6 +121,9 @@ sf::Color DefaultConf<T>::COLONY_COLORS[MAX_COLONIES_COUNT] = {sf::Color::Red, s
 
 template<typename T>
 uint32_t DefaultConf<T>::USE_FULLSCREEN = 1;
+
+template<typename T>
+float DefaultConf<T>::GUI_SCALE = 1.0f;
 
 using Conf = DefaultConf<int>;
 
