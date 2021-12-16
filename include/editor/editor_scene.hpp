@@ -133,8 +133,9 @@ struct EditorScene : public GUI::Scene
     void onSizeChange() override
     {
         renderer->setSize(root.size);
-        simulation.renderer.vp_handler.wheelZoom(0);
         renderer->simulation.renderer.vp_handler.state.center = root.size;
+        // This is to update mouse_position
+        simulation.renderer.vp_handler.wheelZoom(0);
     }
 };
 

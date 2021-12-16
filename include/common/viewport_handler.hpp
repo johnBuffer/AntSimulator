@@ -68,6 +68,8 @@ struct ViewportHandler
             const float zoom_amount = 1.2f;
             const float delta = w > 0 ? zoom_amount : 1.0f / zoom_amount;
             zoom(delta);
+        } else {
+            zoom(1.0f);
         }
     }
 
