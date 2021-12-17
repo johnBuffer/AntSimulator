@@ -51,7 +51,7 @@ struct Ant
 	// Fight info
 	FightMode fight_mode;
 	civ::Ref<Ant> target;
-	float dammage = 10.0f;
+	float damage = 10.0f;
     float fight_dist = length * 0.25f;
     sf::Vector2f fight_pos;
     sf::Vector2f fight_vec;
@@ -134,7 +134,7 @@ struct Ant
             attack_cooldown.update(dt);
             if (attack_cooldown.ready()) {
                 attack_cooldown.reset();
-                opponent.autonomy += dammage;
+                opponent.autonomy += damage;
             }
 		} else {
 			fight_mode = FightMode::NoFight;

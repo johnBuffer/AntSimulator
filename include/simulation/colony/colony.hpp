@@ -42,7 +42,7 @@ struct Colony
     {
         id = colony_id;
         base.food = 0.0f;
-        uint32_t ants_count = 128;
+        uint32_t ants_count = 2000;
         for (uint32_t i(ants_count); i--;) {
             createWorker();
         }
@@ -74,7 +74,7 @@ struct Colony
 		ant.type = Ant::Type::Soldier;
 		ant.length *= soldier_scale;
 		ant.width *= soldier_scale;
-		ant.dammage *= soldier_scale * 2.0f;
+		ant.damage *= soldier_scale * 2.0f;
 		ant.max_autonomy *= soldier_scale;
 	}
 
