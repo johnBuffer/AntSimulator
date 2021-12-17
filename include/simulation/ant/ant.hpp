@@ -84,15 +84,10 @@ struct Ant
 		, search_markers(5.0f, 5.0f)
 		, phase(Mode::ToFood)
 		, liberty_coef(RNGf::getRange(0.001f, 0.01f))
-		, hits(0)
         , fight_mode(FightMode::NoFight)
-		, to_enemy_markers_count(0.0f)
-		, autonomy(0.0f)
-		, id(0)
 		, col_id(colony_id)
         , attack_cooldown(1.5f, 0.0f)
 		, type(Type::Worker)
-
 	{
 	}
     

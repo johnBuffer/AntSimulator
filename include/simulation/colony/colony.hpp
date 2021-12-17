@@ -71,11 +71,11 @@ struct Colony
 	{
 		--base.enemies_found_count;
 		const float soldier_scale = 2.0f;
-		ant.type = Ant::Type::Soldier;
-		ant.length *= soldier_scale;
-		ant.width *= soldier_scale;
-		ant.damage *= soldier_scale * 2.0f;
-		ant.max_autonomy *= soldier_scale;
+		ant.type                  = Ant::Type::Soldier;
+		ant.length                *= soldier_scale;
+		ant.width                 *= soldier_scale;
+		ant.damage                *= soldier_scale * 2.0f;
+		ant.max_autonomy          *= soldier_scale;
 	}
 
 	void genericAntsUpdate(float dt, World& world)
@@ -117,7 +117,7 @@ struct Colony
 	{
 		// Update stats
 		if (pop_diff_update.updateAutoReset(dt)) {
- 			pop_diff.addValue(ants.size());
+ 			pop_diff.addValue(to<float>(ants.size()));
 		}
 		createNewAnts(dt);
 		// Update ants and check if collision with colony
@@ -152,6 +152,7 @@ struct Colony
         return count;
     }
 
+    [[nodiscard]]
 	uint32_t soldiersCount() const
 	{
 		return to<uint32_t>(std::count_if(ants.begin(), ants.end(), [](const Ant& a) { return a.type == Ant::Type::Soldier; }));
