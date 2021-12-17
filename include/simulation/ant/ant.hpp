@@ -34,47 +34,46 @@ struct Ant
 	};
 
 	// Parameters
-	float width = 3.0f;
-	float length = 4.7f;
-	float move_speed = 40.0f;
-	float marker_detection_max_dist = 40.0f;
-	float direction_update_period = 0.25f;
-	float marker_period = 0.25f;
-	float direction_noise_range = PI * 0.02f;
-	float repellent_period = 128.0f;
+	static constexpr float move_speed                = 40.0f;
+	static constexpr float marker_detection_max_dist = 40.0f;
+	static constexpr float direction_update_period   = 0.25f;
+	static constexpr float marker_period             = 0.25f;
+	static constexpr float direction_noise_range     = PI * 0.02f;
+	static constexpr float repellent_period          = 128.0f;
 
-	Mode phase;
+    float width           = 3.0f;
+    float length          = 4.7f;
+	Mode phase            = Mode::ToFood;
+    uint16_t hits         = 0;
 	sf::Vector2f position;
 	Direction direction;
-	uint16_t hits;
 
 	// Fight info
-	FightMode fight_mode;
-	civ::Ref<Ant> target;
-	float damage = 10.0f;
-    float fight_dist = length * 0.25f;
+	FightMode fight_mode    = FightMode::NoFight;
+	float damage            = 10.0f;
+    float fight_dist        = length * 0.25f;
+    civ::Ref<Ant> target;
     sf::Vector2f fight_pos;
     sf::Vector2f fight_vec;
-    Cooldown attack_cooldown;
-    bool enemy_found = false;
-	float enemy_intensity = 0.0f;
-    float to_fight_timeout = 1.0f;
-    float to_fight_time = 0.0f;
+    bool enemy_found        = false;
+	float enemy_intensity   = 0.0f;
+    float to_fight_timeout  = 1.0f;
+    float to_fight_time     = 0.0f;
 	AntRef fight_request;
-	
-    
-	Cooldown direction_update;
+
+    Cooldown attack_cooldown;
+    Cooldown direction_update;
 	Cooldown marker_add;
 	Cooldown search_markers;
-	float internal_clock = 0.0f;
-	float to_enemy_markers_count;
-	float liberty_coef;
-	float autonomy;
-	float max_autonomy = 300.0f;
+	float internal_clock         = 0.0f;
+	float to_enemy_markers_count = 0.0f;
+    float max_autonomy           = 300.0f;
+    float liberty_coef           = 0.0f;
+	float autonomy               = 0.0f;
 
-	int16_t id;
-	uint8_t col_id;
-	Type type;
+	int16_t id     = 0;
+	uint8_t col_id = 0;
+	Type type      = Type::Worker;
 
 	Ant() = default;
 	Ant(float x, float y, float angle, uint8_t colony_id)
@@ -113,14 +112,15 @@ struct Ant
         }
     }
 
-	void removeFromWorldGrid(World& world)
+	void removeFromWorldGrid(World& world) const
 	{
 		ColonyCell& cell = world.map.get(position).markers[col_id];
 		if (cell.current_ant == id) {
 			cell.current_ant = -1;
 		}
 	}
-    
+
+    [[nodiscard]]
     bool isFighting() const
     {
         return fight_mode == FightMode::Fighting;
@@ -139,7 +139,7 @@ struct Ant
 		} else {
 			fight_mode = FightMode::NoFight;
 			if (type == Type::Soldier) {
-				// Restaure some energy
+				// Restore some energy
 				autonomy = std::max(0.0f, autonomy - 3.0f);
 			}
 		}
@@ -148,7 +148,6 @@ struct Ant
 	void updatePosition(World& world, float dt)
 	{
 		sf::Vector2f v = direction.getVec();
-		const sf::Vector2f next_position = position + (dt * move_speed) * v;
 		const HitPoint hit = world.map.getFirstHit(position, v, dt * move_speed);
 		if (hit.cell) {
 			const uint32_t hits_threshold = 4;
@@ -156,8 +155,8 @@ struct Ant
 				terminate();
 			}
 			else {
-				v.x *= hit.normal.x ? -1.0f : 1.0f;
-				v.y *= hit.normal.y ? -1.0f : 1.0f;
+				v.x *= hit.normal.x != 0.0f ? -1.0f : 1.0f;
+				v.y *= hit.normal.y != 0.0f ? -1.0f : 1.0f;
 			}
 			++hits;
 			direction.setDirectionNow(v);
@@ -166,7 +165,8 @@ struct Ant
 			hits = 0;
 			position += (dt * move_speed) * v;
 			// Ants outside the map go back to home
-			if (position.x < 0.0f || position.x > Conf::WORLD_WIDTH || position.y < 0.0f || position.y > Conf::WORLD_HEIGHT) {
+			if (position.x < 0.0f || position.x > to<float>(Conf::WORLD_WIDTH) ||
+			    position.y < 0.0f || position.y > to<float>(Conf::WORLD_HEIGHT)) {
 				terminate();
 			}
 		}
@@ -221,6 +221,7 @@ struct Ant
 		to_enemy_markers_count += dt;
 	}
 
+    [[nodiscard]]
 	Mode getMarkersSamplingType() const
 	{
 		if (phase == Mode::ToHome || phase == Mode::Refill || phase == Mode::ToHomeNoFood) {
@@ -235,14 +236,14 @@ struct Ant
 		to_enemy_markers_count = 0.0f;
 	}
 
-	void addMarker(World& world)
+	void addMarker(World& world) const
 	{
 		if (phase == Mode::ToHome || phase == Mode::ToFood) {
 			const float intensity = getMarkerIntensity(0.05f, internal_clock);
 			world.addMarker(position, phase == Mode::ToFood ? Mode::ToHome : Mode::ToFood, intensity, col_id);
 		}
 		else if (phase == Mode::ToHomeNoFood) {
-			const float intensity = to<float>(getMarkerIntensity(0.1f, internal_clock));
+			const auto intensity = to<float>(getMarkerIntensity(0.1f, internal_clock));
 			world.addMarkerRepellent(position, col_id, intensity);
 		}
 		if (enemy_found) {
@@ -278,7 +279,8 @@ struct Ant
 		va[index + 3].position = position - nrm_vec - dir_vec;
 	}
 
-	float getMarkerIntensity(float coef, float count)
+    [[nodiscard]]
+	static float getMarkerIntensity(float coef, float count)
 	{
 		return Conf::MARKER_INTENSITY * expf(-coef * count);
 	}
@@ -325,11 +327,13 @@ struct Ant
 		autonomy = max_autonomy + 1.0f;
 	}
 
+    [[nodiscard]]
 	bool isDone() const
 	{
 		return autonomy >= max_autonomy;
 	}
 
+    [[nodiscard]]
 	bool isDead() const
 	{
 		return phase == Mode::Dead;

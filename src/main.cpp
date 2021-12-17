@@ -25,9 +25,7 @@ int main()
     // Create editor scene around it
     GUI::Scene::Ptr scene = create<edtr::EditorScene>(window, simulation);
     scene->resize();
-
     
-
     // Main loop
 	while (window.isOpen()) {
         // Update
