@@ -28,6 +28,7 @@ struct Simulation
 		, renderer()
         , distance_field_builder(world.map)
 	{
+        distance_field_builder.requestUpdate();
 	}
 
 	void loadMap(const std::string& map_filename)

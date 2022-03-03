@@ -13,8 +13,8 @@ constexpr float min_intensity = 0.1f;
 struct AntRef
 {
 	bool     active = false;
-	uint8_t  col_id;
-	uint16_t ant_id;
+	uint8_t  col_id = 0;
+	uint16_t ant_id = 0;
 };
 
 
@@ -24,14 +24,14 @@ struct ColonyCell
 	float intensity[3];
 	// Is the marker permanent ?
 	bool permanent = false;
-	// Repellent instensity
+	// Repellent intensity
 	float repellent;
 	// Current ant
 	int16_t current_ant = -1;
     bool fighting;
 
 	ColonyCell()
-		: intensity{ min_intensity, min_intensity, min_intensity }
+		: intensity{0.0f, 0.0f, 0.0f}
 		, repellent(0.0f)
         , fighting(false)
 	{}
@@ -40,7 +40,7 @@ struct ColonyCell
 	{
 		// Reset current ant
 		current_ant = -1;
-        fighting = false;
+        fighting    = false;
 		// Update toFood and toHome
 		intensity[0] -= permanent ? 0.0f : dt;
 		intensity[1] -= dt;
@@ -130,11 +130,13 @@ struct WorldCell
 		return markers[colony_id].repellent;
 	}
 
+	[[nodiscard]]
 	float getIntensity(Mode mode, uint8_t colony_id) const
 	{
 		return std::max(min_intensity, markers[colony_id].intensity[to<uint32_t>(mode)]);
 	}
 
+	[[nodiscard]]
 	bool isPermanent(uint8_t colony_id) const
 	{
 		return markers[colony_id].permanent;
@@ -213,7 +215,7 @@ struct WorldGrid : public Grid<WorldCell>
 	void remove(sf::Vector2f pos, Mode type, uint8_t colony_id)
 	{
 		WorldCell& cell = get(pos);
-		const uint32_t mode_index = to<uint32_t>(type);
+		const auto mode_index = to<uint32_t>(type);
 		cell.markers[colony_id].intensity[mode_index] = 0.0f;
 	}
 

@@ -19,8 +19,9 @@ struct WorkerUpdater
 		// Sample the world
 		for (uint32_t i(sample_count); i--;) {
 			// Get random point in range
-			const float sample_angle     = current_angle + RNGf::getRange(sample_angle_range);
-			const float distance         = RNGf::getUnder(ant.marker_detection_max_dist);
+            const float delta_angle      = RNGf::getRange(sample_angle_range);
+			const float sample_angle     = current_angle + delta_angle;
+			const float distance         = RNGf::getUnder(Ant::marker_detection_max_dist);
 			const sf::Vector2f to_marker = { cos(sample_angle), sin(sample_angle) };
 			auto* cell                   = world.map.getSafe(ant.position + distance * to_marker);
 			const HitPoint hit_result    = world.map.getFirstHit(ant.position, to_marker, distance);
@@ -51,7 +52,8 @@ struct WorkerUpdater
 				result.repellent_cell = cell;
 			}
 			// Check for the most intense marker
-			const float marker_intensity = to<float>(cell->getIntensity(marker_phase, ant.col_id) * std::pow(cell->wall_dist, 2.0));
+            const float wall_rep = cell->wall_dist * cell->wall_dist;
+			const auto marker_intensity = to<float>(cell->getIntensity(marker_phase, ant.col_id)) * wall_rep;
 			if (marker_intensity > result.max_intensity) {
 				result.max_intensity = marker_intensity;
 				result.max_direction = to_marker;
@@ -62,7 +64,8 @@ struct WorkerUpdater
 				break;
 			}
 		}
-		if (result.found_fight) {
+
+        if (result.found_fight) {
 			ant.direction = getAngle(result.max_direction);
 			ant.fight_mode = FightMode::ToFight;
 			return;
@@ -80,7 +83,8 @@ struct WorkerUpdater
 		if (result.repellent_cell && ant.phase == Mode::ToHome) {
 			result.repellent_cell->getRepellent(ant.col_id) *= 0.95f;
 		}
-		// Update direction
+
+        // Update direction
 		if (result.max_intensity) {
 			// Slowly degrade the track to accelerate its dissipation
 			if (RNGf::proba(0.2f) && ant.phase == Mode::ToFood) {

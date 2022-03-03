@@ -66,7 +66,7 @@ struct DefaultConf
                         DefaultConf<T>::USE_FULLSCREEN = std::atoi(line_c);
                         break;
                     case 3:
-                        DefaultConf<T>::GUI_SCALE = std::atof(line_c);
+                        DefaultConf<T>::GUI_SCALE = static_cast<float>(std::atof(line_c));
                         break;
                     case 4:
                         DefaultConf<T>::ANTS_COUNT = std::atoi(line_c);

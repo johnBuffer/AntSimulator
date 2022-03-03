@@ -58,37 +58,42 @@ template<typename T>
 class RNG
 {
 private:
-	static RealNumberGenerator<T> gen;
+	static RealNumberGenerator<T>* gen;
 
 public:
+    static void initialize()
+    {
+        gen = new RealNumberGenerator<T>();
+    }
+
 	static T get()
 	{
-		return gen.get();
+		return gen->get();
 	}
 
 	static float getUnder(T max)
 	{
-		return gen.getUnder(max);
+		return gen->getUnder(max);
 	}
 
 	static uint64_t getUintUnder(uint64_t max)
 	{
-		return static_cast<uint64_t>(gen.getUnder(static_cast<float>(max) + 1.0f));
+		return static_cast<uint64_t>(gen->getUnder(static_cast<float>(max) + 1.0f));
 	}
 
 	static float getRange(T min, T max)
 	{
-		return gen.getRange(min, max);
+		return gen->getRange(min, max);
 	}
 
 	static float getRange(T width)
 	{
-		return gen.getRange(width);
+		return gen->getRange(width);
 	}
 
 	static float getFullRange(T width)
 	{
-		return gen.getRange(static_cast<T>(2.0f) * width);
+		return gen->getRange(static_cast<T>(2.0f) * width);
 	}
 
 	static bool proba(float threshold)
@@ -100,7 +105,7 @@ public:
 using RNGf = RNG<float>;
 
 template<typename T>
-RealNumberGenerator<T> RNG<T>::gen = RealNumberGenerator<T>();
+RealNumberGenerator<T>* RNG<T>::gen = nullptr;
 
 
 template<typename T>

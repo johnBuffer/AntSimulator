@@ -42,7 +42,7 @@ struct Colony
     {
         id = colony_id;
         base.food = 0.0f;
-        uint32_t ants_count = 2000;
+        uint32_t ants_count = 1000;
         for (uint32_t i(ants_count); i--;) {
             createWorker();
         }
@@ -117,7 +117,7 @@ struct Colony
 	{
 		// Update stats
 		if (pop_diff_update.updateAutoReset(dt)) {
- 			pop_diff.addValue(to<float>(ants.size()));
+ 			pop_diff.addValue(to<int64_t>(ants.size()));
 		}
 		createNewAnts(dt);
 		// Update ants and check if collision with colony

@@ -21,6 +21,7 @@ struct World
 		, size(to<float>(width), to<float>(height))
 		, renderer(map, va_map)
 	{
+        // Create walls around the map
 		for (int32_t x(0); x < map.width; x++) {
 			for (int32_t y(0); y < map.height; y++) {
 				if (x == 0 || x == map.width - 1 || y == 0 || y == map.height - 1) {

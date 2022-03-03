@@ -15,6 +15,9 @@ int main()
     } else {
         std::cout << "Configuration file couldn't be found." << std::endl;
     }
+
+    RNGf::initialize();
+
 	sf::ContextSettings settings;
 	settings.antialiasingLevel = 4;
     int32_t window_style = Conf::USE_FULLSCREEN ? sf::Style::Fullscreen : sf::Style::Default;

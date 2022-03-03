@@ -13,15 +13,15 @@
 
 struct SamplingResult
 {
-	float max_intensity = 0.0f;
+	float max_intensity         = 0.0f;
 	// To objective stuff
-	sf::Vector2f max_direction;
-	WorldCell* max_cell = nullptr;
-	bool found_permanent = false;
-	bool found_fight = false;
+	sf::Vector2f max_direction  = {0.0f, 0.0f};
+	WorldCell* max_cell         = nullptr;
+	bool found_permanent        = false;
+	bool found_fight            = false;
 	// Repellent stuff
-	float max_repellent = 0.0f;
-	WorldCell* repellent_cell = nullptr;
+	float max_repellent         = 0.0f;
+	WorldCell* repellent_cell   = nullptr;
 };
 
 

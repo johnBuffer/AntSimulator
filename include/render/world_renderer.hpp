@@ -43,7 +43,7 @@ struct WorldRenderer : public AsyncRenderer
 				va[4 * i + 0].position = position;
 				va[4 * i + 1].position = position + sf::Vector2f(cell_size_eps, 0.0f);
 				va[4 * i + 2].position = position + sf::Vector2f(cell_size_eps, cell_size_eps);
-				va[4 * i + 3].position = position + sf::Vector2f(0.0f, cell_size_eps);
+				va[4 * i + 3].position = position + sf::Vector2f(0.0f         , cell_size_eps);
 				++i;
 			}
 		}
@@ -93,6 +93,7 @@ struct WorldRenderer : public AsyncRenderer
 				va[4 * i + 1].color = color;
 				va[4 * i + 2].color = color;
 				va[4 * i + 3].color = color;
+
 				++i;
 			}
 		}

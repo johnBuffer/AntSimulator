@@ -13,6 +13,7 @@ struct AsyncRenderer
 	bool run;
 	bool swap_ok;
 
+    explicit
 	AsyncRenderer(DoubleObject<sf::VertexArray>& target)
 		: vertex_array(target)
 		, run(true)

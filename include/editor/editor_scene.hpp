@@ -118,7 +118,7 @@ struct EditorScene : public GUI::Scene
 
     void updateRenderOptions() const
     {
-        renderer->simulation.renderer.render_ants = display_controls->draw_ants;
+        renderer->simulation.renderer.render_ants        = display_controls->draw_ants;
         renderer->simulation.world.renderer.draw_markers = display_controls->draw_markers;
         renderer->simulation.world.renderer.draw_density = display_controls->draw_density;
     }
