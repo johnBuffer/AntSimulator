@@ -60,9 +60,14 @@ struct ColonyTool : GUI::Container
                 target.draw(c, vp_handler.getRenderState());
             };
             control_state.view_action = [this](sf::Vector2f world_position) {
-                colony->setPosition(world_position);
-                control_state.draw_action = nullptr;
-                control_state.view_action = nullptr;
+                const sf::FloatRect bounds = {{0.0f, 0.0f}, control_state.simulation.world.size};
+                if (bounds.contains(world_position)) {
+                    colony->setPosition(world_position);
+                    control_state.draw_action = nullptr;
+                    control_state.view_action = nullptr;
+                } else {
+                    std::cout << "Invalid colony position: outside world" << std::endl;
+                }
             };
         });
         set_position_button->setHeight(20.0f);

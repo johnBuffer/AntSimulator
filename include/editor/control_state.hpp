@@ -9,7 +9,6 @@ struct ControlState
     using ViewAction = std::function<void(sf::Vector2f)>;
     using Action     = std::function<void(void)>;
     using DrawAction = std::function<void(sf::RenderTarget&, const ViewportHandler&)>;
-
     // Actions
     Action     action                       = nullptr;
     ViewAction view_action                  = nullptr;
@@ -22,9 +21,16 @@ struct ControlState
     trn::Transition<sf::Vector2f> focus;
     bool                          updating        = false;
     // Preview callback
-    float brush_radius      = 0.0f;
+    float brush_radius = 0.0f;
 
-    ControlState() = default;
+    Simulation& simulation;
+
+    explicit
+    ControlState(Simulation& sim)
+        : simulation(sim)
+    {
+
+    }
 
     void executeViewAction(sf::Vector2f mouse_world_position)
     {

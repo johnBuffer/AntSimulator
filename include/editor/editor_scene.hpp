@@ -34,6 +34,7 @@ struct EditorScene : public GUI::Scene
     explicit
     EditorScene(sf::RenderWindow& window, Simulation& sim)
         : GUI::Scene(window)
+        , control_state(sim)
         , simulation(sim)
     {
         root.padding = 20.0f;
