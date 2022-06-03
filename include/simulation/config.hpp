@@ -27,22 +27,6 @@ struct DefaultConf
 	static sf::Color COLONY_COLORS[MAX_COLONIES_COUNT];
     static uint32_t USE_FULLSCREEN;
     static float GUI_SCALE;
-
-	static void loadTextures()
-	{
-		DefaultConf::ANT_TEXTURE = std::make_shared<sf::Texture>();
-		DefaultConf::ANT_TEXTURE->loadFromFile("res/ant.png");
-		DefaultConf::ANT_TEXTURE->setSmooth(true);
-		DefaultConf::MARKER_TEXTURE = std::make_shared<sf::Texture>();
-		DefaultConf::MARKER_TEXTURE->loadFromFile("res/marker.png");
-		DefaultConf::MARKER_TEXTURE->setSmooth(true);
-	}
-
-	static void freeTextures()
-	{
-		DefaultConf::ANT_TEXTURE = nullptr;
-		DefaultConf::MARKER_TEXTURE = nullptr;
-	}
     
     static bool loadUserConf()
     {
@@ -112,10 +96,6 @@ float DefaultConf<T>::MARKER_INTENSITY = 8000.0f;
 template<typename T>
 sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(500.0f, DefaultConf<T>::WIN_HEIGHT * 0.5f);
 
-template<typename T>
-std::shared_ptr<sf::Texture> DefaultConf<T>::ANT_TEXTURE;
-template<typename T>
-std::shared_ptr<sf::Texture> DefaultConf<T>::MARKER_TEXTURE;
 template<typename T>
 sf::Color DefaultConf<T>::COLONY_COLORS[MAX_COLONIES_COUNT] = {sf::Color::Red, sf::Color::Blue, sf::Color::Yellow, sf::Color(50, 255, 255)};
 

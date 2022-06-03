@@ -3,6 +3,7 @@
 #include "simulation/config.hpp"
 #include "simulation/colony/colony.hpp"
 #include "common/circular_gauge.hpp"
+#include "common/resource_store.hpp"
 
 
 struct PopulationChart
@@ -15,7 +16,6 @@ struct PopulationChart
 	Cooldown population_update;
 	Graphic population;
 	
-	sf::Font font;
 	sf::Text text;
 
 	uint32_t ants_count = 0;
@@ -26,8 +26,7 @@ struct PopulationChart
 		: population(800, sf::Vector2f(800.0f, 100.0f), sf::Vector2f())
 		, population_update(3.0f)
 	{
-		font.loadFromFile("res/font.ttf");
-		text.setFont(font);
+		text.setFont(*ResourceStore::getFont("font"));
 	}
 
 	void configure(sf::Vector2f pos, sf::Vector2f size_)
@@ -87,10 +86,11 @@ struct PopulationChart
 
 struct ColonyRenderer
 {
-	sf::Font         font;
 	sf::Text         text;
 	sf::VertexArray  ants_va;
 	sf::VertexArray  ants_food_va;
+    const sf::Texture* ants_texture;
+    const sf::Texture* markers_texture;
 	PopulationChart  population;
 	civ::Ref<Colony> colony_ref;
 
@@ -102,8 +102,9 @@ struct ColonyRenderer
 		, ants_food_va(sf::Quads, 4 * Conf::ANTS_COUNT)
 		, colony_ref(colony)
 	{
-		font.loadFromFile("res/font.ttf");
-		text.setFont(font);
+        ants_texture = ResourceStore::getTexture("ant");
+        markers_texture = ResourceStore::getTexture("marker");
+		text.setFont(*ResourceStore::getFont("font"));
 
         initializeAntsVA();
 		for (uint64_t i(Conf::ANTS_COUNT-1); i--;) {
@@ -167,9 +168,9 @@ struct ColonyRenderer
 		}
 
 		sf::RenderStates rs = states;
-		rs.texture = &(*Conf::MARKER_TEXTURE);
+		rs.texture = markers_texture;
 		target.draw(ants_food_va, rs);
-		rs.texture = &(*Conf::ANT_TEXTURE);
+		rs.texture = ants_texture;
 		target.draw(ants_va, rs);
 	}
     

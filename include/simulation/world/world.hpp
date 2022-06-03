@@ -7,6 +7,7 @@
 #include "common/grid.hpp"
 #include "simulation/ant/ant_mode.hpp"
 #include "render/world_renderer.hpp"
+#include "common/resource_store.hpp"
 
 
 struct World
@@ -72,7 +73,7 @@ struct World
 
 	void render(sf::RenderTarget& target, sf::RenderStates states)
 	{
-		states.texture = &(*Conf::MARKER_TEXTURE);
+		states.texture = ResourceStore::getTexture("marker");
 		renderer.mutex.lock();
 		target.draw(va_map.getCurrent(), states);
 		renderer.mutex.unlock();

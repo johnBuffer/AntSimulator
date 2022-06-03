@@ -1,6 +1,6 @@
 #pragma once
 #include "editor/GUI/item.hpp"
-#include "editor/GUI/resource_store.hpp"
+#include "common/resource_store.hpp"
 
 namespace GUI
 {

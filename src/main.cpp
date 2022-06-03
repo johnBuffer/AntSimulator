@@ -9,7 +9,14 @@
 
 int main(int32_t argc, char** argv)
 {
-    std::cout << std::string(argv[0]) << std::endl;
+    if (argc > 0) {
+        // Should be always true but we never know
+        ResourceStore::initialize(argv[0]);
+        ResourceStore::loadFont("res/font.ttf", "font");
+        ResourceStore::loadTexture("res/ant.png", "ant");
+        ResourceStore::loadTexture("res/marker.png", "marker");
+    }
+
     // Load configuration
     if (Conf::loadUserConf()) {
         std::cout << "Configuration file loaded." << std::endl;
@@ -17,11 +24,6 @@ int main(int32_t argc, char** argv)
         std::cout << "Configuration file couldn't be found." << std::endl;
     }
 
-    if (argc > 0) {
-        // Should be always true but we never know
-        ResourceStore::initialize(argv[0]);
-        ResourceStore::loadFont("res/font.ttf", "font");
-    }
     RNGf::initialize();
 
 	sf::ContextSettings settings;

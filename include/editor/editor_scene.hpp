@@ -37,15 +37,13 @@ struct EditorScene : public GUI::Scene
         , simulation(sim)
     {
         root.padding = 20.0f;
-
-        Conf::loadTextures();
         initialize();
     }
 
     ~EditorScene()
     {
-        std::cout << "Exiting, clean resources" << std::endl;
-        Conf::freeTextures();
+        std::cout << "Exiting, freeing resources" << std::endl;
+
     }
     
     void initialize()
