@@ -1,6 +1,6 @@
 #pragma once
 #include "editor/GUI/item.hpp"
-
+#include "editor/GUI/resource_store.hpp"
 
 namespace GUI
 {
@@ -8,7 +8,6 @@ namespace GUI
 struct TextLabel : public Item
 {
     std::string label;
-    sf::Font font;
     sf::Text text;
     uint32_t char_size;
     bool auto_size_update = true;
@@ -22,8 +21,7 @@ struct TextLabel : public Item
         , alignment(Alignment::Center)
     {
         padding = 1.0f;
-        font.loadFromFile("res/font.ttf");
-        text.setFont(font);
+        text.setFont(*ResourceStore::getFont("font"));
         text.setCharacterSize(char_size);
         setColor({100, 100, 100});
         setText(label);
