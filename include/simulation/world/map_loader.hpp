@@ -7,6 +7,8 @@
 
 struct MapLoader
 {
+    // Red > 100 -> Wall
+    // Green > 100 -> Food
 	static void loadMap(World& world, const std::string& map_filename)
 	{
         constexpr uint8_t wall_0_value = 100;
