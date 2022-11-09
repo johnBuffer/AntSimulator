@@ -29,11 +29,20 @@ struct World
 				}
 			}
 		}
+
+        sf::Image height_map;
+        height_map.loadFromFile("res/height_low.png");
+        // Load height
+        for (int32_t x(0); x < map.width; x++) {
+            for (int32_t y(0); y < map.height; y++) {
+                map.get(sf::Vector2i(x, y)).wall_dist = static_cast<float>(height_map.getPixel(x, y).r) / 255.0f;
+            }
+        }
 	}
 
 	void update(float dt)
 	{
-		map.update(dt);
+		//map.update(dt);
 	}
 
 	void addMarker(sf::Vector2f pos, Mode type, float intensity, uint8_t colony_id, bool permanent = false)

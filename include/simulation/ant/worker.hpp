@@ -52,8 +52,7 @@ struct WorkerUpdater
 				result.repellent_cell = cell;
 			}
 			// Check for the most intense marker
-            const float wall_rep = cell->wall_dist * cell->wall_dist;
-			const auto marker_intensity = to<float>(cell->getIntensity(marker_phase, ant.col_id)) * wall_rep;
+			const auto marker_intensity = to<float>(cell->getIntensity(marker_phase, ant.col_id));
 			if (marker_intensity > result.max_intensity) {
 				result.max_intensity = marker_intensity;
 				result.max_direction = to_marker;

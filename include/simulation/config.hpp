@@ -100,9 +100,9 @@ uint32_t DefaultConf<T>::WIN_WIDTH = 1920;
 template<typename T>
 uint32_t DefaultConf<T>::WIN_HEIGHT = 1080;
 template<typename T>
-uint32_t DefaultConf<T>::WORLD_WIDTH = 1920;
+uint32_t DefaultConf<T>::WORLD_WIDTH = 2540;
 template<typename T>
-uint32_t DefaultConf<T>::WORLD_HEIGHT = 1080;
+uint32_t DefaultConf<T>::WORLD_HEIGHT = 1280;
 template<typename T>
 uint32_t DefaultConf<T>::ANTS_COUNT = 3000;
 template<typename T>

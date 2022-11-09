@@ -22,6 +22,7 @@ struct ColonyCell
 {
 	// Stores the intensity of ToHome and ToFood markers
 	float intensity[3];
+	float timer[3];
 	// Is the marker permanent ?
 	bool permanent = false;
 	// Repellent intensity
@@ -32,6 +33,7 @@ struct ColonyCell
 
 	ColonyCell()
 		: intensity{0.0f, 0.0f, 0.0f}
+		, timer{100000.0f, 100000.0f, 100000.0f}
 		, repellent(0.0f)
         , fighting(false)
 	{}
@@ -62,14 +64,12 @@ struct WorldCell
 	float density;
 	// Dist to wall
 	float wall_dist;
-	float discovered;
 
 	WorldCell()
 		: food(0)
 		, wall(0)
 		, density(0.0f)
 		, wall_dist(0.0f)
-		, discovered(1.0f)
 	{
 		for (ColonyCell& c : markers) {
 			c = ColonyCell();
@@ -119,6 +119,17 @@ struct WorldCell
 		}
 		return false;
 	}
+
+    [[nodiscard]]
+    float getTimer(uint8_t colony_id, Mode mode) const
+    {
+        return markers[colony_id].timer[to<uint32_t>(mode)];
+    }
+
+    void setTimer(uint8_t colony_id, Mode mode, float value)
+    {
+        markers[colony_id].timer[to<uint32_t>(mode)] = value;
+    }
 
 	bool checkFight(uint8_t colony_id)
 	{

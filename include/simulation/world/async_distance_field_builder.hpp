@@ -21,15 +21,15 @@ struct AsyncDistanceFieldBuilder
         , update_requested(false)
         , running(true)
     {
-        worker = std::thread([this]{update();});
+        //worker = std::thread([this]{update();});
     }
 
     ~AsyncDistanceFieldBuilder()
     {
-        update_requested = true;
+        /*update_requested = true;
         running          = false;
         condition.notify_all();
-        worker.join();
+        worker.join();*/
     }
 
     void update()

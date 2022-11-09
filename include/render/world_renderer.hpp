@@ -71,6 +71,14 @@ struct WorldRenderer : public AsyncRenderer
                             drawMarkers(i, colony_cell, va, color);
                         }
 					}
+                    else {
+                        const float ratio = cell.wall_dist;
+                        color = vec3ToColor(255.0f * sf::Vector3f{ratio, ratio, ratio});
+                        va[4 * i + 0].texCoords = sf::Vector2f(200.0f + offset, offset);
+                        va[4 * i + 1].texCoords = sf::Vector2f(300.0f - offset, offset);
+                        va[4 * i + 2].texCoords = sf::Vector2f(300.0f - offset, 100.0f - offset);
+                        va[4 * i + 3].texCoords = sf::Vector2f(200.0f + offset, 100.0f - offset);
+                    }
 				}
 				else if (cell.food) {
 					color = sf::Color(0, to<uint8_t>(std::min(255u, 100 + cell.food)), 0);
@@ -79,15 +87,6 @@ struct WorldRenderer : public AsyncRenderer
 					va[4 * i + 1].texCoords = sf::Vector2f(200.0f - food_offset, food_offset);
 					va[4 * i + 2].texCoords = sf::Vector2f(200.0f - food_offset, 100.0f - food_offset);
 					va[4 * i + 3].texCoords = sf::Vector2f(100.0f + food_offset, 100.0f - food_offset);
-				}
-				else if (cell.wall) {
-					const sf::Color base = Conf::WALL_COLOR;
-					const float ratio = std::min(2.0f, 0.5f + cell.wall_dist);
-					color = vec3ToColor(sf::Vector3f(base.r * ratio, base.g * ratio, base.b * ratio));
-					va[4 * i + 0].texCoords = sf::Vector2f(200.0f + offset, offset);
-					va[4 * i + 1].texCoords = sf::Vector2f(300.0f - offset, offset);
-					va[4 * i + 2].texCoords = sf::Vector2f(300.0f - offset, 100.0f - offset);
-					va[4 * i + 3].texCoords = sf::Vector2f(200.0f + offset, 100.0f - offset);
 				}
 				va[4 * i + 0].color = color;
 				va[4 * i + 1].color = color;

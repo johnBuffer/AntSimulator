@@ -75,6 +75,9 @@ struct Ant
 	uint8_t col_id = 0;
 	Type type      = Type::Worker;
 
+    float current_height = 0.0f;
+    float last_height    = 0.0f;
+
 	Ant() = default;
 	Ant(float x, float y, float angle, uint8_t colony_id)
 		: position(x, y)
@@ -142,6 +145,10 @@ struct Ant
 
 	void updatePosition(World& world, float dt)
 	{
+        const WorldCell& cell = world.map.get(position);
+        last_height    = current_height;
+        current_height = cell.wall_dist * 2550.0f;
+
 		sf::Vector2f v = direction.getVec();
 		const HitPoint hit = world.map.getFirstHit(position, v, dt * move_speed);
 		if (hit.cell) {
@@ -212,7 +219,7 @@ struct Ant
 	void updateClocks(float dt)
 	{
 		autonomy += dt;
-		internal_clock += dt;
+		internal_clock += dt * (1.0f + std::pow(std::abs(current_height - last_height), 1.0f));
 		to_enemy_markers_count += dt;
 	}
 
@@ -225,20 +232,38 @@ struct Ant
 		return phase;
 	}
 
+    [[nodiscard]]
+    Mode getMarkersMode() const
+    {
+        if (phase == Mode::ToHome) {
+            return Mode::ToFood;
+        }
+        return Mode::ToHome;
+    }
+
 	void resetMarkers()
 	{
 		internal_clock = 0.0f;
 		to_enemy_markers_count = 0.0f;
 	}
 
-	void addMarker(World& world) const
+	void addMarker(World& world)
 	{
+        WorldCell& cell = world.map.get(position);
+
+        const float value = internal_clock;
 		if (phase == Mode::ToHome || phase == Mode::ToFood) {
-			const float intensity = getMarkerIntensity(0.05f, internal_clock);
+			const float intensity = getMarkerIntensity(0.05f, value);
 			world.addMarker(position, phase == Mode::ToFood ? Mode::ToHome : Mode::ToFood, intensity, col_id);
+            const float timer = cell.getTimer(col_id, getMarkersMode());
+            if (timer < internal_clock) {
+                internal_clock = timer;
+            } else {
+                cell.setTimer(col_id, getMarkersMode(), internal_clock);
+            }
 		}
 		else if (phase == Mode::ToHomeNoFood) {
-			const auto intensity = to<float>(getMarkerIntensity(0.1f, internal_clock));
+			const auto intensity = to<float>(getMarkerIntensity(0.1f, value));
 			world.addMarkerRepellent(position, col_id, intensity);
 		}
 		if (enemy_found) {
@@ -277,7 +302,7 @@ struct Ant
     [[nodiscard]]
 	static float getMarkerIntensity(float coef, float count)
 	{
-		return Conf::MARKER_INTENSITY * expf(-coef * count);
+		return Conf::MARKER_INTENSITY / (1.0f + 0.01f * count);
 	}
 
 	void setTarget(civ::Ref<Ant> new_target)
