@@ -31,7 +31,7 @@ struct World
 		}
 
         sf::Image height_map;
-        height_map.loadFromFile("res/height_low.png");
+        height_map.loadFromFile("res/height.jpeg");
         // Load height
         for (int32_t x(0); x < map.width; x++) {
             for (int32_t y(0); y < map.height; y++) {
