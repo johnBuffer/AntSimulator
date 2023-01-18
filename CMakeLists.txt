@@ -21,8 +21,14 @@ if (UNIX)
    target_link_libraries(${PROJECT_NAME} pthread)
 endif (UNIX)
 
-# Copy res dir to the binary directory
+# Copy res dir and conf file to the binary directory
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/conf.tx)
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/conf.txt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+else()
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/conf_example.txt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    file(RENAME ${CMAKE_CURRENT_SOURCE_DIR}/conf_example.txt ${CMAKE_CURRENT_BINARY_DIR}/conf.txt)
+endif()
 
 if(MSVC)
    foreach(lib ${SFML_LIBS})
