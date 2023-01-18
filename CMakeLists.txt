@@ -23,11 +23,11 @@ endif (UNIX)
 
 # Copy res dir and conf file to the binary directory
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/conf.tx)
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/conf.txt)
     file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/conf.txt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-else()
+elseif(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/conf_example.txt)
     file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/conf_example.txt DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-    file(RENAME ${CMAKE_CURRENT_SOURCE_DIR}/conf_example.txt ${CMAKE_CURRENT_BINARY_DIR}/conf.txt)
+    file(RENAME ${CMAKE_CURRENT_BINARY_DIR}/conf_example.txt ${CMAKE_CURRENT_BINARY_DIR}/conf.txt)
 endif()
 
 if(MSVC)
