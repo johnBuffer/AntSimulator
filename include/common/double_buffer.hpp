@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cstdint>
+
+
 template<typename T>
 struct DoubleObject
 {

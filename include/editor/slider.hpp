@@ -1,4 +1,9 @@
+#pragma once
+
+#include "GUI/container.hpp"
 #include "GUI/item.hpp"
+#include "GUI/rounded_rectangle.hpp"
+#include "GUI/text_label.hpp"
 
 
 namespace edtr

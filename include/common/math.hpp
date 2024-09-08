@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cmath>
+
+
 struct Math
 {
     static constexpr float PI = 3.141592653f;

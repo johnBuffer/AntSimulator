@@ -1,11 +1,16 @@
 #pragma once
+
+#include "colony_stats.hpp"
+
 #include "editor/GUI/container.hpp"
 #include "editor/GUI/button.hpp"
 #include "editor/GUI/rounded_rectangle.hpp"
+#include "editor/GUI/toggle.hpp"
 #include "editor/color_picker/color_picker.hpp"
 #include "editor/control_state.hpp"
+
 #include "common/color_utils.hpp"
-#include "colony_stats.hpp"
+
 
 
 struct ColonyTool : GUI::Container

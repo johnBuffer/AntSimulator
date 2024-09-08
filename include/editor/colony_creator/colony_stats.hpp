@@ -1,6 +1,12 @@
 #pragma once
+
 #include "editor/GUI/named_container.hpp"
+#include "editor/control_state.hpp"
+
+#include "common/index_vector.hpp"
 #include "common/graph.hpp"
+
+#include "simulation/colony/colony.hpp"
 
 
 struct ColonyChart : public GUI::Item

@@ -1,7 +1,9 @@
 #pragma once
 
-#include <memory>
 #include <SFML/Graphics.hpp>
+
+#include <memory>
+#include <fstream>
 
 
 template<typename T>

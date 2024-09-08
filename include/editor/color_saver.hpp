@@ -1,7 +1,10 @@
 #pragma once
-#include "GUI/item.hpp"
-#include "GUI/grid_container.hpp"
+
 #include "GUI/button.hpp"
+#include "GUI/container.hpp"
+#include "GUI/grid_container.hpp"
+#include "GUI/item.hpp"
+
 #include "transition.hpp"
 
 
