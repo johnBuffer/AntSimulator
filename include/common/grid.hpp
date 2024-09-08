@@ -1,7 +1,12 @@
 #pragma once
-#include <vector>
-#include <list>
+
+#include "common/utils.hpp"
+
 #include <SFML/System.hpp>
+
+#include <cstdint>
+#include <list>
+#include <vector>
 
 
 template<typename T>

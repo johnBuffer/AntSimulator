@@ -1,6 +1,10 @@
 #pragma once
-#include <common/utils.hpp>
+
+#include "common/utils.hpp"
+
 #include <SFML/Graphics.hpp>
+
+#include <functional>
 
 
 template<typename T>

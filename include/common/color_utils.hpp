@@ -1,7 +1,10 @@
 #pragma once
-#include <SFML/Graphics.hpp>
+
 #include "common/math.hpp"
 #include "common/number_generator.hpp"
+#include "common/utils.hpp"
+
+#include <SFML/Graphics.hpp>
 
 
 struct ColorUtils

@@ -1,6 +1,9 @@
 #pragma once
-#include "editor/GUI/item.hpp"
+
 #include "common/color_utils.hpp"
+
+#include "editor/GUI/item.hpp"
+#include "editor/GUI/utils.hpp"
 
 
 namespace GUI

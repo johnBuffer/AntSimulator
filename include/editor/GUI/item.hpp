@@ -1,7 +1,10 @@
 #pragma once
+
+#include "common/utils.hpp"
+#include "common/event_manager.hpp"
+#include "simulation/config.hpp"
+
 #include <SFML/Graphics.hpp>
-#include <common/event_manager.hpp>
-#include "utils.hpp"
 
 
 namespace GUI

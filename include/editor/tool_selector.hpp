@@ -1,8 +1,12 @@
 #pragma once
-#include "GUI/container.hpp"
+
 #include "GUI/button.hpp"
+#include "GUI/container.hpp"
+#include "GUI/named_container.hpp"
+
 #include "control_state.hpp"
 #include "simulation/simulation.hpp"
+
 #include <future>
 
 

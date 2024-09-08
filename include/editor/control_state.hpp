@@ -1,7 +1,12 @@
 #pragma once
-#include <functional>
-#include <SFML/Graphics.hpp>
+
+#include "common/viewport_handler.hpp"
 #include "editor/transition.hpp"
+#include "simulation/simulation.hpp"
+
+#include <SFML/Graphics.hpp>
+
+#include <functional>
 
 
 struct ControlState
