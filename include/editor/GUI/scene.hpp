@@ -27,6 +27,8 @@ struct Scene
         initializeEventsCallbacks();
     }
 
+    virtual ~Scene() = default;
+
     template<typename T, typename TCallback>
     void watch(SPtr<T> item, const TCallback&& callback)
     {

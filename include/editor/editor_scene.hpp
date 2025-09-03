@@ -19,7 +19,7 @@
 namespace edtr
 {
 
-struct EditorScene : public GUI::Scene
+struct EditorScene final : public GUI::Scene
 {
     using Ptr = std::shared_ptr<EditorScene>;
 
@@ -34,8 +34,8 @@ struct EditorScene : public GUI::Scene
     explicit
     EditorScene(sf::RenderWindow& window, Simulation& sim)
         : GUI::Scene(window)
-        , control_state(sim)
         , simulation(sim)
+        , control_state(sim)
     {
         root.padding = 20.0f;
 
@@ -43,7 +43,7 @@ struct EditorScene : public GUI::Scene
         initialize();
     }
 
-    ~EditorScene()
+    ~EditorScene() override
     {
         std::cout << "Exiting, clean resources" << std::endl;
         Conf::freeTextures();
