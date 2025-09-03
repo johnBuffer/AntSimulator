@@ -13,12 +13,12 @@ struct World
 {
 	sf::Vector2f size;
 	WorldGrid map;
-	DoubleObject<sf::VertexArray> va_map;
+	DoubleObject<pez::QuadVertexArray> va_map;
 	WorldRenderer renderer;
 
-	World(uint32_t width, uint32_t height)
-		: map(width, height, 4)
-		, size(to<float>(width), to<float>(height))
+	World(uint32_t const width, uint32_t const height)
+		: size(to<float>(width), to<float>(height))
+        , map(width, height, 4)
 		, renderer(map, va_map)
 	{
         // Create walls around the map
@@ -74,7 +74,7 @@ struct World
 	{
 		states.texture = &(*Conf::MARKER_TEXTURE);
 		renderer.mutex.lock();
-		target.draw(va_map.getCurrent(), states);
+		target.draw(va_map.getCurrent().asDrawable(), states);
 		renderer.mutex.unlock();
 	}
 

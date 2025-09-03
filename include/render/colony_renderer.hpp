@@ -12,9 +12,9 @@ struct PopulationChart
 	sf::Vector2f position;
 	sf::Vector2f size;
 
-	Cooldown population_update;
 	Graphic population;
-	
+	Cooldown population_update;
+
 	sf::Font font;
 	sf::Text text;
 
@@ -25,8 +25,11 @@ struct PopulationChart
 	PopulationChart()
 		: population(800, sf::Vector2f(800.0f, 100.0f), sf::Vector2f())
 		, population_update(3.0f)
+        , text{font, ""}
 	{
-		font.loadFromFile("res/font.ttf");
+		if (!font.openFromFile("res/font.ttf")) {
+		    std::cerr << "Failed to open font file" << std::endl;
+		}
 		text.setFont(font);
 	}
 
@@ -65,7 +68,7 @@ struct PopulationChart
 
 		text.setCharacterSize(20);
 		text.setFillColor(sf::Color::White);
-		text.setPosition(position.x + padding, position.y);
+		text.setPosition({position.x + padding, position.y});
 		text.setString("Population " + toStr(ants_count) + "/" + toStr(soldiers_count));
 		target.draw(text);
 
@@ -76,7 +79,7 @@ struct PopulationChart
 		text.setString("(" + sign + toStr(pop_diff) + " last 60s)");
 		// right justify
 		sf::FloatRect bounds = text.getLocalBounds();
-		text.setPosition((position.x + population.width + padding) - bounds.width, position.y + 0.5f * padding);
+		text.setPosition({(position.x + population.width + padding) - bounds.size.x, position.y + 0.5f * padding});
 
 		target.draw(text);
 
@@ -88,9 +91,8 @@ struct PopulationChart
 struct ColonyRenderer
 {
 	sf::Font         font;
-	sf::Text         text;
-	sf::VertexArray  ants_va;
-	sf::VertexArray  ants_food_va;
+	pez::QuadVertexArray ants_va;
+	pez::QuadVertexArray ants_food_va;
 	PopulationChart  population;
 	civ::Ref<Colony> colony_ref;
 
@@ -98,34 +100,31 @@ struct ColonyRenderer
 
     explicit
 	ColonyRenderer(civ::Ref<Colony> colony)
-		: ants_va(sf::Quads, 4 * Conf::ANT_COUNT)
-		, ants_food_va(sf::Quads, 4 * Conf::ANT_COUNT)
+		: ants_va(Conf::ANT_COUNT)
+		, ants_food_va(Conf::ANT_COUNT)
 		, colony_ref(colony)
 	{
-		font.loadFromFile("res/font.ttf");
-		text.setFont(font);
+		if (!font.openFromFile("res/font.ttf")) {
+		    std::cerr << "Failed to open font file" << std::endl;
+		}
 
         initializeAntsVA();
 		for (uint64_t i(Conf::ANT_COUNT-1); i--;) {
-			const uint64_t index = 4 * i;
 			// Food
-			ants_food_va[index + 0].color = Conf::FOOD_COLOR;
-			ants_food_va[index + 1].color = Conf::FOOD_COLOR;
-			ants_food_va[index + 2].color = Conf::FOOD_COLOR;
-			ants_food_va[index + 3].color = Conf::FOOD_COLOR;
-			ants_food_va[index + 0].texCoords = sf::Vector2f(100.0f, 0.0f);
-			ants_food_va[index + 1].texCoords = sf::Vector2f(199.0f, 0.0f);
-			ants_food_va[index + 2].texCoords = sf::Vector2f(199.0f, 100.0f);
-			ants_food_va[index + 3].texCoords = sf::Vector2f(100.0f, 100.0f);
-            ants_food_va[index + 0].position = sf::Vector2f(0.0f, 0.0f);
-            ants_food_va[index + 1].position = sf::Vector2f(0.0f, 0.0f);
-            ants_food_va[index + 2].position = sf::Vector2f(0.0f, 0.0f);
-            ants_food_va[index + 3].position = sf::Vector2f(0.0f, 0.0f);
+		    ants_food_va.setQuadColor(i, Conf::FOOD_COLOR);
+			ants_food_va.setVertex0TextureCoord(i, {100.0f, 0.0f  });
+			ants_food_va.setVertex0TextureCoord(i, {199.0f, 0.0f  });
+			ants_food_va.setVertex0TextureCoord(i, {199.0f, 100.0f});
+			ants_food_va.setVertex0TextureCoord(i, {100.0f, 100.0f});
+		    ants_food_va.setVertex0Position(i, {});
+		    ants_food_va.setVertex1Position(i, {});
+		    ants_food_va.setVertex2Position(i, {});
+		    ants_food_va.setVertex3Position(i, {});
 		}
 	
-		const float margin = 10.0f;
-		const sf::Vector2f size(400.0f, 100.0f);
-		const float colonies_count = 2.0f;
+		constexpr float margin = 10.0f;
+		constexpr sf::Vector2f size(400.0f, 100.0f);
+		constexpr float colonies_count = 2.0f;
 		const float start_x = (Conf::WINDOW_SIZE.x - size.x * colonies_count - (colonies_count - 1.0f) * margin) * 0.5f;
 		population.configure({start_x + (size.x + margin) * colony_ref->id, margin}, size);
 		population.population.color = colony_ref->ants_color;
@@ -135,20 +134,15 @@ struct ColonyRenderer
     {
         const Colony& colony = *colony_ref;
         for (uint64_t i(Conf::ANT_COUNT-1); i--;) {
-            const uint64_t index = 4 * i;
-            // Ant
-            ants_va[index + 0].color = colony.ants_color;
-            ants_va[index + 1].color = colony.ants_color;
-            ants_va[index + 2].color = colony.ants_color;
-            ants_va[index + 3].color = colony.ants_color;
-            ants_va[index + 0].texCoords = sf::Vector2f(0.0f  , 0.0f);
-            ants_va[index + 1].texCoords = sf::Vector2f(370.0f, 0.0f);
-            ants_va[index + 2].texCoords = sf::Vector2f(370.0f, 552.0f);
-            ants_va[index + 3].texCoords = sf::Vector2f(0.0f  , 552.0f);
-            ants_va[index + 0].position = sf::Vector2f(0.0f   , 0.0f);
-            ants_va[index + 1].position = sf::Vector2f(0.0f   , 0.0f);
-            ants_va[index + 2].position = sf::Vector2f(0.0f   , 0.0f);
-            ants_va[index + 3].position = sf::Vector2f(0.0f   , 0.0f);
+            ants_va.setQuadColor(i, colony.ants_color);
+            ants_va.setVertex0TextureCoord(i, {0.0f  , 0.0f  });
+            ants_va.setVertex1TextureCoord(i, {370.0f, 0.0f  });
+            ants_va.setVertex2TextureCoord(i, {370.0f, 552.0f});
+            ants_va.setVertex3TextureCoord(i, {0.0f  , 552.0f});
+            ants_va.setVertex0Position(i, {});
+            ants_va.setVertex1Position(i, {});
+            ants_va.setVertex2Position(i, {});
+            ants_va.setVertex3Position(i, {});
         }
     }
 
@@ -161,44 +155,38 @@ struct ColonyRenderer
         }
 		uint32_t index = 0;
 		for (const Ant& a : colony.ants) {
-			a.render_in(ants_va, 4 * index);
-			a.render_food(ants_food_va, 4 * index);
+			a.render_in(ants_va, index);
+			a.render_food(ants_food_va, index);
 			++index;
 		}
 
 		sf::RenderStates rs = states;
 		rs.texture = &(*Conf::MARKER_TEXTURE);
-		target.draw(ants_food_va, rs);
+		target.draw(ants_food_va.asDrawable(), rs);
 		rs.texture = &(*Conf::ANT_TEXTURE);
-		target.draw(ants_va, rs);
+		target.draw(ants_va.asDrawable(), rs);
 	}
     
-    void cleanVAs(uint32_t from, uint32_t to)
+    void cleanVAs(uint32_t const from, uint32_t const to)
     {
         for (uint32_t i(from); i<to; ++i) {
-            ants_va[4 * i + 0].position = {};
-            ants_va[4 * i + 1].position = {};
-            ants_va[4 * i + 2].position = {};
-            ants_va[4 * i + 3].position = {};
-            ants_food_va[4 * i + 0].position = {};
-            ants_food_va[4 * i + 1].position = {};
-            ants_food_va[4 * i + 2].position = {};
-            ants_food_va[4 * i + 3].position = {};
+            ants_va.createEmptyQuad(i);
+            ants_food_va.createEmptyQuad(i);
         }
     }
 
-	void updatePopulation(float dt)
+	void updatePopulation(float const dt)
 	{
 		population.updateData(*colony_ref, dt);
 	}
 
 	void render(sf::RenderTarget& target, const sf::RenderStates& states)
 	{
-        Colony& colony = *colony_ref;
+        Colony const& colony = *colony_ref;
 
         const float size = colony.base.radius;
 		sf::CircleShape circle(size);
-		circle.setOrigin(size, size);
+		circle.setOrigin({size, size});
 		circle.setPosition(colony.base.position);
 		circle.setFillColor(colony.ants_color);
 		target.draw(circle, states);

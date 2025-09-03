@@ -3,25 +3,26 @@
 #include <mutex>
 #include <SFML/Graphics.hpp>
 #include "common/double_buffer.hpp"
+#include "common/quad_vertex_array.hpp"
 
 
 struct AsyncRenderer
 {
-	DoubleObject<sf::VertexArray>& vertex_array;
+	DoubleObject<pez::QuadVertexArray>& vertex_array;
 	std::thread thread;
 	std::mutex mutex;
 	bool run;
 	bool swap_ok;
 
     explicit
-	AsyncRenderer(DoubleObject<sf::VertexArray>& target)
+	AsyncRenderer(DoubleObject<pez::QuadVertexArray>& target)
 		: vertex_array(target)
 		, run(true)
 		, swap_ok(true)
 	{}
 
 	// To be overloaded
-	virtual void initializeVertexArray(sf::VertexArray& va) = 0;
+	virtual void initializeVertexArray(pez::QuadVertexArray& va) = 0;
 	virtual void updateVertexArray() = 0;
 
 	// Start the rendering in the background

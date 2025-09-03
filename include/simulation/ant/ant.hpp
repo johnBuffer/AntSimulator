@@ -248,34 +248,32 @@ struct Ant
 		}
 	}
 
-	void render_food(sf::VertexArray& va, const uint32_t index) const
+	void render_food(pez::QuadVertexArray& va, const uint32_t index) const
 	{
-		constexpr float radius = 2.0f;
-		sf::Vector2f food_pos(-10000.0f, -10000.0f);
-		if (phase == Mode::ToHome || phase == Mode::ToHomeNoFood) {
-			food_pos = position + length * 0.65f * direction.getVec();
-		}
+	    bool const has_food = (phase == Mode::ToHome) || (phase == Mode::ToHomeNoFood);
+	    float const radius = has_food ? 2.0f : 0.0f;
+		sf::Vector2f const food_pos = has_food ? position + (length * 0.65f) * direction.getVec() : sf::Vector2f(0.0f, 0.0f);
 
-		va[index + 0].position = sf::Vector2f(food_pos.x - radius, food_pos.y - radius);
-		va[index + 1].position = sf::Vector2f(food_pos.x + radius, food_pos.y - radius);
-		va[index + 2].position = sf::Vector2f(food_pos.x + radius, food_pos.y + radius);
-		va[index + 3].position = sf::Vector2f(food_pos.x - radius, food_pos.y + radius);
+		va.setVertex0Position(index, {food_pos.x - radius, food_pos.y - radius});
+		va.setVertex1Position(index, {food_pos.x + radius, food_pos.y - radius});
+		va.setVertex2Position(index, {food_pos.x + radius, food_pos.y + radius});
+		va.setVertex3Position(index, {food_pos.x - radius, food_pos.y + radius});
 	}
 
-	void render_in(sf::VertexArray& va, const uint32_t index) const
+	void render_in(pez::QuadVertexArray& va, const uint32_t index) const
 	{
         const float size_ratio = width / length;
 		const sf::Vector2f dir_vec(direction.getVec() * length);
 		const sf::Vector2f nrm_vec(-dir_vec.y * size_ratio, dir_vec.x * size_ratio);
 
-		va[index + 0].position = position - nrm_vec + dir_vec;
-		va[index + 1].position = position + nrm_vec + dir_vec;
-		va[index + 2].position = position + nrm_vec - dir_vec;
-		va[index + 3].position = position - nrm_vec - dir_vec;
+		va.setVertex0Position(index, position - nrm_vec + dir_vec);
+		va.setVertex1Position(index, position + nrm_vec + dir_vec);
+		va.setVertex2Position(index, position + nrm_vec - dir_vec);
+		va.setVertex3Position(index, position - nrm_vec - dir_vec);
 	}
 
     [[nodiscard]]
-	static float getMarkerIntensity(float coef, float count)
+	static float getMarkerIntensity(float const coef, float const count)
 	{
 		return Conf::MARKER_INTENSITY * expf(-coef * count);
 	}

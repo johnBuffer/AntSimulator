@@ -1,7 +1,7 @@
 #pragma once
 #include "editor/GUI/item.hpp"
 #include "utils.hpp"
-#include <common/event_manager.hpp>
+#include <common/events.hpp>
 #include <vector>
 
 
@@ -12,16 +12,16 @@ struct Scene
 {
     using Ptr = std::shared_ptr<Scene>;
     
-    sf::RenderWindow&  window;
-    sfev::EventManager event_manager;
-    sf::Vector2f       mouse_position;
+    sf::RenderWindow& window;
+    pez::EventHandler event_manager;
+    sf::Vector2f      mouse_position;
 
     Item root;
 
     explicit
     Scene(sf::RenderWindow& window_)
         : window(window_)
-        , event_manager(window_, false)
+        , event_manager(window_)
         , root(toVector2f(window_.getSize()) / Conf::GUI_SCALE)
     {
         initializeEventsCallbacks();
@@ -37,12 +37,12 @@ struct Scene
     
     void initializeEventsCallbacks()
     {
-        event_manager.addEventCallback(sf::Event::Closed, [&](const sf::Event&) {window.close();});
-        event_manager.addEventCallback(sf::Event::MouseButtonPressed, [&](const sf::Event& e) {dispatchClick(e);});
-        event_manager.addEventCallback(sf::Event::MouseButtonReleased, [&](const sf::Event& e) {unclick(e);});
-        event_manager.addEventCallback(sf::Event::MouseMoved, [&](const sf::Event& e) {mouseMove(e.mouseMove.x, e.mouseMove.y);});
-        event_manager.addEventCallback(sf::Event::KeyPressed, [&](const sf::Event& e) {processKeyPressed(e);});
-        event_manager.addEventCallback(sf::Event::Resized, [this](sfev::CstEv){resize();});
+        event_manager.addCallback<sf::Event::Closed>([&](const sf::Event&) {window.close();});
+        event_manager.addCallback<sf::Event::MouseButtonPressed>([&](const sf::Event::MouseButtonPressed& e) {dispatchClick(e);});
+        event_manager.addCallback<sf::Event::MouseButtonReleased>([&](const sf::Event::MouseButtonReleased& e) {unclick(e);});
+        event_manager.addCallback<sf::Event::MouseMoved>([&](const sf::Event::MouseMoved& e) { mouseMove(e.position.x, e.position.y); });
+        event_manager.addCallback<sf::Event::KeyPressed>([&](const sf::Event::KeyPressed& e) { processKeyPressed(e); });
+        event_manager.addCallback<sf::Event::Resized>([this](sf::Event::Resized const&){ resize(); });
     }
 
     virtual void onSizeChange() {}
@@ -56,9 +56,9 @@ struct Scene
         onSizeChange();
     }
     
-    void processKeyPressed(const sf::Event& e)
+    void processKeyPressed(const sf::Event::KeyPressed& e)
     {
-        if (e.key.code == sf::Keyboard::Escape) {
+        if (e.code == sf::Keyboard::Key::Escape) {
             window.close();
         } else {
             root.executeCallback(e);
@@ -68,19 +68,19 @@ struct Scene
     void processEvents()
     {
         mouse_position = toVector2f(sf::Mouse::getPosition(event_manager.getWindow()));
-        event_manager.processEvents([&](const sf::Event& e){
+        event_manager.processEvents([&](const sf::Event& e) {
             root.executeCallback(e);
         });
     }
     
-    void dispatchClick(const sf::Event& e)
+    void dispatchClick(const sf::Event::MouseButtonPressed& e)
     {
-        root.defaultOnClick(mouse_position / Conf::GUI_SCALE, e.mouseButton.button);
+        root.defaultOnClick(mouse_position / Conf::GUI_SCALE, e.button);
     }
     
-    void unclick(const sf::Event& e)
+    void unclick(const sf::Event::MouseButtonReleased& e)
     {
-        root.defaultOnUnclick(e.mouseButton.button);
+        root.defaultOnUnclick(e.button);
     }
     
     void update()

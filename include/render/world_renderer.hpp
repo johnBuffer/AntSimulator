@@ -4,7 +4,6 @@
 #include "simulation/config.hpp"
 #include "simulation/world/world_grid.hpp"
 #include "common/utils.hpp"
-#include <iostream>
 #include "common/index_vector.hpp"
 
 
@@ -23,27 +22,30 @@ struct WorldRenderer : public AsyncRenderer
 
     civ::Vector<sf::Color> colonies_color;
 
-	WorldRenderer(Grid<WorldCell>& grid_, DoubleObject<sf::VertexArray>& target)
+	WorldRenderer(Grid<WorldCell>& grid_, DoubleObject<pez::QuadVertexArray>& target)
 		: AsyncRenderer(target)
 		, grid(grid_)
 	{
 		AsyncRenderer::start();
 	}
 
-	void initializeVertexArray(sf::VertexArray& va) override
+	void initializeVertexArray(pez::QuadVertexArray& va) override
 	{
-		va = sf::VertexArray(sf::Quads, grid.width * grid.height * 4);
+		va = pez::QuadVertexArray(grid.width * grid.height);
 		uint64_t i = 0;
 		constexpr float eps = 0.01f;
 		const auto cell_size = to<float>(grid.cell_size);
 		const float cell_size_eps = cell_size + 2.0f * eps;
 		for (int32_t y(0); y < grid.height; y++) {
 			for (int32_t x(0); x < grid.width; x++) {
-				const sf::Vector2f position(x * cell_size - eps, y * cell_size - eps);
-				va[4 * i + 0].position = position;
-				va[4 * i + 1].position = position + sf::Vector2f(cell_size_eps, 0.0f);
-				va[4 * i + 2].position = position + sf::Vector2f(cell_size_eps, cell_size_eps);
-				va[4 * i + 3].position = position + sf::Vector2f(0.0f         , cell_size_eps);
+				const sf::Vector2f position(
+				    static_cast<float>(x) * cell_size - eps,
+				    static_cast<float>(y) * cell_size - eps
+				);
+			    va.setVertex0Position(i, position);
+			    va.setVertex1Position(i, position + sf::Vector2f(cell_size_eps, 0.0f));
+			    va.setVertex2Position(i, position + sf::Vector2f(cell_size_eps, cell_size_eps));
+			    va.setVertex3Position(i, position + sf::Vector2f(0.0f         , cell_size_eps));
 				++i;
 			}
 		}
@@ -51,7 +53,7 @@ struct WorldRenderer : public AsyncRenderer
 
 	void updateVertexArray() override
 	{
-		sf::VertexArray& va = vertex_array.getLast();
+		pez::QuadVertexArray& va = vertex_array.getLast();
 
 		uint64_t i = 0;
 		for (int32_t y(0); y < grid.height; y++) {
@@ -74,50 +76,47 @@ struct WorldRenderer : public AsyncRenderer
 				}
 				else if (cell.food) {
 					color = sf::Color(0, to<uint8_t>(std::min(255u, 100 + cell.food)), 0);
-					const float food_offset = 1.0f;
-					va[4 * i + 0].texCoords = sf::Vector2f(100.0f + food_offset, food_offset);
-					va[4 * i + 1].texCoords = sf::Vector2f(200.0f - food_offset, food_offset);
-					va[4 * i + 2].texCoords = sf::Vector2f(200.0f - food_offset, 100.0f - food_offset);
-					va[4 * i + 3].texCoords = sf::Vector2f(100.0f + food_offset, 100.0f - food_offset);
+					float constexpr food_offset = 1.0f;
+				    va.setVertex0TextureCoord(i, {100.0f + food_offset, food_offset});
+				    va.setVertex1TextureCoord(i, {200.0f - food_offset, food_offset});
+				    va.setVertex2TextureCoord(i, {200.0f - food_offset, 100.0f - food_offset});
+				    va.setVertex3TextureCoord(i, {100.0f + food_offset, 100.0f - food_offset});
 				}
 				else if (cell.wall) {
 					const sf::Color base = Conf::WALL_COLOR;
 					const float ratio = std::min(2.0f, 0.5f + cell.wall_dist);
 					color = vec3ToColor(sf::Vector3f(base.r * ratio, base.g * ratio, base.b * ratio));
-					va[4 * i + 0].texCoords = sf::Vector2f(200.0f + offset, offset);
-					va[4 * i + 1].texCoords = sf::Vector2f(300.0f - offset, offset);
-					va[4 * i + 2].texCoords = sf::Vector2f(300.0f - offset, 100.0f - offset);
-					va[4 * i + 3].texCoords = sf::Vector2f(200.0f + offset, 100.0f - offset);
+				    va.setVertex0TextureCoord(i, {200.0f + offset, offset});
+				    va.setVertex1TextureCoord(i, {300.0f - offset, offset});
+				    va.setVertex2TextureCoord(i, {300.0f - offset, 100.0f - offset});
+				    va.setVertex3TextureCoord(i, {200.0f + offset, 100.0f - offset});
 				}
-				va[4 * i + 0].color = color;
-				va[4 * i + 1].color = color;
-				va[4 * i + 2].color = color;
-				va[4 * i + 3].color = color;
+			    va.setQuadColor(i, color);
 
 				++i;
 			}
 		}
 	}
 
-    void drawToEnemy(uint64_t i, const ColonyCell& cell, sf::VertexArray& va, sf::Color& color) const
+    void drawToEnemy(uint64_t const i, const ColonyCell& cell, pez::QuadVertexArray& va, sf::Color& color) const
     {
-        const sf::Vector3f to_enemies_color(255.0f, 0.0f, 255.0f);
-        const sf::Vector3f intensity_color = intensity_factor * to_enemies_color * cell.intensity[2];
+        sf::Vector3f constexpr to_enemies_color(255.0f, 0.0f, 255.0f);
+        sf::Vector3f const intensity_color = intensity_factor * to_enemies_color * cell.intensity[2];
         color = vec3ToColor(intensity_color);
-        va[4 * i + 0].texCoords = sf::Vector2f(offset, offset);
-        va[4 * i + 1].texCoords = sf::Vector2f(100.0f - offset, offset);
-        va[4 * i + 2].texCoords = sf::Vector2f(100.0f - offset, 100.0f - offset);
-        va[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
+	    va.setVertex0TextureCoord(i, {offset, offset});
+	    va.setVertex1TextureCoord(i, {100.0f - offset, offset});
+	    va.setVertex2TextureCoord(i, {100.0f - offset, 100.0f - offset});
+	    va.setVertex3TextureCoord(i, {offset, 100.0f - offset});
     }
 
-    void drawMarkers(uint64_t i, const ColonyCell& cell, sf::VertexArray& va, sf::Color& color) const
+    void drawMarkers(uint64_t const i, const ColonyCell& cell, pez::QuadVertexArray& va, sf::Color& color) const
     {
         if (cell.repellent != 0.0f) {
             color = sf::Color::Blue;
-            va[4 * i + 0].texCoords = sf::Vector2f(offset, offset);
-            va[4 * i + 1].texCoords = sf::Vector2f(100.0f - offset, offset);
-            va[4 * i + 2].texCoords = sf::Vector2f(100.0f - offset, 100.0f - offset);
-            va[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
+            va.setVertex0TextureCoord(i, {offset, offset});
+            va.setVertex1TextureCoord(i, {100.0f - offset, offset});
+            va.setVertex2TextureCoord(i, {100.0f - offset, 100.0f - offset});
+            va.setVertex3TextureCoord(i, {offset, 100.0f - offset});
         }
         else {
             const sf::Vector3f intensity_1_color = intensity_factor * to_home_color * cell.intensity[0];
@@ -128,22 +127,21 @@ struct WorldRenderer : public AsyncRenderer
                     intensity_1_color.z + intensity_2_color.z
             );
             color = vec3ToColor(mixed_color);
-            va[4 * i + 0].texCoords = sf::Vector2f(offset, offset);
-            va[4 * i + 1].texCoords = sf::Vector2f(100.0f - offset, offset);
-            va[4 * i + 2].texCoords = sf::Vector2f(100.0f - offset, 100.0f - offset);
-            va[4 * i + 3].texCoords = sf::Vector2f(offset, 100.0f - offset);
+            va.setVertex0TextureCoord(i, {offset, offset});
+            va.setVertex1TextureCoord(i, {100.0f - offset, offset});
+            va.setVertex2TextureCoord(i, {100.0f - offset, 100.0f - offset});
+            va.setVertex3TextureCoord(i, {offset, 100.0f - offset});
         }
     }
 
-    void drawDensityOne(uint64_t i, const WorldCell& cell, sf::VertexArray& va, sf::Color& color)
+    void drawDensityOne(uint64_t const i, WorldCell const& cell, pez::QuadVertexArray& va, sf::Color& color) const
     {
-        const sf::Color c_color = colonies_color[selected_colony];
         const float ratio = cell.density;
         color = vec3ToColor(sf::Vector3f{4.0f * ratio, ratio, ratio});
-        va[4 * i + 0].texCoords = sf::Vector2f(200.0f + offset, offset);
-        va[4 * i + 1].texCoords = sf::Vector2f(300.0f - offset, offset);
-        va[4 * i + 2].texCoords = sf::Vector2f(300.0f - offset, 100.0f - offset);
-        va[4 * i + 3].texCoords = sf::Vector2f(200.0f + offset, 100.0f - offset);
+	    va.setVertex0TextureCoord(i, {200.0f + offset, offset});
+	    va.setVertex1TextureCoord(i, {300.0f - offset, offset});
+	    va.setVertex2TextureCoord(i, {300.0f - offset, 100.0f - offset});
+	    va.setVertex3TextureCoord(i, {200.0f + offset, 100.0f - offset});
     }
 
     static sf::Color getDensityColor(sf::Vector3f density)

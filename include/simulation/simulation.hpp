@@ -3,7 +3,7 @@
 #include "colony/colony.hpp"
 #include "config.hpp"
 #include "common/viewport_handler.hpp"
-#include "common/event_manager.hpp"
+#include "common/events.hpp"
 #include "event_state.hpp"
 #include "render/renderer.hpp"
 #include "simulation/world/map_loader.hpp"
@@ -23,9 +23,8 @@ struct Simulation
     AsyncDistanceFieldBuilder distance_field_builder;
 
     explicit
-	Simulation(sf::Window& window)
+	Simulation()
 		: world(Conf::WORLD_WIDTH, Conf::WORLD_HEIGHT)
-		, renderer()
         , distance_field_builder(world.map)
 	{
         distance_field_builder.requestUpdate();

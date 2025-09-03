@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include <common/event_manager.hpp>
+#include <common/events.hpp>
 #include "utils.hpp"
 
 
@@ -43,7 +43,7 @@ struct Item
     bool clicking = false;
     bool catch_event = true;
     bool click_caught = false;
-    sfev::EventMap event_callbacks;
+    pez::EventMapper event_callbacks;
     sf::Vector2<Size> size_type = sf::Vector2<Size>(Size::Auto, Size::Auto);
     // Sub Items
     std::vector<ItemPtr> sub_items;
@@ -227,7 +227,7 @@ struct Item
     void draw(sf::RenderTarget& target, const sf::Drawable& drawable, const sf::RenderStates& states)
     {
         sf::RenderStates default_states = states;
-        default_states.transform.scale(Conf::GUI_SCALE, Conf::GUI_SCALE);
+        default_states.transform.scale({Conf::GUI_SCALE, Conf::GUI_SCALE});
         default_states.transform.translate(offset);
         target.draw(drawable, default_states);
     }
@@ -292,7 +292,7 @@ struct Item
     }
     
     // Attaches new callback to an event
-    void addEventCallback(sf::Event::EventType type, sfev::EventCallback callback)
+    /*void addEventCallback(sf::Event::EventType type, sfev::EventCallback callback)
     {
         event_callbacks.addEventCallback(type, callback);
     }
@@ -301,31 +301,7 @@ struct Item
     void removeCallback(sf::Event::EventType type)
     {
         event_callbacks.removeCallback(type);
-    }
-
-    // Adds a key pressed callback
-    void addKeyPressedCallback(sf::Keyboard::Key key, sfev::EventCallback callback)
-    {
-        event_callbacks.addKeyPressedCallback(key, callback);
-    }
-
-    // Adds a key released callback
-    void addKeyReleasedCallback(sf::Keyboard::Key key, sfev::EventCallback callback)
-    {
-        event_callbacks.addKeyReleasedCallback(key, callback);
-    }
-
-    // Adds a mouse pressed callback
-    void addMousePressedCallback(sf::Mouse::Button button, sfev::EventCallback callback)
-    {
-        event_callbacks.addMousePressedCallback(button, callback);
-    }
-
-    // Adds a mouse released callback
-    void addMouseReleasedCallback(sf::Mouse::Button button, sfev::EventCallback callback)
-    {
-        event_callbacks.addMouseReleasedCallback(button, callback);
-    }
+    }*/
     
     // Runs the callback associated with an event
     void executeCallback(const sf::Event& e) const
@@ -334,15 +310,15 @@ struct Item
             active_item->executeCallback(e);
         }
         else {
-            event_callbacks.executeCallback(e);
+            (void) event_callbacks.tryProcess(e);
         }
     }
-    
-    sf::Vector2f getRelativeMousePosition(ItemPtr item, sf::Vector2f mouse_position) const
+
+    static sf::Vector2f getRelativeMousePosition(ItemPtr const item, sf::Vector2f const mouse_position)
     {
         const sf::Vector2f item_size = item->size;
         const sf::Vector2f rel_mouse_position = mouse_position - item->position;
-        return sf::Vector2f(clamp(rel_mouse_position.x, 0.0f, item_size.x), clamp(rel_mouse_position.y, 0.0f, item_size.y));
+        return {clamp(rel_mouse_position.x, 0.0f, item_size.x), clamp(rel_mouse_position.y, 0.0f, item_size.y)};
     }
     
     void setOffset(sf::Vector2f new_offset)

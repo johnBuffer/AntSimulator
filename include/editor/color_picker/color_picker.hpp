@@ -10,13 +10,13 @@ struct ColorVariation : public GUI::Item
     sf::Color color;
     sf::Color current_color;
     sf::Color selected_color;
-    sf::VertexArray color_va;
+    pez::QuadVertexArray color_va;
     sf::Vector2f selection;
 
     explicit
     ColorVariation(sf::Vector2f size_ = {})
         : GUI::Item(size_)
-        , color_va(sf::Quads, 8)
+        , color_va(2)
         , color(sf::Color::Red)
         , selection(0.0f, 0.0f)
     {
@@ -84,20 +84,20 @@ struct ColorVariation : public GUI::Item
         updateSelectedColor();
     }
     
-    void setColor(sf::Color new_color)
+    void setColor(sf::Color const new_color)
     {
         color = new_color;
-        color_va[1].color = color;
-        color_va[2].color = color;
+        color_va.setVertex1Color(0, color);
+        color_va.setVertex2Color(0, color);
         updateSelectedColor();
     }
     
     void render(sf::RenderTarget& target) override
     {
-        draw(target, color_va);
+        draw(target, color_va.asDrawable());
         const float selection_radius = 8.0f;
         sf::CircleShape c(selection_radius);
-        c.setOrigin(selection_radius, selection_radius);
+        c.setOrigin({selection_radius, selection_radius});
         c.setPosition(position + sf::Vector2f(size.x * (1.0f - selection.x), size.y * (1.0f - selection.y)));
         c.setFillColor(current_color);
         c.setOutlineColor(sf::Color::White);
@@ -123,7 +123,7 @@ struct HueSlider : public GUI::Item
     explicit
     HueSlider(sf::Vector2f size_ = {})
         : GUI::Item(size_)
-        , hues_va(sf::TriangleStrip, 14)
+        , hues_va(sf::PrimitiveType::TriangleStrip, 14)
     {
         colors = {sf::Color::Red, sf::Color::Yellow, sf::Color::Green, sf::Color::Cyan, sf::Color::Blue, sf::Color::Magenta, sf::Color::Red};
         updateVA();

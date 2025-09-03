@@ -27,18 +27,16 @@ struct ViewportHandler
         void updateState()
         {
             const float z = zoom;
-            const float inv_z = 1.0f / z;
             state = sf::RenderStates();
             state.transform.translate(center);
-            state.transform.scale(z, z);
+            state.transform.scale({z, z});
             state.transform.translate(-offset);
         }
 
-        void updateMousePosition(sf::Vector2f new_position)
+        void updateMousePosition(sf::Vector2f const new_position)
         {
             mouse_position = new_position;
-            const sf::Vector2f pos(static_cast<float>(new_position.x), static_cast<float>(new_position.y));
-            mouse_world_position = offset + (pos - center) / zoom;
+            mouse_world_position = offset + (new_position - center) / zoom;
         }
     };
 

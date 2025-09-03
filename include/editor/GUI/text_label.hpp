@@ -18,11 +18,12 @@ struct TextLabel : public Item
     TextLabel(const std::string& label_, uint32_t char_size_, sf::Vector2f size_ = {}, sf::Vector2f position_ = {})
         : Item(position_, size_)
         , label(label_)
+        , text{font}
         , char_size(char_size_)
         , alignment(Alignment::Center)
     {
         padding = 1.0f;
-        font.loadFromFile("res/font.ttf");
+        (void) font.openFromFile("res/font.ttf");
         text.setFont(font);
         text.setCharacterSize(char_size);
         setColor({100, 100, 100});
@@ -64,8 +65,8 @@ struct TextLabel : public Item
 
     void updateSize()
     {
-        setHeight(2.0f * padding + text.getGlobalBounds().height);
-        setWidth(2.0f * padding + text.getGlobalBounds().width);
+        setHeight(2.0f * padding + text.getGlobalBounds().size.y);
+        setWidth(2.0f * padding + text.getGlobalBounds().size.x);
     }
     
     void updateOrigin()
@@ -73,13 +74,13 @@ struct TextLabel : public Item
         const auto text_bounds = text.getGlobalBounds();
         switch (alignment) {
             case Alignment::Center:
-                text.setOrigin(text_bounds.width * 0.5f - size.x * 0.5f, text_bounds.height - size.y * 0.5f);
+                text.setOrigin({text_bounds.size.x * 0.5f - size.x * 0.5f, text_bounds.size.y - size.y * 0.5f});
                 break;
             case Alignment::Left:
                 text.setOrigin({});
                 break;
             case Alignment::Right:
-                text.setOrigin(text_bounds.width - size.x, 0.0f);
+                text.setOrigin({text_bounds.size.x - size.x, 0.0f});
                 break;
             default:
                 break;

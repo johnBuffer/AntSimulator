@@ -2,7 +2,7 @@
 #include "common/viewport_handler.hpp"
 #include "common/utils.hpp"
 #include "simulation/config.hpp"
-#include "common/event_manager.hpp"
+#include "common/events.hpp"
 #include "simulation/world/world.hpp"
 #include "colony_renderer.hpp"
 

@@ -18,8 +18,8 @@ struct Graphic : public sf::Drawable
 
 	float last_value = 0.0f;
 
-	Graphic(uint32_t values_count, sf::Vector2f size, sf::Vector2f position)
-		: va(sf::TriangleStrip, values_count * 2)
+	Graphic(uint32_t const values_count, sf::Vector2f const size, sf::Vector2f const position)
+		: va(sf::PrimitiveType::TriangleStrip, values_count * 2)
 		, values(values_count, 0.0f)
 		, max_value(0.0f)
 		, width(size.x)

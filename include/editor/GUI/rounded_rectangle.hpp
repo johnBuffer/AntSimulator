@@ -34,19 +34,19 @@ public:
 		sf::CircleShape round(m_radius);
 		r1.setFillColor(m_color);
 		r2.setFillColor(m_color);
-		r1.setPosition(m_x + m_radius, m_y);
-		r2.setPosition(m_x, m_y + m_radius);
+		r1.setPosition({m_x + m_radius, m_y});
+		r2.setPosition({m_x, m_y + m_radius});
         round.setFillColor(m_color);
 
 		target.draw(r1, states);
 		target.draw(r2, states);
-		round.setPosition(m_x, m_y);
+		round.setPosition({m_x, m_y});
 		target.draw(round, states);
-		round.setPosition(m_x + m_width - d, m_y);
+		round.setPosition({m_x + m_width - d, m_y});
 		target.draw(round, states);
-		round.setPosition(m_x + m_width - d, m_y + m_height - d);
+		round.setPosition({m_x + m_width - d, m_y + m_height - d});
 		target.draw(round, states);
-		round.setPosition(m_x, m_y + m_height - d);
+		round.setPosition({m_x, m_y + m_height - d});
 		target.draw(round, states);
 	}
 
