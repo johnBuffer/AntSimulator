@@ -3,6 +3,9 @@
 #include <memory>
 #include <SFML/Graphics.hpp>
 
+#include "common/configuration_loader.hpp"
+#include "common/configuration_helper.hpp"
+
 
 template<typename T>
 struct DefaultConf
@@ -16,11 +19,10 @@ struct DefaultConf
 	static float COLONY_SIZE;
 	static float MARKER_INTENSITY;
 	static sf::Vector2f COLONY_POSITION;
-	static uint32_t WIN_WIDTH;
-	static uint32_t WIN_HEIGHT;
+    static sf::Vector2u WINDOW_SIZE;
 	static uint32_t WORLD_WIDTH;
 	static uint32_t WORLD_HEIGHT;
-	static uint32_t ANTS_COUNT;
+	static uint32_t ANT_COUNT;
 	static std::shared_ptr<sf::Texture> ANT_TEXTURE;
 	static std::shared_ptr<sf::Texture> MARKER_TEXTURE;
     static constexpr uint32_t MAX_COLONIES_COUNT = 4;
@@ -44,42 +46,16 @@ struct DefaultConf
 		DefaultConf::MARKER_TEXTURE = nullptr;
 	}
     
-    static bool loadUserConf()
+    static bool loadUserConf(std::string const& conf_filepath)
     {
-        std::ifstream conf_file("conf.txt");
-        if (conf_file) {
-            std::string line;
-            uint32_t line_count = 0;
-            while (std::getline(conf_file, line)) {
-                if (line[0] == '#') {
-                    continue;
-                }
-                const char* line_c = line.c_str();
-                switch (line_count) {
-                    case 0:
-                        DefaultConf<T>::WIN_WIDTH = std::atoi(line_c);
-                        break;
-                    case 1:
-                        DefaultConf<T>::WIN_HEIGHT = std::atoi(line_c);
-                        break;
-                    case 2:
-                        DefaultConf<T>::USE_FULLSCREEN = std::atoi(line_c);
-                        break;
-                    case 3:
-                        DefaultConf<T>::GUI_SCALE = static_cast<float>(std::atof(line_c));
-                        break;
-                    case 4:
-                        DefaultConf<T>::ANTS_COUNT = std::atoi(line_c);
-                        break;
-                    default:
-                        break;
-                }
-                ++line_count;
-            }
-        } else {
-            return false;
+	    cload::ConfigurationLoader const loader{conf_filepath};
+        if (loader.isValid()) {
+            loadInto(loader, "window_size", &DefaultConf<T>::WINDOW_SIZE);
+            loadInto(loader, "fullscreen", &DefaultConf<T>::USE_FULLSCREEN);
+            loadInto(loader, "ant_count", &DefaultConf<T>::ANT_COUNT);
+            return true;
         }
-        return true;
+	    return false;
     }
 };
 
@@ -96,21 +72,19 @@ const sf::Color DefaultConf<T>::COLONY_COLOR = DefaultConf<T>::ANT_COLOR;
 template<typename T>
 const sf::Color DefaultConf<T>::WALL_COLOR = sf::Color(114, 107, 107);
 template<typename T>
-uint32_t DefaultConf<T>::WIN_WIDTH = 1920;
-template<typename T>
-uint32_t DefaultConf<T>::WIN_HEIGHT = 1080;
+sf::Vector2u DefaultConf<T>::WINDOW_SIZE = {1920, 1080};
 template<typename T>
 uint32_t DefaultConf<T>::WORLD_WIDTH = 1920;
 template<typename T>
 uint32_t DefaultConf<T>::WORLD_HEIGHT = 1080;
 template<typename T>
-uint32_t DefaultConf<T>::ANTS_COUNT = 3000;
+uint32_t DefaultConf<T>::ANT_COUNT = 3000;
 template<typename T>
 float DefaultConf<T>::COLONY_SIZE = 20.0f;
 template<typename T>
 float DefaultConf<T>::MARKER_INTENSITY = 8000.0f;
 template<typename T>
-sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(500.0f, DefaultConf<T>::WIN_HEIGHT * 0.5f);
+sf::Vector2f DefaultConf<T>::COLONY_POSITION = sf::Vector2f(500.0f, DefaultConf<T>::WINDOW_SIZE.y * 0.5f);
 
 template<typename T>
 std::shared_ptr<sf::Texture> DefaultConf<T>::ANT_TEXTURE;

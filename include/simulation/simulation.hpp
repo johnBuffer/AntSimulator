@@ -40,7 +40,7 @@ struct Simulation
 	civ::Ref<Colony> createColony(float colony_x, float colony_y)
 	{
 		// Create the colony object
-		const civ::ID colony_id = colonies.emplace_back(colony_x, colony_y, Conf::ANTS_COUNT);
+		const civ::ID colony_id = colonies.emplace_back(colony_x, colony_y, Conf::ANT_COUNT);
 		auto colony_ref = colonies.getRef(colony_id);
         Colony& colony = *colony_ref;
         colony.initialize(to<uint8_t>(colony_id));

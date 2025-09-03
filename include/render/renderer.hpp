@@ -14,7 +14,7 @@ struct Renderer
 	civ::Vector<ColonyRenderer> colonies;
 	
 	Renderer()
-		: vp_handler({ to<float>(Conf::WIN_WIDTH), to<float>(Conf::WIN_HEIGHT) })
+		: vp_handler{static_cast<sf::Vector2f>(Conf::WINDOW_SIZE)}
 	{
 	}
 

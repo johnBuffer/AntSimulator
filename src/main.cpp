@@ -10,7 +10,7 @@
 int main()
 {
     // Load configuration
-    if (Conf::loadUserConf()) {
+    if (Conf::loadUserConf("conf.txt")) {
         std::cout << "Configuration file loaded." << std::endl;
     } else {
         std::cout << "Configuration file couldn't be found." << std::endl;
@@ -18,15 +18,15 @@ int main()
 
     RNGf::initialize();
 
-	sf::ContextSettings settings;
-	settings.antialiasingLevel = 4;
-    int32_t window_style = Conf::USE_FULLSCREEN ? sf::Style::Default : sf::Style::Default;
-	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", window_style, settings);
-	window.setFramerateLimit(60);
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 4;
+    int32_t const window_style = Conf::USE_FULLSCREEN ? sf::Style::Fullscreen : sf::Style::Default;
+    sf::RenderWindow window(sf::VideoMode(Conf::WINDOW_SIZE.x, Conf::WINDOW_SIZE.y), "AntSim", window_style, settings);
+    window.setFramerateLimit(60);
     // Initialize simulation
     Simulation simulation(window);
     // Create editor scene around it
-    GUI::Scene::Ptr scene = create<edtr::EditorScene>(window, simulation);
+    GUI::Scene::Ptr const scene = create<edtr::EditorScene>(window, simulation);
     scene->resize();
     // Main loop
 	while (window.isOpen()) {

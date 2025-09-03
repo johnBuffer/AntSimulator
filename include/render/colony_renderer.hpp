@@ -98,15 +98,15 @@ struct ColonyRenderer
 
     explicit
 	ColonyRenderer(civ::Ref<Colony> colony)
-		: ants_va(sf::Quads, 4 * Conf::ANTS_COUNT)
-		, ants_food_va(sf::Quads, 4 * Conf::ANTS_COUNT)
+		: ants_va(sf::Quads, 4 * Conf::ANT_COUNT)
+		, ants_food_va(sf::Quads, 4 * Conf::ANT_COUNT)
 		, colony_ref(colony)
 	{
 		font.loadFromFile("res/font.ttf");
 		text.setFont(font);
 
         initializeAntsVA();
-		for (uint64_t i(Conf::ANTS_COUNT-1); i--;) {
+		for (uint64_t i(Conf::ANT_COUNT-1); i--;) {
 			const uint64_t index = 4 * i;
 			// Food
 			ants_food_va[index + 0].color = Conf::FOOD_COLOR;
@@ -126,7 +126,7 @@ struct ColonyRenderer
 		const float margin = 10.0f;
 		const sf::Vector2f size(400.0f, 100.0f);
 		const float colonies_count = 2.0f;
-		const float start_x = (Conf::WIN_WIDTH - size.x * colonies_count - (colonies_count - 1.0f) * margin) * 0.5f;
+		const float start_x = (Conf::WINDOW_SIZE.x - size.x * colonies_count - (colonies_count - 1.0f) * margin) * 0.5f;
 		population.configure({start_x + (size.x + margin) * colony_ref->id, margin}, size);
 		population.population.color = colony_ref->ants_color;
 	}
@@ -134,7 +134,7 @@ struct ColonyRenderer
     void initializeAntsVA()
     {
         const Colony& colony = *colony_ref;
-        for (uint64_t i(Conf::ANTS_COUNT-1); i--;) {
+        for (uint64_t i(Conf::ANT_COUNT-1); i--;) {
             const uint64_t index = 4 * i;
             // Ant
             ants_va[index + 0].color = colony.ants_color;
