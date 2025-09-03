@@ -42,7 +42,7 @@ struct Colony
     {
         id = colony_id;
         base.food = 0.0f;
-        uint32_t ants_count = 1000;
+        uint32_t ants_count = Conf::ANTS_COUNT;
         for (uint32_t i(ants_count); i--;) {
             createWorker();
         }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fstream>
 #include <memory>
 #include <SFML/Graphics.hpp>
 
@@ -96,15 +97,15 @@ const sf::Color DefaultConf<T>::COLONY_COLOR = DefaultConf<T>::ANT_COLOR;
 template<typename T>
 const sf::Color DefaultConf<T>::WALL_COLOR = sf::Color(114, 107, 107);
 template<typename T>
-uint32_t DefaultConf<T>::WIN_WIDTH = 1920;
+uint32_t DefaultConf<T>::WIN_WIDTH = 2560;
 template<typename T>
-uint32_t DefaultConf<T>::WIN_HEIGHT = 1080;
+uint32_t DefaultConf<T>::WIN_HEIGHT = 1440;
 template<typename T>
 uint32_t DefaultConf<T>::WORLD_WIDTH = 1920;
 template<typename T>
 uint32_t DefaultConf<T>::WORLD_HEIGHT = 1080;
 template<typename T>
-uint32_t DefaultConf<T>::ANTS_COUNT = 3000;
+uint32_t DefaultConf<T>::ANTS_COUNT = 24000;
 template<typename T>
 float DefaultConf<T>::COLONY_SIZE = 20.0f;
 template<typename T>

@@ -22,6 +22,10 @@ struct WorldView : GUI::Item
         , control_state(control_state_)
     {
         simulation.renderer.vp_handler.reset();
+        simulation.renderer.vp_handler.setFocus(sf::Vector2f(Conf::WORLD_WIDTH * 0.5f, Conf::WORLD_HEIGHT * 0.5f));
+
+        float const base_zoom{0.9f * static_cast<float>(Conf::WIN_WIDTH) / static_cast<float>(Conf::WORLD_WIDTH)};
+        simulation.renderer.vp_handler.setZoom(base_zoom);
         control_state.focus.setValueInstant(simulation.renderer.vp_handler.state.offset);
         control_state.zoom.setValueInstant(simulation.renderer.vp_handler.state.zoom);
     }
@@ -88,7 +92,10 @@ struct WorldView : GUI::Item
     {
         const float dt = 0.016f;
         if (current_time_state == TimeController::State::Play) {
+            sf::Clock clock;
             simulation.update(dt);
+            float const ms = clock.getElapsedTime().asMicroseconds();
+            std::cout << ms << std::endl;
         }
     }
 };
