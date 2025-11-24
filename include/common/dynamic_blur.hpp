@@ -70,8 +70,9 @@ public:
             current_buffer = blurPass(current_buffer, i);
         }
         m_textures[current_buffer].display();
-        m_result.setTexture(m_textures[current_buffer].getTexture());
-        return m_result;
+        sf::Sprite result(m_textures[current_buffer].getTexture());
+        m_result = result;
+        return *m_result;
     }
 
 private:
@@ -83,14 +84,18 @@ private:
     // Shaders
     sf::Shader m_horizontal;
     sf::Shader m_vertical;
-    sf::Sprite m_result;
+    std::optional<sf::Sprite> m_result;
 
     // Methods
     void createTextures()
     {
         // Initialize textures
-        m_textures[0].create(m_render_size.x, m_render_size.y);
-        m_textures[1].create(m_render_size.x, m_render_size.y);
+        m_textures[0].~RenderTexture();
+        m_textures[1].~RenderTexture();
+        // Recreate them in-place using placement new
+        new (&m_textures[0]) sf::RenderTexture({m_render_size.x, m_render_size.y});
+        new (&m_textures[1]) sf::RenderTexture({m_render_size.x, m_render_size.y});
+
         m_textures[0].setSmooth(true);
         m_textures[1].setSmooth(true);
         m_textures[0].setRepeated(true);
@@ -139,21 +144,21 @@ private:
         const int32_t current_pass_size_x = m_render_size.x >> downscale;
         const int32_t current_pass_size_y = m_render_size.y >> downscale;
         // Draw from source to target with separate blur passes
-        sf::Sprite sprite;
-        sprite.setScale(scale, scale);
-        sprite.setTexture(getTexture(source_buffer));
+        sf::Sprite sprite(getTexture(source_buffer));
+        sprite.setScale({scale, scale});
+        // sprite.setTexture(getTexture(source_buffer));
         draw(sprite, !source_buffer);
 
-        sprite.setScale(1.0f, 1.0f);
+        sprite.setScale({1.0f, 1.0f});
         sprite.setTexture(getTexture(!source_buffer));
-        sprite.setTextureRect({0, 0, current_pass_size_x, current_pass_size_y});
+        sprite.setTextureRect(sf::IntRect({0, 0}, {current_pass_size_x, current_pass_size_y}));
         draw(sprite, source_buffer, m_horizontal);
 
         sprite.setTexture(getTexture(source_buffer));
         draw(sprite, !source_buffer, m_vertical);
 
         const float safe_scale = 1.0f;
-        sprite.setScale(inv_scale * safe_scale, inv_scale * safe_scale);
+        sprite.setScale({inv_scale * safe_scale, inv_scale * safe_scale});
         sprite.setTexture(getTexture(!source_buffer));
         draw(sprite, source_buffer);
 
