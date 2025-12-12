@@ -28,7 +28,7 @@ struct CircularGauge
 	{
 		const float ratio = (current_value - min_value) / (max_value - min_value);
 		const float max_angle = 2.0f * PI * ratio;
-		sf::VertexArray va(sf::TriangleStrip, 2 * quality);
+		sf::VertexArray va(sf::PrimitiveType::TriangleStrip, 2 * quality);
 		for (uint32_t i(0); i < quality; ++i) {
 			const float angle = max_angle * (i / float(quality - 1));
 			const sf::Vector2f vec(-cos(angle), -sin(angle));

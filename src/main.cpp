@@ -19,9 +19,10 @@ int main()
     RNGf::initialize();
 
 	sf::ContextSettings settings;
-	settings.antialiasingLevel = 4;
-    int32_t window_style = Conf::USE_FULLSCREEN ? sf::Style::Default : sf::Style::Default;
-	sf::RenderWindow window(sf::VideoMode(Conf::WIN_WIDTH, Conf::WIN_HEIGHT), "AntSim", window_style, settings);
+	settings.antiAliasingLevel = 4;
+    uint32_t window_style = Conf::USE_FULLSCREEN ? sf::Style::Default : sf::Style::Default;
+    std::string title = "AntSim";
+	sf::RenderWindow window(sf::VideoMode({Conf::WIN_WIDTH, Conf::WIN_HEIGHT}), title, window_style, sf::State::Windowed, settings);
 	window.setFramerateLimit(60);
     // Initialize simulation
     Simulation simulation(window);
